@@ -43,8 +43,8 @@ def _go_fix_localmoment(result, ref, shortname=False):
     df1 = pd.DataFrame([[x for x in result.values()]], index=[_CURRENT_],
                        columns=result.keys())
     if ref is not None:
-        df2 = pd.DataFrame([[x for x in result.values()]], index=[_REFERENCE_],
-                           columns=result.keys())
+        df2 = pd.DataFrame([[x for x in ref.values()]], index=[_REFERENCE_],
+                           columns=ref.keys())
     else:
         df2 = None
     return df1, df2
