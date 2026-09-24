@@ -13,7 +13,7 @@ def _show_df_exist(df):
         pass
 
     _df = df.copy()
-    for col_name, v in _df.iteritems():
+    for col_name, v in _df.items():
         vlist = []
         for x in v:
             if isinstance(x, type(_foo)):

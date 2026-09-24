@@ -448,7 +448,7 @@ def go_diff_msg(key, result, ref,
     diffresult = DiffResult(key, result, ref, thres)
     df, df_chk = diffresult.process()
     # df.dropna(axis=0, inplace=True)
-    df.fillna(_FILL_STR_, inplace=True)
+    df = df.astype(object).fillna(_FILL_STR_)
 
     thresbase = ThresBase(thres)
     col = thresbase.key_name

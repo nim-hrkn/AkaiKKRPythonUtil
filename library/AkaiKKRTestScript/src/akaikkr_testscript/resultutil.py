@@ -38,7 +38,7 @@ class ResultUtil:
             v = [np.nan for i in uniq_gonames]
             content.append(v)
 
-        df = pd.DataFrame(content, columns=uniq_gonames,
+        df = pd.DataFrame(content, columns=uniq_gonames, dtype=object,
                           index=uniq_materialnames)
         for materialname, goname in zip(materialnames, gonames):
             name = "_".join([materialname, goname])
