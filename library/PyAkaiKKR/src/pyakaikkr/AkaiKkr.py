@@ -3,6 +3,7 @@
 # Distributed under the terms of the Apache License, Version 2.0.
 
 from pymatgen.core import Structure
+import re
 import subprocess
 import os
 import pandas as pd
@@ -262,14 +263,15 @@ class AkaikkrJob:
             list: newline splitted contents of the file
         """
         if isinstance(outfile, str):
-            if self.data is None:
+            if self.data is None or outfile != self.outfile:
+                # (re)read when no cache or another file is requested
                 self.outfile = outfile
                 filepath = os.path.join(self.path_dir, outfile)
                 data = None
                 with open(filepath) as f:
                     data = f.read().splitlines()
                 self.data = data
-            elif outfile == self.outfile and self.data is not None:
+            else:
                 data = self.data
         elif isinstance(outfile, io.TextIOBase):
             outfile.seek(0) # rewind must be done.
@@ -358,8 +360,6 @@ class AkaikkrJob:
             Returns:
                 [str]: lines in kkr input format
             """
-            print("dic", dic)
-            
             result = []
             nn = 0
             if "displc" in dic:
@@ -476,7 +476,7 @@ class AkaikkrJob:
         if dic["go"] == "fsm":
             card += [str(dic["fspin"])]
         elif dic["go"][:3] == "spc":
-            if "kpath_raw":
+            if "kpath_raw" in dic:
                 card += dic["kpath_raw"]
         if isinstance(inputcard, str):
             with open(self.path_dir+"/"+inputcard, mode="w") as f:
@@ -1475,6 +1475,42 @@ class AkaikkrJob:
         else:
             raise ValueError("failed to get local moment. "
                              "because of unknown mode={}".format(mode))
+
+    def get_component_moment(self, outfile):
+        """get spin and orbital moments of every component of every type.
+
+        The blocks "*** type-<type>  <element> (z= <Z>) ***" followed by
+        "spin moment= ... orbital moment= ..." are read. The order is the same as
+        get_type_of_site() (type order, then component order). If a block appears
+        more than once, the last one is used.
+
+        Args:
+            outfile (str): filename to analyze
+
+        Raises:
+            KKRValueAquisitionError: failed to get keyword
+
+        Returns:
+            list: a list of dict {"type", "element", "Z", "spin", "orbital"}
+        """
+        data = self._read(outfile)
+        pat = re.compile(r"\*\*\* type-(\S+)\s+(\S+)\s+\(z=\s*([0-9.]+)\)\s*\*\*\*")
+        result = {}
+        current = None
+        for line in data:
+            m = pat.search(line)
+            if m:
+                current = (m.group(1), m.group(2), float(m.group(3)))
+                continue
+            if current is not None and "spin moment=" in line and "orbital moment=" in line:
+                spin = float(line.split("spin moment=")[1].split()[0])
+                orbital = float(line.split("orbital moment=")[1].split()[0])
+                result[current] = {"type": current[0], "element": current[1], "Z": current[2],
+                                   "spin": spin, "orbital": orbital}
+                current = None
+        if len(result) == 0:
+            raise KKRValueAquisitionError("failed to get component moments")
+        return list(result.values())
 
     def get_type_charge(self, outfile):
         """get type charges

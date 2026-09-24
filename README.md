@@ -79,6 +79,37 @@ O: passed. X: failed, -: no reference
 As an example, the block spectra $A(w,k)$ of NiFe (FCC $\mathrm{Ni}_{0.9}\mathrm{Fe}_{0.1}$) is generated under the NiFe directory as follows.
 ![](https://github.com/nim-hrkn/AkaiKKRPythonUtil/blob/cpa2021v01_supported/fig/NiFe_Awk_all.png?raw=true)
 
+# ASE interface
+
+`pyakaikkr.ase` runs AkaiKKR through an [ASE](https://wiki.fysik.dtu.dk/ase/) calculator (energy, magmom, magmoms; no forces).
+Install ase by `pip install ase` (or `pip install {PREFIX}/library/PyAkaiKKR[ase]`).
+
+```python
+from ase.build import bulk
+from pyakaikkr.ase import AkaiKKR, set_occupancy
+
+cu = bulk("Cu", "fcc", a=3.615)
+cu.calc = AkaiKKR(directory="cu", command="/path/to/specx < PREFIX.in > PREFIX.out",
+                  magtyp="nmag")
+print(cu.get_potential_energy())          # eV per cell
+
+# CPA alloy: partial occupancies in the ASE convention (atoms.info["occupancy"])
+nife = set_occupancy(bulk("Ni", "fcc", a=3.571), {0: {"Fe": 0.1, "Ni": 0.9}})
+nife.calc = AkaiKKR(directory="nife", command="/path/to/specx < PREFIX.in > PREFIX.out",
+                    sdftyp="pbeasa", bzqlty=8)
+print(nife.get_potential_energy(), nife.get_magnetic_moment())
+print(nife.calc.results["component_moments"])   # moment of each component of each type
+```
+
+The structure is passed as `brvtyp=aux` with `a=|cell[0]|`. Sites are grouped into AkaiKKR types
+when they have the same occupancy and are symmetrically equivalent (spglib).
+CIF files with partial occupancies read by `ase.io.read` work as they are.
+See `docs/ase_calculator_spec.md`.
+
+The test script can use the ASE backend: run `python testrun_ase.py <program_path> --create_ref`
+in `tests/akaikkr` to make `reference/ifort_ase.json`, then `python testrun_ase.py <program_path>`.
+`testrun.py` (pymatgen backend) is unchanged. See `docs/testscript_ase_spec.md`.
+
 # BUG
 - TEST FAILED is always shown at the end of testrun.py.
 - Awk\_both.png is generated at the top directory of testrun.py.

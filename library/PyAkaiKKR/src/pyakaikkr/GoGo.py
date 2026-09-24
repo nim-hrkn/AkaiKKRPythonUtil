@@ -83,6 +83,40 @@ def _cut_only_nn(_jijdf):
     return jijnn
 
 
+def _resolve_flip_list(flip_list, typeofsites):
+    """resolve flip names.
+
+    A name starting with "*" matches every component shortname which ends with
+    the rest of the name, e.g. "*_Mn_25.0%" matches "<type>_Mn_25.0%" of any type.
+    Other names must be exact component shortnames.
+
+    Args:
+        flip_list (list): a list of names
+        typeofsites (list): output of AkaikkrJob.get_type_of_site()
+
+    Raises:
+        ValueError: a name matches nothing
+
+    Returns:
+        list: a list of component shortnames
+    """
+    shortnames = []
+    for comp in typeofsites:
+        shortnames.extend(comp["comp_shortname"])
+    result = []
+    for name in flip_list:
+        if name.startswith("*"):
+            matched = [s for s in shortnames if s.endswith(name[1:])]
+        else:
+            matched = [s for s in shortnames if s == name]
+        if len(matched) == 0:
+            raise ValueError("flip name '{}' matches nothing. candidates={}".format(name, shortnames))
+        for s in matched:
+            if s not in result:
+                result.append(s)
+    return result
+
+
 def _make_inputcard(go):
     return "inputcard_{}".format(go)
 
@@ -318,11 +352,12 @@ class GoFmg(GoGo):
         job = AkaikkrJob(directory)
         outfile = "out_go.log"  # no way to get it
         typeofsites = job.get_type_of_site(outfile)
+        flip_list = _resolve_flip_list(self.flip_list, typeofsites)
         potentialfile1, potentialfile2 = job.default["potentialfile"], "pot_fmg.dat"
         if not self.no_run:
             fmg = Fmg(directory)
             fmg.make_inputfile(typeofsites, potentialfile1, potentialfile2,
-                               self.flip_list)
+                               flip_list)
             fmg.run(self.fmg_exe)
 
         self.param["potentialfile"] = potentialfile2

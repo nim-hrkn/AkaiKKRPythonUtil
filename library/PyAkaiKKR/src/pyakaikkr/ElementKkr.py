@@ -153,7 +153,6 @@ class ElementKKR:
             elm = self.dict[Vc]
             self.dict[Vc] = self._Element(
                 0, elm.rmt, elm.field, elm.lmax)
-            print("debug, _ElementKKR", Vc, ":", self.dict[Vc])
 
     def getAtomicNumber(self, element):
         if element in self.dict:

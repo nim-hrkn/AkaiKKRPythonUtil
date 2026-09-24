@@ -71,6 +71,45 @@ def get_kkr_struc_from_cif(ciffilepath: str, akaikkr_exe: str, displc: bool,
     return struc_param
 
 
+def get_kkr_struc(ciffilepath: str, akaikkr_exe: dict, displc: bool,
+                  use_bravais=True, remove_temperaryfiles=True,
+                  Vc: str = "Og", directory: str = "temporary") -> dict:
+    """get kkr structure parameters with the backend given by akaikkr_exe["backend"].
+
+    backend "cif" (default): get_kkr_struc_from_cif (pymatgen).
+    backend "ase": akaikkr_testscript.asestruc.get_kkr_struc_from_ase (ase is imported here).
+
+    Args:
+        ciffilepath (str): structure file path
+        akaikkr_exe (dict): "specx", "fmg", "args" and optionally "backend"
+        displc (bool): include displc or not
+        use_bravais (bool, optional): use bravais lattice (cif backend only). Defaults to True.
+        remove_temperaryfiles (bool, optional): delete temporary files. Defaults to True.
+        Vc (str, optional): dummy vacancy element. Defaults to "Og".
+        directory (str, optional): working directory of the geom run. Defaults to "temporary".
+
+    Returns:
+        dict: kkr structure parameters
+    """
+    backend = akaikkr_exe.get("backend", "cif")
+    if backend == "cif":
+        return get_kkr_struc_from_cif(ciffilepath, akaikkr_exe["specx"], displc,
+                                      use_bravais=use_bravais,
+                                      remove_temperaryfiles=remove_temperaryfiles,
+                                      Vc=Vc, directory=directory)
+    elif backend == "ase":
+        try:
+            from .asestruc import get_kkr_struc_from_ase
+        except ImportError as e:
+            raise ImportError("backend 'ase' needs the ase package. "
+                              "Install it with 'pip install ase'.") from e
+        return get_kkr_struc_from_ase(ciffilepath, akaikkr_exe["specx"], displc,
+                                      use_bravais=use_bravais,
+                                      remove_temperaryfiles=remove_temperaryfiles,
+                                      Vc=Vc, directory=directory)
+    raise ValueError("unknown backend {}".format(backend))
+
+
 def _atmicx_float2frac(atmicx: list, eps=1e-7) -> list:
     """convert 0.333333 to 1/3, also for 2/3
 
@@ -207,20 +246,27 @@ def _reorder_type(param: dict, typeorder: list) -> dict:
 def change_atomic_type(param: dict, type_rep: dict) -> dict:
     """change type by type_rep.
 
-    change type param["type"] and param["atmicx"] according to type_rep = {"Cu_4a_0": "Cu"}.
+    change type param["type"] and param["atmicx"] according to type_rep = {"Cu_4a_0": "Cu"} or {0: "Cu"}.
 
     Args:
         param (dict): kkr param
         type_rep (dict): replace dict
     """
+    # keys can be type names or type indices
+    name_rep = {}
+    for key, value in type_rep.items():
+        if isinstance(key, int):
+            name_rep[param["type"][key]] = value
+        else:
+            name_rep[key] = value
     newtype = []
     for type_ in param["type"]:
-        newtype.append(type_rep[type_])
+        newtype.append(name_rep[type_])
     param["type"] = newtype
     newatmicx = []
     for atmicx in param["atmicx"]:
         newatmicx.append(
-            [atmicx[0], atmicx[1], atmicx[2], type_rep[atmicx[3]]])
+            [atmicx[0], atmicx[1], atmicx[2], name_rep[atmicx[3]]])
     param["atmicx"] = newatmicx
     return param
 
@@ -243,8 +289,8 @@ def _Cu_common_param(
         dict: kkr input parameters
     """
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -252,7 +298,7 @@ def _Cu_common_param(
     param["magtyp"] = "nmag"
 
     # to compare the results with reference
-    param = change_atomic_type(param, {"Cu_4a_0": "Cu"})
+    param = change_atomic_type(param, {0: "Cu"})  # type name depends on the backend
 
     return param
 
@@ -316,8 +362,8 @@ def _Fe_common_param(
         use_bravais=True, remove_temperaryfiles=False,
         directory="temporary") -> dict:
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -402,8 +448,8 @@ def _Co_common_param(
         use_bravais=True, remove_temperaryfiles=False,
         directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -506,8 +552,8 @@ def _Ni_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../structure/
                      use_bravais=True, remove_temperaryfiles=False,
                      directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -596,8 +642,8 @@ def _AlMnFeCo_bcc_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../
                                use_bravais=True, remove_temperaryfiles=False,
                                directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -632,7 +678,7 @@ def AlMnFeCo_bcc_gofmg(akaikkr_exe,  directory="AlMnFeCo_bcc",
                        comment="bcc AlMnFeCo (magnetic, pbeasa, spin flipped Mn, {})",
                        displc=False, execute_postscript=True):
 
-    flip_list = ["HEA_Mn_25.0%", ]
+    flip_list = ["*_Mn_25.0%", ]  # "*" matches any type name
     gogo = GoFmg(akaikkr_exe, directory,
                  _AlMnFeCo_bcc_common_param(akaikkr_exe=akaikkr_exe,
                                             displc=displc, directory=directory),
@@ -679,9 +725,9 @@ def AlMnFeCo_bcc_j30(akaikkr_exe,  directory="AlMnFeCo_bcc", comment=_AlMnFeCo_b
         outfile = "out_go.log"
         typeofsite = job.get_type_of_site(outfile)
         jijplotter = JijPlotter(gogo.df_jij, directory)
-        jijplotter.make_comppair(
-            "Mn0.25Al0.25Fe0.25Co0.25_2a_0", "Mn0.25Al0.25Fe0.25Co0.25_2a_0", typeofsite,
-        )
+        # type names depend on the pymatgen version. take them from the output.
+        types = [x["type"] for x in typeofsite]
+        jijplotter.make_comppair(types[0], types[0], typeofsite)
     return label, gogo.result
 
 
@@ -723,8 +769,8 @@ def _FeRh05Pt05_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../st
                              use_bravais=True, remove_temperaryfiles=False,
                              directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -809,10 +855,10 @@ def FeRh05Pt05_j30(akaikkr_exe,  directory="FeRh05Pt05",
         job = AkaikkrJob(directory)
         typeofsite = job.get_type_of_site(outfile)
         jijplotter = JijPlotter(gogo.df_jij, directory)
-        jijplotter.make_comppair(
-            "Fe_1a_0", "Rh0.5Pt0.5_1d_1", typeofsite, )
-        jijplotter.make_comppair("Fe_1a_0", "Fe_1a_0",
-                                 typeofsite,)
+        # type names depend on the pymatgen version. take them from the output.
+        types = [x["type"] for x in typeofsite]  # [Fe, RhPt alloy]
+        jijplotter.make_comppair(types[0], types[1], typeofsite)
+        jijplotter.make_comppair(types[0], types[0], typeofsite)
 
     label = "{}_{}".format(directory, gogo.go)
     return label, gogo.result
@@ -844,8 +890,8 @@ def _NiFe_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../structur
                        use_bravais=True, remove_temperaryfiles=False,
                        directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -910,8 +956,9 @@ def NiFe_j30(akaikkr_exe,  directory="NiFe", comment=_NiFe_COMMENT_,
         job = AkaikkrJob(directory)
         typeofsite = job.get_type_of_site(outfile)
         jijplotter = JijPlotter(gogo.df_jij, directory)
-        jijplotter.make_comppair(
-            "Fe0.1Ni0.9_4a_0", "Fe0.1Ni0.9_4a_0", typeofsite, )
+        # type names depend on the pymatgen version. take them from the output.
+        types = [x["type"] for x in typeofsite]
+        jijplotter.make_comppair(types[0], types[0], typeofsite)
     label = "{}_{}".format(directory, gogo.go)
     return label, gogo.result
 
@@ -954,8 +1001,8 @@ def _Fe_lmd_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../struct
                          use_bravais=True, remove_temperaryfiles=False,
                          directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -1052,8 +1099,8 @@ def _FeB195_common_param(akaikkr_exe: dict, displc: bool,
                          use_bravais=True, remove_temperaryfiles=False,
                          directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         Vc="Og", directory=directory)
 
@@ -1105,8 +1152,8 @@ def _GaAs_common_param(akaikkr_exe: dict, displc: bool,
                        use_bravais=True, remove_temperaryfiles=False,
                        directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         Vc="Og", directory=directory)
 
@@ -1170,8 +1217,8 @@ def _Co2MnSi_common_param(akaikkr_exe: dict, displc: bool,
                           use_bravais=True, remove_temperaryfiles=False,
                           directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -1260,8 +1307,8 @@ def _SmCo5_oc_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../stru
                            use_bravais=True, remove_temperaryfiles=False,
                            directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -1273,7 +1320,8 @@ def _SmCo5_oc_common_param(akaikkr_exe: dict, displc: bool, ciffilepath="../stru
     param["sdftyp"] = "mjwasa"
     param["magtyp"] = "mag"
     param["rmt"] = [0.0 for i in range(param["ntyp"])]
-    param["mxl"] = [3, 2, 2]
+    # the type order depends on the backend. mxl=3 for Sm, 2 for Co.
+    param["mxl"] = [3 if t.startswith("Sm") else 2 for t in param["type"]]
 
     return param
 
@@ -1352,8 +1400,8 @@ def _SmCo5_noc_common_param(akaikkr_exe: dict, displc: bool,
                             use_bravais=True, remove_temperaryfiles=False,
                             directory="temporary"):
 
-    param = get_kkr_struc_from_cif(
-        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe["specx"], displc=displc,
+    param = get_kkr_struc(
+        ciffilepath=ciffilepath, akaikkr_exe=akaikkr_exe, displc=displc,
         use_bravais=use_bravais, remove_temperaryfiles=remove_temperaryfiles,
         directory=directory)
 
@@ -1366,7 +1414,8 @@ def _SmCo5_noc_common_param(akaikkr_exe: dict, displc: bool,
     param["magtyp"] = "mag"
     param["pmix"] = 0.005
     param["rmt"] = [0.0 for i in range(param["ntyp"])]
-    param["mxl"] = [3, 2, 2]
+    # the type order depends on the backend. mxl=3 for Sm, 2 for Co.
+    param["mxl"] = [3 if t.startswith("Sm") else 2 for t in param["type"]]
 
     return param
 
@@ -1451,7 +1500,22 @@ def check_go(key: str, result_dic: dict, ref_dic_result: dict):
     return chk
 
 
-def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False):
+def _ref_suffix(backend):
+    return "" if backend == "cif" else "_" + backend
+
+
+def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False, backend="cif"):
+    """run all tests in exe_dic[args.set].
+
+    Args:
+        akaikkr_exe (str): specx filename
+        fmg_exe (str): fmg filename
+        exe_dic (dict): {set name: a list of test functions}
+        displc (bool, optional): add displc (akaikkr_cnd). Defaults to False.
+        backend (str, optional): structure backend, "cif" (pymatgen) or "ase".
+            The reference is reference/<compiler>.json for "cif" and
+            reference/<compiler>_<backend>.json otherwise. Defaults to "cif".
+    """
     # stop using it because line breakig occurs...
     # pd.set_option("display.max_columns", 12)
     pd.set_option("display.precision", 8)
@@ -1459,7 +1523,7 @@ def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False):
 
     args = parse_args()
 
-    ref_file = os.path.join(_REFERENCE_PATH_, args.compiler+".json")
+    ref_file = os.path.join(_REFERENCE_PATH_, args.compiler+_ref_suffix(backend)+".json")
     print(ref_file)
     meta_file = "meta.json"
     meta_str = """{
@@ -1495,6 +1559,7 @@ def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False):
             meta.update(commit)
     else:
         meta = make_meta()
+    meta["backend"] = backend
     print("metadata", meta)
 
     if args.create_ref:
@@ -1526,7 +1591,7 @@ def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False):
         print(f"failed to find {akaikkr_path} or {akaikkr_path}")
         sys.exit(100)
 
-    prog = {"specx": akaikkr_path, "fmg": fmg_path, "args": args}
+    prog = {"specx": akaikkr_path, "fmg": fmg_path, "args": args, "backend": backend}
     execute_postscript = not args.no_postscript
 
     for exe_ in exe_list:
@@ -1566,7 +1631,7 @@ def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False):
         for key, value in ref_dic["meta"].items():
             print("{}: {}".format(key, value))
 
-        result_file = "result.json"
+        result_file = "result{}.json".format(_ref_suffix(backend))
         with open(result_file, "w") as f:
             json.dump({"meta": meta, "result": dump_result_dic}, f, indent=1)
             print()

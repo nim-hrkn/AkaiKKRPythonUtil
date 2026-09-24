@@ -3,6 +3,7 @@
 # Distributed under the terms of the Apache License, Version 2.0.
 
 
+import re
 from copy import deepcopy
 import pandas as pd
 import numpy as np
@@ -271,13 +272,34 @@ class DiffVector:
         return df_diff
 
 
+def _canonical_type_name(name):
+    """make the type name independent of the element order in the formula part.
+
+    Cif2Kkr names a type as <formula>_<wyckoff>_<n>, where <formula> comes from
+    pymatgen's reduced_formula whose element order changed between pymatgen
+    versions (e.g. Rh0.5Pt0.5_1d_1 vs Pt0.5Rh0.5_1d_1). The elements are
+    sorted alphabetically so that results and references made with different
+    pymatgen versions can be compared.
+    """
+    name = str(name)
+    if "_" not in name:
+        return name
+    formula, rest = name.split("_", 1)
+    tokens = re.findall(r"([A-Z][a-z]?)([0-9.]*)", formula)
+    if len(tokens) == 0 or "".join(e + x for e, x in tokens) != formula:
+        return name
+    tokens.sort(key=lambda ex: ex[0])
+    return "".join(e + x for e, x in tokens) + "_" + rest
+
+
 def _sort_types_inside_row(df):
     """exchange type1 and type2 as type1<type2 to compare with another data.
     and add pair column.
+    type names are canonicalized by _canonical_type_name().
     """
     df = df.copy()
-    type1 = df["type1"].values
-    type2 = df["type2"].values
+    type1 = [_canonical_type_name(x) for x in df["type1"].values]
+    type2 = [_canonical_type_name(x) for x in df["type2"].values]
     t1t2_list = []
     for t1, t2 in zip(type1, type2):
         _t1t2 = [t1, t2]
@@ -305,6 +327,7 @@ def _sort_types_inside_row(df):
 def _make_jij_dataframe(result_jij, ref_jij, target="J_ij(meV)"):
     # make jij dataframe
     df_result_jij = pd.DataFrame(result_jij[1:], columns=result_jij[0])
+    df_result_jij = _sort_types_inside_row(df_result_jij)
     df_result_jij = df_result_jij[[
         "comp1", "comp2", "J_ij", "J_ij(meV)", "pair"]]
 

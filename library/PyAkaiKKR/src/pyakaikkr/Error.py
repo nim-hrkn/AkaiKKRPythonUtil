@@ -57,3 +57,8 @@ class KKRFailedExecutionError(Exception):
 class KKRValueAquisitionError(Exception):
     """failed to execute specx"""
     pass
+
+
+class KKRStructureMismatchError(Exception):
+    """the structure in the akaikkr output differs from the input"""
+    pass

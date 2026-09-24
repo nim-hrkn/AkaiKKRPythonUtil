@@ -44,6 +44,9 @@ class Fmg:
 
         # flip if it exists
         for comp in flip_list:
+            if comp not in all_flip_dic:
+                raise ValueError("flip name '{}' is not found in the type of site. candidates={}".format(
+                    comp, comp_shortname_list))
             all_flip_dic[comp] = 1
 
         ilist1 = [i+1 for i in range(len(comp_shortname_list))]
