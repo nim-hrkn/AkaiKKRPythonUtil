@@ -270,3 +270,9 @@ print(hea.get_potential_energy())
 
 - **type 順（追記）**: `rmt=0`（自動決定）のマフィンティン半径は type の並び順に依存する（FeB1.95 で Fe→B と B→Fe で Fe の rmt が 0.381 と 0.474、全エネルギーが 0.02 Ry 違った）。そのため `atoms_to_kkr_types` に `type_order` を追加し、既定を `"electronegativity"`（占有率加重の Pauling 電気陰性度の昇順、同点は出現順、Og などの NaN は最後）にした。これは pymatgen がサイトを並べる規則と同じで、cif 経路と type 順が一致する（consistency テストで順序一致も検査する）。`"appearance"` で出現順にできる。
 - **原子の並び（追記）**: 自動 rmt は原子の並びにも依存する（SmCo5 で type 順を揃えても原子が Co, Co, Sm の順だと rmt が変わった）。`atoms_to_kkr_atmicx` は原子を type 順にまとめて並べる（Cif2Kkr と同じ）。`param["atom_order"]` に行ごとの元の原子 index を持つ。calculator の `magmoms` は元の原子順で返す。
+
+## 10. 後日談（2026-09-24、AiiDA プラグイン整備時に分かったこと）
+
+- **pymatgen の ASE 変換は部分占有を受け付けない。** `pymatgen.io.ase.AseAtomsAdaptor.get_atoms` は部分占有サイトがあると `ValueError: ASE Atoms only supports ordered structures` を投げる（pymatgen 2026.9.24）。本仕様 §3.1 の ASE 表現（`info["occupancy"]` + `spacegroup_kinds`）に pymatgen の `Structure` から変換する経路は無いので、CPA 構造は CIF を `ase.io.read` で読むか `set_occupancy` で作る。AiiDA では `StructureData(pymatgen=...)` が Kind の weights として占有を保持する（aiida-akaikkr のパーサーはこれを使う）。
+- 利用者向けの要点は [ase_calculator_usage.md](ase_calculator_usage.md) にまとめた。
+- 参照ファイルは `reference/ifort_ase.json` として cif 経路と分けた（Cu の aux/fcc の差 1.8e-11 が閾値 1e-11 を超えるため）。

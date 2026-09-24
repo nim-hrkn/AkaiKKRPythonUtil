@@ -1,6 +1,12 @@
 # AkaiKKRPythonUtil
 Python utilities for AkaiKKR
 
+- `library/PyAkaiKKR` (`pyakaikkr`): input-card generation, output parsing, `go/dos/spc/j/tc/fsm/cnd` runner classes, A(w,k)/DOS plotters, an [ASE calculator](#ase-interface).
+- `library/AkaiKKRTestScript` (`akaikkr_testscript`): the per-material test definitions and result comparison used by `tests/`.
+- `tests/akaikkr`, `tests/akaikkr_cnd`, `tests/akaikkr_cpa2021v01`: regression tests against `reference/*.json`.
+- `docs/`: documentation index in [docs/README.md](docs/README.md) (usage of the ASE calculator and the test scripts, the `begin_option` keys, design specs).
+- AiiDA: the separate plugin [aiida-akaikkr](../aiida-akaikkr) runs the same test set as AiiDA CalcJobs.
+
 # License
 
  Copyright (c) 2021-2023 AkaiKKRteam.
@@ -52,9 +58,11 @@ $ make specx fmg
  
 For example, if you use CPA2021V01, (Note that the directory name specified by {PREFIX} must be .../akaikkr_cpa2021v01.)
 ```
-$ cd {PREFIX}
-$ python testrun.py
+$ cd {PREFIX}/tests/akaikkr_cpa2021v01
+$ python testrun.py <program_path> [--set <name>] [--create_ref] [--compiler ifort]
 ```
+`<program_path>` is the directory that contains `akaikkr/specx`, `akaikkr_cnd/specx`, ...
+See [docs/testscript_usage.md](docs/testscript_usage.md) for the options, the reference files and the known last-digit differences.
 
 The following display appears at the end of the execution.
 ```
@@ -104,11 +112,16 @@ print(nife.calc.results["component_moments"])   # moment of each component of ea
 The structure is passed as `brvtyp=aux` with `a=|cell[0]|`. Sites are grouped into AkaiKKR types
 when they have the same occupancy and are symmetrically equivalent (spglib).
 CIF files with partial occupancies read by `ase.io.read` work as they are.
-See `docs/ase_calculator_spec.md`.
+Partial occupancies cannot come through pymatgen's `AseAtomsAdaptor.get_atoms` (it rejects disordered structures); build them with `set_occupancy` or read the CIF with `ase.io.read`.
+See [docs/ase_calculator_usage.md](docs/ase_calculator_usage.md) (usage) and [docs/ase_calculator_spec.md](docs/ase_calculator_spec.md) (design).
 
 The test script can use the ASE backend: run `python testrun_ase.py <program_path> --create_ref`
 in `tests/akaikkr` to make `reference/ifort_ase.json`, then `python testrun_ase.py <program_path>`.
-`testrun.py` (pymatgen backend) is unchanged. See `docs/testscript_ase_spec.md`.
+`testrun.py` (pymatgen backend) is unchanged. See [docs/testscript_usage.md](docs/testscript_usage.md) and [docs/testscript_ase_spec.md](docs/testscript_ase_spec.md).
+
+# AiiDA
+
+[aiida-akaikkr](../aiida-akaikkr) wraps specx as AiiDA CalcJobs (go / fsm / dos / j3.0 / tc / spc31 / cnd). Its `example/run_examples.py` uses the same `_<material>_common_param` definitions as the test script and reproduces `tests/*/reference/ifort.json`; see `aiida-akaikkr/docs/`.
 
 # BUG
 - TEST FAILED is always shown at the end of testrun.py.

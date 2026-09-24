@@ -256,3 +256,9 @@ specx 実行を伴う確認（手動）:
 
 - **type 順（追記）**: `rmt=0`（自動決定）のマフィンティン半径は type の並び順に依存する（FeB1.95 で Fe→B と B→Fe で Fe の rmt が 0.381 と 0.474、全エネルギーが 0.02 Ry 違った）。そのため `atoms_to_kkr_types` に `type_order` を追加し、既定を `"electronegativity"`（占有率加重の Pauling 電気陰性度の昇順、同点は出現順、Og などの NaN は最後）にした。これは pymatgen がサイトを並べる規則と同じで、cif 経路と type 順が一致する（consistency テストで順序一致も検査する）。`"appearance"` で出現順にできる。
 - **原子の並び（追記）**: 自動 rmt は原子の並びにも依存する（SmCo5 で type 順を揃えても原子が Co, Co, Sm の順だと rmt が変わった）。`atoms_to_kkr_atmicx` は原子を type 順にまとめて並べる（Cif2Kkr と同じ）。`param["atom_order"]` に行ごとの元の原子 index を持つ。calculator の `magmoms` は元の原子順で返す。
+
+## 9. 後日談（2026-09-24）
+
+- `tests/akaikkr_cnd` を全件流した際に直した不具合（`*_j30` 後処理の type 名決め打ち、`_canonical_type_name` による Jij `pair` キーの正規化）と、残る 6 件の最終桁差は [testscript_usage.md](testscript_usage.md) §4–5 にまとめた。
+- `AlMnFeCo_bcc_gofmg` は flip 名の修正で本当に Mn を反転するようになったため、旧 cif 参照とは一致しない。参照を作り直すこと。
+- 同じ `_<物質>_common_param` を AiiDA から使う経路を `aiida-akaikkr/example/run_examples.py` に置いた。共通パラメータを構造キー（`brvtyp, a, ..., atmicx, displc`）とそれ以外に分けて CalcJob の `structure` / `parameters` に渡す。akaikkr_cnd では `displc` が無いと specx が "illegal input" で止まるので、`GoGo.execute` と同様に `make_displc_list(anclr)` を付ける。
