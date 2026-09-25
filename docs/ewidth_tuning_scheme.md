@@ -428,6 +428,7 @@ specx が必要（`AKAIKKR_PROGRAM_PATH`）:
 - specx は `a=1000000` をヘッダで `a=*********` と印字する。`get_lattice_constant` は `bravais=` の行から読むので影響しない。
 - DOS の閾値判定は E − E_F の軸で行う。`get_dos` が返すエネルギーは out_dos.log の 1 列目そのもの（E_F 基準）。
 - 移植元の `pot.dat.info` は読まない。
+- **ewidth を微少動かしただけで SCF が収束する / しないことがある**（ユーザー注記、2026-09-25）。積分路の下端 E_F − ewidth が準位や帯の端の近くにあると、わずかな ewidth の違いで下端が準位をまたぐ（`*` の付け替え、reconf の結果が変わる）、あるいは帯の裾を切る量が変わり、収束の可否が反転する。例: Hf 4f が −1.2 Ry にある系で ewidth 1.2 は収束せず 0.9 は収束する（§13.1）、Rb 4p core 指定で 0.5875（valence 帯の底 −0.58 に接する）は発散する（§15.5.1）。したがって、収束しないことだけを理由に「その ewidth 付近に解が無い」とは言えず、ギャップ判定は DOS で行う（§0.2）。逆に、収束したことは積分路がギャップにある証拠にならない（In 4d core の 0.641 は valence 帯の中で収束した）。候補 ewidth は必ずギャップの位置から決め、収束パラメタ（edelt、pmix、bzqlty）の変更と ewidth の変更は別の段階で行う（§7）。
 - DOS 図を出すときは go の ewidth の線を入れる（`DosEXPlotter(..., go_outfile="out_go.log")`、[dos_plot_ewidth_line.md](dos_plot_ewidth_line.md)）。
 - 2019 年の RUN を読むときは、誤り #1 のため `ew_000` に「ewidth=1.2 で計算した結果」しか無い。ewidth は必ず inputcard_go から読み直す。
 - `test_committee_small.py`: 同じ系で `GaesCommittee(ewidth_members=(0.5, 1.0, 1.5), n_parallel=3, maxitr_member=30).run` が `committee` の票と consensus gap を返し、採用した初期 ewidth がその区間に入ること。

@@ -73,6 +73,7 @@ kkr-gaes check --dos RUN/.../out_dos.log --go RUN/.../out_go.log --ewidth 1.2 --
 
 - akaikkr ビルドは Hf を含む go が `reconf` で止まる。cpa2021v01 ビルド（`supprs=.true.`）を使う。詳細は設計書 §13.1。
 - cpa2021v01 の dos は ref=0.5 固定なので、2019 年と同じ窓（下端 −2.25 Ry）には `ewidth_dos=4.5` が要る。
+- ewidth を微少動かしただけで SCF が収束する / しないことがある（下端が準位や帯の端をまたぐため）。収束の可否は ewidth がギャップにある証拠にも反証にもならないので、判定は DOS で行い、収束しない go の DOS も判定に使う（設計書 §12）。
 
 ## テスト
 
