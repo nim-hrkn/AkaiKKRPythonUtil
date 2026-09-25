@@ -1,0 +1,23 @@
+#--- go potentialfile
+ cnd pot.dat
+#--- brvtyp a c/a b/a alpha beta gamma
+bcc 1000000 1.0 1.0 90.0 90.0 90.0
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 0.01 sra pbeasa mag 2nd
+#--- outtyp bzqlty maxitr pmix
+update 40 200 0.01
+#--- ntyp
+1
+#--- type ncmp
+  Mn0.25Al0.25Fe0.25Co0.25_2a_0 4
+#- rmt field mxl
+1.0 0.0 3
+#- anclr conc
+0 0 0 13 25.0
+0 0 0 25 25.0
+0 0 0 26 25.0
+0 0 0 27 25.0
+#--- natm
+1
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Mn0.25Al0.25Fe0.25Co0.25_2a_0

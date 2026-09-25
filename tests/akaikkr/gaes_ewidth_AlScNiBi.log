@@ -1,0 +1,12 @@
+status  : finished
+ewidth  : 1.2375  tried: [1.2, 1.2375]
+gap used: [-1.3125, -1.1025]
+  ewidth 1.2000 new  converged={'fcc': False} coarse=[[-1.657, -1.028]] fine=[[-1.312, -1.103]] candidates=[1.2375]
+     note: region [-2.243, -2.138] (DOS < 0.02) is 0.105 Ry wide < eth 0.30
+     note: region [-2.033, -1.792] (DOS < 0.02) is 0.240 Ry wide < eth 0.30
+     note: region [-0.743, -0.532] (DOS < 0.02) is 0.210 Ry wide < eth 0.30
+  ewidth 1.2375 old  converged={'fcc': True} coarse=[[-1.657, -1.028]] fine=[[-1.312, -1.103]] candidates=[1.2375]
+     note: region [-2.243, -2.138] (DOS < 0.02) is 0.105 Ry wide < eth 0.30
+     note: region [-2.033, -1.792] (DOS < 0.02) is 0.240 Ry wide < eth 0.30
+     note: region [-0.743, -0.532] (DOS < 0.02) is 0.210 Ry wide < eth 0.30
+figure  : gaes_ewidth_AlScNiBi_fcc.png

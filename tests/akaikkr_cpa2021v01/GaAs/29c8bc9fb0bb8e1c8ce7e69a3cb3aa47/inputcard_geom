@@ -1,0 +1,41 @@
+#--- go potentialfile
+geom pot.dat
+#--- brvtyp a c/a b/a alpha beta gamma
+fcc 10.68319295812176 1.0 1.0 90.0 90.0 90.0
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 1.0 sra mjw nmag 2nd
+#--- outtyp bzqlty maxitr pmix
+update 6 0 0.02
+#--- ntyp
+4
+#--- type ncmp
+  Ga_4a_0 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+31 100.0
+#--- type ncmp
+  As_4c_4 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+33 100.0
+#--- type ncmp
+  Og_4b_8 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+0 100.0
+#--- type ncmp
+  Og_4d_9 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+0 100.0
+#--- natm
+4
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Ga_4a_0
+0.25000000a 0.25000000b 0.25000000c As_4c_4
+0.50000000a 0.50000000b 0.50000000c Og_4b_8
+0.75000000a 0.75000000b 0.75000000c Og_4d_9

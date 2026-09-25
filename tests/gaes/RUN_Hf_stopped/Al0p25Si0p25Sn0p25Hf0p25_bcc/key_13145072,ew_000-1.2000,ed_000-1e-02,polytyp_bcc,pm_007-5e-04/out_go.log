@@ -1,0 +1,674 @@
+ 25-Sep-2026
+    14:43:30
+    meshr   mse    ng   mxl
+      400    43    21     3
+
+
+
+   data read in
+   go=go   file=pot.dat                                                         
+   brvtyp=bcc     a=*********  c/a= 1.00000  b/a= 1.00000
+   alpha= 90.0  beta= 90.0  gamma= 90.0
+   edelt= 1.0E-02  ewidth=  1.200  reltyp=sra    sdftyp=pbe      
+   magtyp=mag     record=2nd   outtyp=update  bzqlty=10      
+   maxitr=300  pmix= 0.00050  mixtyp=tchb-brydn
+   ntyp=  1  natm=  1  ncmpx=  4
+
+
+   complex energy mesh
+   1( -1.2000, 0.0000)   2( -1.1995, 0.0078)   3( -1.1979, 0.0167) 
+   4( -1.1946, 0.0268)   5( -1.1890, 0.0381)   6( -1.1805, 0.0506) 
+   7( -1.1681, 0.0644)   8( -1.1509, 0.0793)   9( -1.1278, 0.0951) 
+  10( -1.0980, 0.1116)  11( -1.0605, 0.1282)  12( -1.0147, 0.1445) 
+  13( -0.9605, 0.1599)  14( -0.8981, 0.1736)  15( -0.8285, 0.1849) 
+  16( -0.7532, 0.1934)  17( -0.6743, 0.1985)  18( -0.5940, 0.2000) 
+  19( -0.5148, 0.1980)  20( -0.4390, 0.1927)  21( -0.3684, 0.1845) 
+  22( -0.3045, 0.1741)  23( -0.2481, 0.1620)  24( -0.1995, 0.1489) 
+  25( -0.1585, 0.1354)  26( -0.1245, 0.1220)  27( -0.0968, 0.1089) 
+  28( -0.0746, 0.0966)  29( -0.0571, 0.0851)  30( -0.0433, 0.0746) 
+  31( -0.0327, 0.0652)  32( -0.0246, 0.0567)  33( -0.0184, 0.0491) 
+  34( -0.0137, 0.0425)  35( -0.0102, 0.0367)  36( -0.0075, 0.0316) 
+  37( -0.0056, 0.0272)  38( -0.0041, 0.0233)  39( -0.0030, 0.0200) 
+  40( -0.0022, 0.0172)  41( -0.0016, 0.0147)  42( -0.0012, 0.0126) 
+  43( -0.0009, 0.0108) 
+
+   file to be accessed=pot.dat                                                                                                                                                                                                                                                         
+   created
+ ***wrn in chklat...given rmt's conflict; reduced
+
+   lattice constant
+   bravais=bcc   a=  6.62171   c/a= 1.0000   b/a= 1.0000
+   alpha=  90.00   beta=  90.00   gamma=  90.00
+   unit cell volume=   145.17150(a.u.)
+   volume filling=  68.0%
+
+   primitive translation vectors (in units of a)
+   a=( -0.50000  0.50000  0.50000)
+   b=(  0.50000 -0.50000  0.50000)
+   c=(  0.50000  0.50000 -0.50000)
+
+   reciprocal lattice vectors (in units of 2*pi/a)
+   ga=(  0.00000  1.00000  1.00000)
+   gb=(  1.00000  0.00000  1.00000)
+   gc=(  1.00000  1.00000  0.00000)
+
+   type of site
+   type=HEA  rmt= 0.43301 field=  0.000   lmxtyp=  2
+                  component= 1  anclr=  13.00  conc= 0.2500
+                  component= 2  anclr=  14.00  conc= 0.2500
+                  component= 3  anclr=  50.00  conc= 0.2500
+                  component= 4  anclr=  72.00  conc= 0.2500
+
+   atoms in the unit cell
+   position=   0.00000000   0.00000000   0.00000000  type=HEA
+
+ ***wrn in spmain...eof detected; data generated
+ ***msg in spmain...new ew, ez generated
+   ew=   0.09913  ez=   0.85000
+
+   preta= 0.35542  eta= 0.35542
+
+   symop   E  C4*3   C2*3  C4^3*3   C3*4    C3^2*4      C2'*6
+     g     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+     u     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+
+   last=  243   np=  19   ngpt= 273   nrpt= 169   nk=    256   nd=    1
+
+   atomic potential generated
+
+   itr=  1      rms error = -0.051
+   itr=  2      rms error = -0.698
+   itr=  3      rms error = -1.256
+   itr=  4      rms error = -1.489
+   itr=  5      rms error = -2.307
+   itr=  6      rms error = -2.241
+   itr=  7      rms error = -2.737
+   itr=  8      rms error = -3.493
+   itr=  9      rms error = -3.501
+   itr= 10      rms error = -4.216
+   itr= 11      rms error = -4.548
+   itr= 12      rms error = -4.873
+   itr= 13      rms error = -6.010
+   interval= 13     cpu time=      0.00 sec
+   nuclear charge=13.00
+
+         nl      cnf         energy
+    -----------------------------------
+         1s     2.000       -110.4081
+         2s     2.000         -7.9682
+         2p     6.000         -5.2268
+         3s     2.000         -0.6553
+         3p     1.000         -0.3120
+
+
+
+   itr=  1      rms error = -0.135
+   itr=  2      rms error = -0.827
+   itr=  3      rms error = -1.153
+   itr=  4      rms error = -1.602
+   itr=  5      rms error = -2.020
+   itr=  6      rms error = -2.185
+   itr=  7      rms error = -3.067
+   itr=  8      rms error = -3.179
+   itr=  9      rms error = -3.654
+   itr= 10      rms error = -4.456
+   itr= 11      rms error = -4.475
+   itr= 12      rms error = -5.394
+   itr= 13      rms error = -5.401
+   itr= 14      rms error = -5.964
+   itr= 15      rms error = -6.359
+   interval= 15     cpu time=      0.00 sec
+   nuclear charge=14.00
+
+         nl      cnf         energy
+    -----------------------------------
+         1s     2.000       -130.4744
+         2s     2.000        -10.2569
+         2p     6.000         -7.1371
+         3s     2.000         -0.8791
+         3p     2.000         -0.4047
+
+
+
+   itr=  1      rms error =  0.185
+   itr=  2      rms error = -0.513
+   itr=  3      rms error = -0.985
+   itr=  4      rms error = -1.498
+   itr=  5      rms error = -1.792
+   itr=  6      rms error = -2.230
+   itr=  7      rms error = -2.754
+   itr=  8      rms error = -3.120
+   itr=  9      rms error = -3.565
+   itr= 10      rms error = -3.874
+   itr= 11      rms error = -4.678
+   itr= 12      rms error = -4.682
+   itr= 13      rms error = -5.672
+   itr= 14      rms error = -5.508
+   itr= 15      rms error = -6.003
+   interval= 15     cpu time=      0.00 sec
+   nuclear charge=50.00
+
+         nl      cnf         energy
+    -----------------------------------
+         1s     2.000      -2053.5836
+         2s     2.000       -303.1172
+         2p     6.000       -283.7106
+         3s     2.000        -58.3269
+         3p     6.000        -50.3106
+         3d    10.000        -35.3890
+         4s     2.000         -9.1712
+         4p     6.000         -6.5026
+         4d    10.000         -2.0880
+         5s     2.000         -0.8072
+         5p     2.000         -0.3717
+
+
+
+   itr=  1      rms error =  0.539
+   itr=  2      rms error = -0.421
+   itr=  3      rms error = -0.544
+   itr=  4      rms error = -0.990
+   itr=  5      rms error = -1.621
+   itr=  6      rms error = -1.794
+   itr=  7      rms error = -2.376
+   itr=  8      rms error = -2.834
+   itr=  9      rms error = -3.004
+   itr= 10      rms error = -4.003
+   itr= 11      rms error = -4.004
+   itr= 12      rms error = -4.532
+   itr= 13      rms error = -5.434
+   itr= 14      rms error = -5.119
+   itr= 15      rms error = -5.633
+   itr= 16      rms error = -6.402
+   interval= 16     cpu time=      0.00 sec
+   nuclear charge=72.00
+
+         nl      cnf         energy
+    -----------------------------------
+         1s     2.000      -4421.3497
+         2s     2.000       -722.0703
+         2p     6.000       -691.4302
+         3s     2.000       -163.1093
+         3p     6.000       -148.9687
+         3d    10.000       -122.5256
+         4s     2.000        -31.8340
+         4p     6.000        -26.0093
+         4d    10.000        -15.4203
+         5s     2.000         -4.1685
+         5p     6.000         -2.5609
+         4f    14.000         -1.8109
+         5d     2.000         -0.3511
+         6s     2.000         -0.4037
+
+
+
+   record 1 will be overlaied by input and
+   record 2 will be replaced by new output.
+
+   core configuration for Z= 13
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   core configuration for Z= 14
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   core configuration for Z= 50
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  5  1  3  5  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  5  1  3  5  0  0  0  0  0  0  0  0  0
+
+   core configuration for Z= 72
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  5  1  3  5  1  3  7  0  0  0  0  0  0
+   down    1  1  3  1  3  5  1  3  5  1  3  7  0  0  0  0  0  0
+
+   ***** self-consistent iteration starts *****
+       HEA
+   itr=  1 neu=    2.1146  moment=  1.0827  te= -10889.30036786  err=  1.527
+   itr=  2 neu=    2.0817  moment=  0.3743  te= -10888.90103117  err=  1.558
+   itr=  3 neu=    1.9584  moment=  0.3801  te= -10889.15795222  err=  1.542
+   itr=  4 neu=    1.8021  moment=  0.3929  te= -10889.51060869  err=  1.518
+   itr=  5 neu=    1.6190  moment=  0.4171  te= -10889.95643298  err=  1.483
+   itr=  6 neu=    1.4115  moment=  0.4473  te= -10890.48184208  err=  1.478
+   itr=  7 neu=    1.1841  moment=  0.4652  te= -10891.04379968  err=  1.442
+   itr=  8 neu=    0.9424  moment=  0.4610  te= -10891.60416108  err=  1.392
+   itr=  9 neu=    0.6891  moment=  0.4422  te= -10892.13684338  err=  1.328
+   itr= 10 neu=    0.4306  moment=  0.4289  te= -10892.52227753  err=  1.266
+ ***msg in spmain...new ew and ez generated:
+   ew=  -0.08875  ez=   0.84517
+   itr= 11 neu=    0.1826  moment=  0.4260  te= -10892.57072056  err=  1.252
+   itr= 12 neu=   -0.0086  moment=  0.4219  te= -10892.62769352  err=  1.236
+   itr= 13 neu=   -0.1275  moment=  0.4165  te= -10892.68143499  err=  1.221
+   itr= 14 neu=   -0.1790  moment=  0.4114  te= -10892.72508214  err=  1.208
+   itr= 15 neu=   -0.1796  moment=  0.4066  te= -10892.75956813  err=  1.197
+   itr= 16 neu=   -0.1494  moment=  0.4022  te= -10892.78831430  err=  1.188
+   itr= 17 neu=   -0.1068  moment=  0.3978  te= -10892.81447443  err=  1.179
+   itr= 18 neu=   -0.0651  moment=  0.3934  te= -10892.84000217  err=  1.170
+   itr= 19 neu=   -0.0321  moment=  0.3890  te= -10892.86568641  err=  1.161
+   itr= 20 neu=   -0.0108  moment=  0.3845  te= -10892.89159301  err=  1.151
+   itr= 21 neu=   -0.0007  moment=  0.3801  te= -10892.91748880  err=  1.142
+   itr= 22 neu=    0.0024  moment=  0.3747  te= -10892.94951191  err=  1.129
+   itr= 23 neu=   -0.0006  moment=  0.3684  te= -10892.98566921  err=  1.114
+   itr= 24 neu=   -0.0075  moment=  0.3614  te= -10893.02426434  err=  1.097
+   itr= 25 neu=   -0.0160  moment=  0.3540  te= -10893.06391202  err=  1.079
+   itr= 26 neu=   -0.0237  moment=  0.3463  te= -10893.10353626  err=  1.059
+   itr= 27 neu=   -0.0291  moment=  0.3383  te= -10893.14235643  err=  1.038
+   itr= 28 neu=   -0.0312  moment=  0.3302  te= -10893.17985749  err=  1.016
+   itr= 29 neu=   -0.0300  moment=  0.3220  te= -10893.21574411  err=  0.994
+   itr= 30 neu=   -0.0263  moment=  0.3137  te= -10893.24988387  err=  0.971
+   itr= 31 neu=   -0.0210  moment=  0.3055  te= -10893.28225029  err=  0.948
+   itr= 32 neu=   -0.0153  moment=  0.2974  te= -10893.31287468  err=  0.924
+   itr= 33 neu=   -0.0103  moment=  0.2894  te= -10893.34181399  err=  0.900
+   itr= 34 neu=   -0.0067  moment=  0.2814  te= -10893.36913255  err=  0.876
+   itr= 35 neu=   -1.7547  moment=  0.2756  te= -10881.20293159  err=  1.714
+   itr= 36 neu=    0.1051  moment=  0.2675  te= -10893.39545842  err=  0.864
+   itr= 37 neu=    0.1702  moment=  0.2611  te= -10893.40176047  err=  0.869
+   itr= 38 neu=    0.1861  moment=  0.2547  te= -10893.41200415  err=  0.867
+   itr= 39 neu=    0.1593  moment=  0.2484  te= -10893.42507234  err=  0.859
+   itr= 40 neu=    0.1035  moment=  0.2421  te= -10893.44049193  err=  0.847
+   itr= 41 neu=   -1.7142  moment=  0.2380  te= -10881.20315276  err=  1.714
+   itr= 42 neu=    0.0895  moment=  0.2310  te= -10893.45245141  err=  0.852
+   itr= 43 neu=    0.1125  moment=  0.2260  te= -10893.45258953  err=  0.864
+   itr= 44 neu=    0.1062  moment=  0.2209  te= -10893.45741409  err=  0.868
+   itr= 45 neu=    0.0774  moment=  0.2156  te= -10893.46615991  err=  0.866
+   itr= 46 neu=   -1.7136  moment=  0.2122  te= -10881.33804211  err=  1.709
+   itr= 47 neu=    0.1118  moment=  0.2065  te= -10893.46676496  err=  0.886
+   itr= 48 neu=    0.1478  moment=  0.2023  te= -10893.46248894  err=  0.902
+   itr= 49 neu=    0.1446  moment=  0.1980  te= -10893.46416759  err=  0.908
+   itr= 50 neu=    0.1103  moment=  0.1935  te= -10893.47092376  err=  0.908
+   itr= 51 neu=    0.0580  moment=  0.1890  te= -10893.48194655  err=  0.902
+   itr= 52 neu=    0.0017  moment=  0.1844  te= -10893.49615838  err=  0.891
+   itr= 53 neu=   -1.7964  moment=  0.1810  te= -10881.30436202  err=  1.711
+   itr= 54 neu=    0.0236  moment=  0.1765  te= -10893.50152607  err=  0.901
+   itr= 55 neu=    0.0728  moment=  0.1731  te= -10893.49763226  err=  0.915
+   itr= 56 neu=    0.0951  moment=  0.1695  te= -10893.49974487  err=  0.920
+   itr= 57 neu=    0.0912  moment=  0.1657  te= -10893.50679523  err=  0.918
+   itr= 58 neu=    0.0670  moment=  0.1618  te= -10893.51776597  err=  0.912
+   itr= 59 neu=    0.0315  moment=  0.1579  te= -10893.53167535  err=  0.901
+   itr= 60 neu=   -0.0060  moment=  0.1539  te= -10893.54749035  err=  0.888
+   itr= 61 neu=   -1.7874  moment=  0.1512  te= -10881.29840951  err=  1.711
+   itr= 62 neu=    0.0461  moment=  0.1474  te= -10893.55440502  err=  0.894
+   itr= 63 neu=    0.1017  moment=  0.1447  te= -10893.55141877  err=  0.906
+   itr= 64 neu=    0.1234  moment=  0.1417  te= -10893.55415455  err=  0.909
+   itr= 65 neu=    0.1134  moment=  0.1387  te= -10893.56144289  err=  0.906
+   itr= 66 neu=    0.0800  moment=  0.1355  te= -10893.57234100  err=  0.898
+   itr= 67 neu=    0.0346  moment=  0.1322  te= -10893.58595430  err=  0.886
+   itr= 68 neu=   -1.7614  moment=  0.1304  te= -10881.33905153  err=  1.709
+   itr= 69 neu=    0.0605  moment=  0.1271  te= -10893.59072480  err=  0.893
+   itr= 70 neu=    0.1038  moment=  0.1250  te= -10893.58686610  err=  0.905
+   itr= 71 neu=    0.1152  moment=  0.1227  te= -10893.58867177  err=  0.909
+   itr= 72 neu=    0.0986  moment=  0.1201  te= -10893.59508756  err=  0.906
+   itr= 73 neu=    0.0628  moment=  0.1175  te= -10893.60518271  err=  0.898
+   itr= 74 neu=    0.0188  moment=  0.1148  te= -10893.61797981  err=  0.887
+   itr= 75 neu=   -1.7728  moment=  0.1134  te= -10881.32956811  err=  1.710
+   itr= 76 neu=    0.0528  moment=  0.1107  te= -10893.62073126  err=  0.895
+   itr= 77 neu=    0.1006  moment=  0.1090  te= -10893.61589635  err=  0.907
+   itr= 78 neu=    0.1162  moment=  0.1071  te= -10893.61688329  err=  0.912
+   itr= 79 neu=    0.1028  moment=  0.1050  te= -10893.62259641  err=  0.909
+   itr= 80 neu=    0.0687  moment=  0.1028  te= -10893.63208457  err=  0.902
+   itr= 81 neu=    0.0249  moment=  0.1005  te= -10893.64437877  err=  0.890
+   itr= 82 neu=   -1.7679  moment=  0.0995  te= -10881.35509597  err=  1.708
+   itr= 83 neu=    0.0569  moment=  0.0972  te= -10893.64625710  err=  0.898
+   itr= 84 neu=    0.1033  moment=  0.0959  te= -10893.64101744  err=  0.910
+   itr= 85 neu=    0.1171  moment=  0.0943  te= -10893.64164487  err=  0.914
+   itr= 86 neu=    0.1021  moment=  0.0926  te= -10893.64703909  err=  0.912
+   itr= 87 neu=    0.0668  moment=  0.0908  te= -10893.65624289  err=  0.904
+   itr= 88 neu=    0.0224  moment=  0.0888  te= -10893.66826396  err=  0.892
+   itr= 89 neu=   -0.0204  moment=  0.0867  te= -10893.68196728  err=  0.877
+   itr= 90 neu=   -1.8031  moment=  0.0860  te= -10881.23942682  err=  1.713
+   itr= 91 neu=    0.0299  moment=  0.0839  te= -10893.68429691  err=  0.884
+   itr= 92 neu=    0.0883  moment=  0.0829  te= -10893.67889931  err=  0.897
+   itr= 93 neu=    0.1150  moment=  0.0817  te= -10893.67917755  err=  0.901
+   itr= 94 neu=    0.1108  moment=  0.0803  te= -10893.68400193  err=  0.899
+   itr= 95 neu=    0.0825  moment=  0.0787  te= -10893.69241618  err=  0.891
+   itr= 96 neu=    0.0407  moment=  0.0770  te= -10893.70354264  err=  0.879
+   itr= 97 neu=   -0.0035  moment=  0.0753  te= -10893.71639643  err=  0.864
+   itr= 98 neu=   -1.7907  moment=  0.0749  te= -10881.20248057  err=  1.714
+   itr= 99 neu=    0.0386  moment=  0.0730  te= -10893.71825264  err=  0.871
+   itr=100 neu=    0.0924  moment=  0.0723  te= -10893.71277135  err=  0.884
+   itr=101 neu=    0.1147  moment=  0.0713  te= -10893.71266243  err=  0.889
+   itr=102 neu=    0.1067  moment=  0.0702  te= -10893.71686069  err=  0.887
+   itr=103 neu=    0.0765  moment=  0.0690  te= -10893.72441609  err=  0.879
+   itr=104 neu=    0.0349  moment=  0.0676  te= -10893.73443796  err=  0.868
+   itr=105 neu=   -0.0073  moment=  0.0662  te= -10893.74594648  err=  0.853
+   itr=106 neu=   -1.7913  moment=  0.0661  te= -10881.15888624  err=  1.715
+   itr=107 neu=    0.0410  moment=  0.0646  te= -10893.74547536  err=  0.862
+   itr=108 neu=    0.0955  moment=  0.0641  te= -10893.73933531  err=  0.876
+   itr=109 neu=    0.1169  moment=  0.0635  te= -10893.73858235  err=  0.881
+   itr=110 neu=    0.1078  moment=  0.0626  te= -10893.74210223  err=  0.880
+   itr=111 neu=    0.0766  moment=  0.0616  te= -10893.74896975  err=  0.872
+   itr=112 neu=    0.0342  moment=  0.0604  te= -10893.75830641  err=  0.861
+   itr=113 neu=   -0.0085  moment=  0.0592  te= -10893.76913619  err=  0.846
+   itr=114 neu=   -1.7926  moment=  0.0594  te= -10881.12877883  err=  1.716
+   itr=115 neu=    0.0398  moment=  0.0580  te= -10893.76771819  err=  0.857
+   itr=116 neu=    0.0945  moment=  0.0578  te= -10893.76119556  err=  0.871
+   itr=117 neu=    0.1164  moment=  0.0573  te= -10893.75999942  err=  0.877
+   itr=118 neu=    0.1078  moment=  0.0565  te= -10893.76304227  err=  0.875
+   itr=119 neu=    0.0770  moment=  0.0557  te= -10893.76941335  err=  0.868
+   itr=120 neu=    0.0348  moment=  0.0547  te= -10893.77824875  err=  0.857
+   itr=121 neu=   -0.0077  moment=  0.0536  te= -10893.78858434  err=  0.842
+   itr=122 neu=   -1.7919  moment=  0.0539  te= -10881.11217381  err=  1.717
+   itr=123 neu=    0.0405  moment=  0.0527  te= -10893.78649133  err=  0.853
+   itr=124 neu=    0.0952  moment=  0.0526  te= -10893.77970230  err=  0.868
+   itr=125 neu=    0.1168  moment=  0.0522  te= -10893.77819701  err=  0.874
+   itr=126 neu=    0.1080  moment=  0.0516  te= -10893.78090455  err=  0.872
+   itr=127 neu=    0.0770  moment=  0.0508  te= -10893.78692839  err=  0.865
+   itr=128 neu=    0.0347  moment=  0.0500  te= -10893.79540999  err=  0.854
+   itr=129 neu=   -0.0079  moment=  0.0490  te= -10893.80539041  err=  0.840
+   itr=130 neu=   -1.7921  moment=  0.0493  te= -10881.10004103  err=  1.717
+   itr=131 neu=    0.0403  moment=  0.0483  te= -10893.80275040  err=  0.851
+   itr=132 neu=    0.0951  moment=  0.0482  te= -10893.79572615  err=  0.866
+   itr=133 neu=    0.1169  moment=  0.0479  te= -10893.79396088  err=  0.872
+   itr=134 neu=    0.1081  moment=  0.0475  te= -10893.79639620  err=  0.871
+   itr=135 neu=    0.0771  moment=  0.0468  te= -10893.80214070  err=  0.864
+   itr=136 neu=    0.0348  moment=  0.0460  te= -10893.81034202  err=  0.852
+   itr=137 neu=   -0.0078  moment=  0.0452  te= -10893.82004257  err=  0.838
+   itr=138 neu=   -0.0420  moment=  0.0443  te= -10893.83027799  err=  0.823
+   itr=139 neu=   -1.8127  moment=  0.0446  te= -10880.99431293  err=  1.721
+   itr=140 neu=    0.0304  moment=  0.0436  te= -10893.82729633  err=  0.834
+   itr=141 neu=    0.0957  moment=  0.0436  te= -10893.82024598  err=  0.851
+   itr=142 neu=    0.1247  moment=  0.0434  te= -10893.81838708  err=  0.857
+   itr=143 neu=    0.1198  moment=  0.0430  te= -10893.82052116  err=  0.856
+   itr=144 neu=    0.0896  moment=  0.0425  te= -10893.82572640  err=  0.849
+   itr=145 neu=    0.0461  moment=  0.0418  te= -10893.83320798  err=  0.838
+   itr=146 neu=    0.0010  moment=  0.0411  te= -10893.84208142  err=  0.824
+   itr=147 neu=   -0.0361  moment=  0.0403  te= -10893.85142949  err=  0.808
+   itr=148 neu=   -1.8095  moment=  0.0408  te= -10880.94071615  err=  1.722
+   itr=149 neu=    0.0316  moment=  0.0399  te= -10893.84746593  err=  0.822
+   itr=150 neu=    0.0937  moment=  0.0400  te= -10893.84028735  err=  0.838
+   itr=151 neu=    0.1207  moment=  0.0399  te= -10893.83807989  err=  0.845
+   itr=152 neu=    0.1151  moment=  0.0396  te= -10893.83973712  err=  0.845
+   itr=153 neu=    0.0855  moment=  0.0391  te= -10893.84438396  err=  0.838
+   itr=154 neu=    0.0432  moment=  0.0385  te= -10893.85124143  err=  0.827
+   itr=155 neu=   -0.0002  moment=  0.0379  te= -10893.85945188  err=  0.813
+   itr=156 neu=   -1.7858  moment=  0.0385  te= -10880.99855953  err=  1.720
+   itr=157 neu=    0.0460  moment=  0.0377  te= -10893.85483494  err=  0.828
+   itr=158 neu=    0.0980  moment=  0.0379  te= -10893.84741659  err=  0.844
+   itr=159 neu=    0.1163  moment=  0.0378  te= -10893.84497504  err=  0.851
+   itr=160 neu=    0.1048  moment=  0.0376  te= -10893.84647423  err=  0.850
+   itr=161 neu=    0.0726  moment=  0.0372  te= -10893.85104378  err=  0.844
+   itr=162 neu=    0.0315  moment=  0.0367  te= -10893.85774301  err=  0.833
+   itr=163 neu=   -0.0082  moment=  0.0361  te= -10893.86564469  err=  0.820
+   itr=164 neu=   -0.0386  moment=  0.0354  te= -10893.87388981  err=  0.806
+   itr=165 neu=   -1.8059  moment=  0.0360  te= -10880.93574624  err=  1.722
+   itr=166 neu=    0.0401  moment=  0.0353  te= -10893.86811060  err=  0.822
+   itr=167 neu=    0.1029  moment=  0.0355  te= -10893.86060060  err=  0.839
+   itr=168 neu=    0.1277  moment=  0.0355  te= -10893.85819106  err=  0.846
+   itr=169 neu=    0.1186  moment=  0.0353  te= -10893.85965265  err=  0.845
+   itr=170 neu=    0.0856  moment=  0.0349  te= -10893.86406560  err=  0.838
+   itr=171 neu=    0.0414  moment=  0.0345  te= -10893.87061399  err=  0.827
+   itr=172 neu=   -0.0026  moment=  0.0339  te= -10893.87840152  err=  0.813
+   itr=173 neu=   -0.0374  moment=  0.0333  te= -10893.88654505  err=  0.798
+   itr=174 neu=   -1.8082  moment=  0.0339  te= -10880.89910207  err=  1.723
+   itr=175 neu=    0.0353  moment=  0.0333  te= -10893.88080880  err=  0.814
+   itr=176 neu=    0.0971  moment=  0.0335  te= -10893.87324634  err=  0.832
+   itr=177 neu=    0.1223  moment=  0.0336  te= -10893.87065499  err=  0.839
+   itr=178 neu=    0.1146  moment=  0.0334  te= -10893.87186136  err=  0.838
+   itr=179 neu=    0.0836  moment=  0.0331  te= -10893.87595974  err=  0.832
+   itr=180 neu=    0.0413  moment=  0.0326  te= -10893.88214786  err=  0.821
+   itr=181 neu=   -0.0012  moment=  0.0321  te= -10893.88956078  err=  0.807
+   itr=182 neu=   -0.0351  moment=  0.0316  te= -10893.89735165  err=  0.793
+   itr=183 neu=   -1.8057  moment=  0.0322  te= -10880.87961329  err=  1.723
+   itr=184 neu=    0.0379  moment=  0.0316  te= -10893.89135331  err=  0.810
+   itr=185 neu=    0.0994  moment=  0.0319  te= -10893.88375339  err=  0.827
+   itr=186 neu=    0.1239  moment=  0.0319  te= -10893.88104983  err=  0.835
+   itr=187 neu=    0.1154  moment=  0.0318  te= -10893.88209245  err=  0.834
+   itr=188 neu=    0.0836  moment=  0.0315  te= -10893.88599781  err=  0.828
+   itr=189 neu=    0.0407  moment=  0.0311  te= -10893.89197579  err=  0.817
+   itr=190 neu=   -0.0020  moment=  0.0306  te= -10893.89916607  err=  0.803
+   itr=191 neu=   -0.0360  moment=  0.0301  te= -10893.90672545  err=  0.789
+   itr=192 neu=   -0.0564  moment=  0.0295  te= -10893.91402635  err=  0.774
+   itr=193 neu=   -1.8124  moment=  0.0301  te= -10880.79765040  err=  1.726
+   itr=194 neu=    0.0422  moment=  0.0295  te= -10893.90743639  err=  0.793
+   itr=195 neu=    0.1112  moment=  0.0298  te= -10893.89997147  err=  0.812
+   itr=196 neu=    0.1392  moment=  0.0299  te= -10893.89724488  err=  0.820
+   itr=197 neu=    0.1303  moment=  0.0298  te= -10893.89807391  err=  0.820
+   itr=198 neu=    0.0954  moment=  0.0295  te= -10893.90164374  err=  0.813
+   itr=199 neu=    0.0478  moment=  0.0291  te= -10893.90725519  err=  0.802
+   itr=200 neu=    0.0002  moment=  0.0287  te= -10893.91408767  err=  0.788
+   itr=201 neu=   -0.0378  moment=  0.0282  te= -10893.92128284  err=  0.773
+   itr=202 neu=   -1.8108  moment=  0.0289  te= -10880.79162467  err=  1.726
+   itr=203 neu=    0.0309  moment=  0.0283  te= -10893.91490314  err=  0.792
+   itr=204 neu=    0.0924  moment=  0.0287  te= -10893.90716118  err=  0.811
+   itr=205 neu=    0.1184  moment=  0.0288  te= -10893.90407658  err=  0.820
+   itr=206 neu=    0.1123  moment=  0.0287  te= -10893.90459096  err=  0.820
+   itr=207 neu=    0.0830  moment=  0.0285  te= -10893.90786261  err=  0.814
+   itr=208 neu=    0.0421  moment=  0.0281  te= -10893.91314322  err=  0.804
+   itr=209 neu=    0.0007  moment=  0.0277  te= -10893.91962878  err=  0.791
+   itr=210 neu=   -0.0327  moment=  0.0272  te= -10893.92652733  err=  0.776
+   itr=211 neu=   -0.0533  moment=  0.0268  te= -10893.93323700  err=  0.762
+   itr=212 neu=   -1.8100  moment=  0.0274  te= -10880.74874726  err=  1.727
+   itr=213 neu=    0.0440  moment=  0.0269  te= -10893.92627944  err=  0.782
+   itr=214 neu=    0.1123  moment=  0.0272  te= -10893.91875023  err=  0.802
+   itr=215 neu=    0.1395  moment=  0.0273  te= -10893.91579558  err=  0.811
+   itr=216 neu=    0.1301  moment=  0.0272  te= -10893.91629195  err=  0.811
+   itr=217 neu=    0.0949  moment=  0.0270  te= -10893.91946495  err=  0.804
+   itr=218 neu=    0.0471  moment=  0.0267  te= -10893.92464067  err=  0.794
+   itr=219 neu=   -0.0004  moment=  0.0263  te= -10893.93101863  err=  0.780
+   itr=220 neu=   -0.0381  moment=  0.0259  te= -10893.93775969  err=  0.765
+   itr=221 neu=   -1.8109  moment=  0.0265  te= -10880.75297177  err=  1.727
+   itr=222 neu=    0.0310  moment=  0.0261  te= -10893.93097152  err=  0.785
+   itr=223 neu=    0.0927  moment=  0.0264  te= -10893.92312405  err=  0.805
+   itr=224 neu=    0.1189  moment=  0.0266  te= -10893.91983734  err=  0.813
+   itr=225 neu=    0.1128  moment=  0.0265  te= -10893.92008499  err=  0.814
+   itr=226 neu=    0.0834  moment=  0.0263  te= -10893.92304936  err=  0.808
+   itr=227 neu=    0.0425  moment=  0.0260  te= -10893.92800113  err=  0.798
+   itr=228 neu=    0.0010  moment=  0.0257  te= -10893.93415138  err=  0.785
+   itr=229 neu=   -0.0326  moment=  0.0253  te= -10893.94071894  err=  0.771
+   itr=230 neu=   -0.0532  moment=  0.0248  te= -10893.94710817  err=  0.756
+   itr=231 neu=   -1.8100  moment=  0.0254  te= -10880.72166310  err=  1.728
+   itr=232 neu=    0.0440  moment=  0.0250  te= -10893.93983993  err=  0.778
+   itr=233 neu=    0.1123  moment=  0.0253  te= -10893.93221300  err=  0.798
+   itr=234 neu=    0.1396  moment=  0.0255  te= -10893.92909586  err=  0.807
+   itr=235 neu=    0.1302  moment=  0.0254  te= -10893.92938769  err=  0.807
+   itr=236 neu=    0.0950  moment=  0.0253  te= -10893.93232957  err=  0.801
+   itr=237 neu=    0.0473  moment=  0.0250  te= -10893.93725908  err=  0.790
+   itr=238 neu=   -0.0003  moment=  0.0246  te= -10893.94338561  err=  0.777
+   itr=239 neu=   -0.0380  moment=  0.0242  te= -10893.94987762  err=  0.762
+   itr=240 neu=   -0.0608  moment=  0.0238  te= -10893.95609616  err=  0.747
+   itr=241 neu=   -1.8176  moment=  0.0244  te= -10880.67235520  err=  1.729
+   itr=242 neu=    0.0364  moment=  0.0240  te= -10893.94861695  err=  0.769
+   itr=243 neu=    0.1062  moment=  0.0244  te= -10893.94088385  err=  0.791
+   itr=244 neu=    0.1359  moment=  0.0245  te= -10893.93758617  err=  0.800
+   itr=245 neu=    0.1292  moment=  0.0245  te= -10893.93764926  err=  0.801
+   itr=246 neu=    0.0962  moment=  0.0243  te= -10893.94031664  err=  0.795
+   itr=247 neu=    0.0499  moment=  0.0241  te= -10893.94494616  err=  0.784
+   itr=248 neu=    0.0030  moment=  0.0237  te= -10893.95078364  err=  0.771
+   itr=249 neu=   -0.0349  moment=  0.0234  te= -10893.95702631  err=  0.756
+   itr=250 neu=   -0.0584  moment=  0.0229  te= -10893.96304191  err=  0.742
+   itr=251 neu=   -1.8162  moment=  0.0236  te= -10880.65120868  err=  1.730
+   itr=252 neu=    0.0370  moment=  0.0232  te= -10893.95550699  err=  0.765
+   itr=253 neu=    0.1061  moment=  0.0236  te= -10893.94777996  err=  0.786
+   itr=254 neu=    0.1354  moment=  0.0237  te= -10893.94441019  err=  0.796
+   itr=255 neu=    0.1284  moment=  0.0237  te= -10893.94435289  err=  0.797
+   itr=256 neu=    0.0954  moment=  0.0236  te= -10893.94686904  err=  0.791
+   itr=257 neu=    0.0493  moment=  0.0233  te= -10893.95132608  err=  0.781
+   itr=258 neu=    0.0027  moment=  0.0230  te= -10893.95697918  err=  0.767
+   itr=259 neu=   -0.0350  moment=  0.0226  te= -10893.96303664  err=  0.753
+   itr=260 neu=   -0.0582  moment=  0.0222  te= -10893.96887588  err=  0.738
+   itr=261 neu=   -1.8159  moment=  0.0229  te= -10880.63511207  err=  1.730
+   itr=262 neu=    0.0375  moment=  0.0225  te= -10893.96121400  err=  0.761
+   itr=263 neu=    0.1066  moment=  0.0229  te= -10893.95346740  err=  0.783
+   itr=264 neu=    0.1358  moment=  0.0231  te= -10893.95003517  err=  0.793
+   itr=265 neu=    0.1287  moment=  0.0231  te= -10893.94988583  err=  0.794
+   itr=266 neu=    0.0955  moment=  0.0229  te= -10893.95229187  err=  0.789
+   itr=267 neu=    0.0493  moment=  0.0227  te= -10893.95662901  err=  0.778
+   itr=268 neu=    0.0026  moment=  0.0224  te= -10893.96215831  err=  0.765
+   itr=269 neu=   -0.0351  moment=  0.0220  te= -10893.96809220  err=  0.751
+   itr=270 neu=   -0.0583  moment=  0.0217  te= -10893.97381082  err=  0.736
+   itr=271 neu=   -1.8159  moment=  0.0223  te= -10880.62290223  err=  1.730
+   itr=272 neu=    0.0374  moment=  0.0219  te= -10893.96604420  err=  0.760
+   itr=273 neu=    0.1066  moment=  0.0223  te= -10893.95827026  err=  0.781
+   itr=274 neu=    0.1358  moment=  0.0225  te= -10893.95478331  err=  0.791
+   itr=275 neu=    0.1288  moment=  0.0225  te= -10893.95456081  err=  0.793
+   itr=276 neu=    0.0956  moment=  0.0224  te= -10893.95688178  err=  0.787
+   itr=277 neu=    0.0494  moment=  0.0222  te= -10893.96112721  err=  0.777
+   itr=278 neu=    0.0027  moment=  0.0219  te= -10893.96656261  err=  0.764
+   itr=279 neu=   -0.0350  moment=  0.0215  te= -10893.97240372  err=  0.749
+   itr=280 neu=   -0.0583  moment=  0.0212  te= -10893.97803256  err=  0.735
+   itr=281 neu=   -1.8159  moment=  0.0218  te= -10880.61410897  err=  1.730
+   itr=282 neu=    0.0374  moment=  0.0215  te= -10893.97018022  err=  0.758
+   itr=283 neu=    0.1067  moment=  0.0219  te= -10893.96238045  err=  0.780
+   itr=284 neu=    0.1359  moment=  0.0221  te= -10893.95884908  err=  0.791
+   itr=285 neu=    0.1288  moment=  0.0221  te= -10893.95856984  err=  0.792
+   itr=286 neu=    0.0956  moment=  0.0220  te= -10893.96082618  err=  0.786
+   itr=287 neu=    0.0495  moment=  0.0217  te= -10893.96500237  err=  0.776
+   itr=288 neu=    0.0027  moment=  0.0215  te= -10893.97036656  err=  0.763
+   itr=289 neu=   -0.0350  moment=  0.0211  te= -10893.97613647  err=  0.748
+   itr=290 neu=   -0.0583  moment=  0.0208  te= -10893.98169541  err=  0.734
+   itr=291 neu=   -1.8159  moment=  0.0214  te= -10880.60746682  err=  1.730
+   itr=292 neu=    0.0375  moment=  0.0211  te= -10893.97376730  err=  0.758
+   itr=293 neu=    0.1067  moment=  0.0215  te= -10893.96594218  err=  0.780
+   itr=294 neu=    0.1359  moment=  0.0217  te= -10893.96237321  err=  0.790
+   itr=295 neu=    0.1288  moment=  0.0217  te= -10893.96204826  err=  0.791
+   itr=296 neu=    0.0957  moment=  0.0216  te= -10893.96425372  err=  0.786
+   itr=297 neu=    0.0495  moment=  0.0214  te= -10893.96837602  err=  0.776
+   itr=298 neu=    0.0027  moment=  0.0211  te= -10893.97368485  err=  0.762
+   itr=299 neu=   -0.0350  moment=  0.0208  te= -10893.97939903  err=  0.748
+   itr=300 neu=   -0.0583  moment=  0.0204  te= -10893.98490256  err=  0.733
+   *** no convergence
+   interval=300     cpu time=     15.14 sec
+   sdftyp=pbe     reltyp=sra     dmpc= 0.00050
+       HEA
+   itr=300  neu -0.0583  chr,spn   3.7500000   0.0204135  intc,ints  1.0042  0.0003
+   rms err=  0.048  0.033  0.054  0.733  0.048  0.033
+             0.054  0.727
+   ef=   0.5015206   0.5014795  def=     4.6159692     4.5929244
+   band energy=    0.891658882   total energy= -10893.984902557
+   magnetization=   0.0111 T
+
+
+
+
+
+
+
+                             *** type-HEA     Al (z= 13.0) ***
+   core charge in the muffin-tin sphere = 9.9997042
+   valence charge in the cell (spin up  ) =     0.48522(s)   0.41908(p)   0.08512(d)
+   valence charge in the cell (spin down) =     0.48671(s)   0.41996(p)   0.08449(d)
+   total charge=  11.98029   valence charge (up/down)=   0.98942   0.99116
+   spin moment=  -0.00174  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -110.2557863 Ry(1s)        -7.0981735 Ry(2s)        -4.2672182 Ry(2p) 
+   core level  (spin down)
+      -110.2558522 Ry(1s)        -7.0982534 Ry(2s)        -4.2673025 Ry(2p) 
+
+   hyperfine field of Al
+       -3.729 kG (core=    -0.020 kG  valence=    -3.709 kG  orbital=     0.000 kG )
+   core contribution
+       -0.027 kG(1s)        0.007 kG(2s)
+
+   charge density at the nucleus
+        1501.0022 (core=     1497.0068  valence=        3.9924 )
+   core contribution
+        1402.0039(1s)          95.0029(2s)
+
+
+
+                             *** type-HEA     Si (z= 14.0) ***
+   core charge in the muffin-tin sphere = 9.9999597
+   valence charge in the cell (spin up  ) =     0.73672(s)   0.69872(p)   0.09185(d)
+   valence charge in the cell (spin down) =     0.73674(s)   0.70165(p)   0.09118(d)
+   total charge=  13.05682   valence charge (up/down)=   1.52729   1.52957
+   spin moment=  -0.00228  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -130.4636581 Ry(1s)        -9.4012846 Ry(2s)        -6.1731438 Ry(2p) 
+   core level  (spin down)
+      -130.4637217 Ry(1s)        -9.4013495 Ry(2s)        -6.1732186 Ry(2p) 
+
+   hyperfine field of Si
+        0.726 kG (core=     0.062 kG  valence=     0.664 kG  orbital=     0.000 kG )
+   core contribution
+        0.136 kG(1s)       -0.074 kG(2s)
+
+   charge density at the nucleus
+        1908.9689 (core=     1900.3166  valence=        8.6477 )
+   core contribution
+        1774.4674(1s)         125.8492(2s)
+
+
+
+                             *** type-HEA     Sn (z= 50.0) ***
+   core charge in the muffin-tin sphere =45.9438589
+   valence charge in the cell (spin up  ) =     0.68549(s)   0.63929(p)   0.07389(d)
+   valence charge in the cell (spin down) =     0.68571(s)   0.64143(p)   0.07331(d)
+   total charge=  48.74297   valence charge (up/down)=   1.39867   1.40044
+   spin moment=  -0.00177  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+     -2133.2500817 Ry(1s)      -321.4930781 Ry(2s)      -288.6279962 Ry(2p) 
+       -61.3553896 Ry(3s)       -50.5983525 Ry(3p)       -34.0166804 Ry(3d) 
+        -9.0020784 Ry(4s)        -5.7523504 Ry(4p)        -1.0589902 Ry(4d) 
+   core level  (spin down)
+     -2133.2501280 Ry(1s)      -321.4931140 Ry(2s)      -288.6280361 Ry(2p) 
+       -61.3554318 Ry(3s)       -50.5983951 Ry(3p)       -34.0167207 Ry(3d) 
+        -9.0021160 Ry(4s)        -5.7523902 Ry(4p)        -1.0590560 Ry(4d) 
+
+   hyperfine field of Sn
+       -1.828 kG (core=    -0.047 kG  valence=    -1.781 kG  orbital=     0.000 kG )
+   core contribution
+        0.086 kG(1s)       -0.089 kG(2s)       -0.007 kG(3s)       -0.037 kG(4s)
+
+   charge density at the nucleus
+      190352.5809 (core=   190278.2416  valence=       69.0664 )
+   core contribution
+      166218.7107(1s)       19506.7189(2s)        3789.7568(3s)         763.0552(4s)
+
+
+
+                             *** type-HEA     Hf (z= 72.0) ***
+   core charge in the muffin-tin sphere =67.9441040
+   valence charge in the cell (spin up  ) =     0.23339(s)   0.15969(p)   1.27913(d)
+   valence charge in the cell (spin down) =     0.23017(s)   0.15690(p)   1.19956(d)
+   total charge=  71.20295   valence charge (up/down)=   1.67221   1.58663
+   spin moment=   0.08558  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+     -4802.8165362 Ry(1s)      -821.9186429 Ry(2s)      -722.1723089 Ry(2p) 
+      -187.0138211 Ry(3s)      -157.1646454 Ry(3p)      -121.7555877 Ry(3d) 
+       -37.3205256 Ry(4s)       -27.5093106 Ry(4p)       -14.8000214 Ry(4d) 
+        -4.2855326 Ry(5s)        -1.9356514 Ry(5p)        -0.7543624 Ry(4f) 
+   core level  (spin down)
+     -4802.8165652 Ry(1s)      -821.9176208 Ry(2s)      -722.1715364 Ry(2p) 
+      -186.9853913 Ry(3s)      -157.1360583 Ry(3p)      -121.7338023 Ry(3d) 
+       -37.2625192 Ry(4s)       -27.4524930 Ry(4p)       -14.7442431 Ry(4d) 
+        -4.2595539 Ry(5s)        -1.9163625 Ry(5p)        -0.7025966 Ry(4f)*
+
+   hyperfine field of Hf
+      119.384 kG (core=    29.553 kG  valence=    89.832 kG  orbital=     0.000 kG )
+   core contribution
+        0.303 kG(1s)      -48.024 kG(2s)     -627.757 kG(3s)      192.975 kG(4s)
+      512.055 kG(5s)
+
+   charge density at the nucleus
+     1199631.3671 (core=  1199512.6738  valence=       69.6636 )
+   core contribution
+     1015290.0646(1s)      143124.5296(2s)       31941.0250(3s)        7825.7042(4s)
+        1331.3503(5s)
+
+
+
+
+ 
+ sbtime report
+  routine           1         2         3         4
+  count        162080    162263    169233       600
+  cpu(sec)    1897.63    533.73    491.72      5.13
+ 
+ OS: Linux
+ Host: mygardenx2
+ Machine: x86_64
+ numcor: 24
+ elapsed time        15.22 sec ( 24 threads)
+
+

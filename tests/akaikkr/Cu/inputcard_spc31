@@ -1,0 +1,46 @@
+#--- go potentialfile
+spc31 pot.dat
+#--- brvtyp
+aux
+0.0 0.7071067811865476 0.7071067811865476
+0.7071067811865476 0.0 0.7071067811865476
+0.7071067811865476 0.7071067811865476 0.0
+4.830502863860995
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 1.0 sra mjw nmag 2nd
+#--- outtyp bzqlty maxitr pmix
+update 6 200 0.02
+#--- ntyp
+1
+#--- type ncmp
+  Cu 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+29 100.0
+#--- natm
+1
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Cu
+150
+c ---  \Gamma X W K \Gamma L U W L K
+c ---  \Gamma
+0.0 0.0 0.0
+c ---  X
+0.5 0.0 0.5
+c ---  W
+0.5 0.25 0.75
+c ---  K
+0.375 0.375 0.75
+c ---  \Gamma
+0.0 0.0 0.0
+c ---  L
+0.5 0.5 0.5
+c ---  U
+0.625 0.25 0.625
+c ---  W
+0.5 0.25 0.75
+c ---  L
+0.5 0.5 0.5
+c ---  K
+0.375 0.375 0.75

@@ -1,0 +1,60 @@
+ 20-Sep-2023
+    14:42:35
+    meshr   mse    ng   mxl
+      400    35    21     3
+
+
+
+   data read in
+   go=geo  file=pot.dat                                                         
+   brvtyp=bcc     a=  5.41596  c/a= 1.00000  b/a= 1.00000
+   alpha= 90.0  beta= 90.0  gamma= 90.0
+   edelt= 1.0E-03  ewidth=  1.000  reltyp=sra    sdftyp=mjw      
+   magtyp=nmag    record=2nd   outtyp=update  bzqlty=6       
+   maxitr=  0  pmix= 0.02000  mixtyp=tchb-brydn
+   ntyp=  1  natm=  1  ncmpx=  4
+
+
+   complex energy mesh
+   1( -1.0000, 0.0000)   2( -0.9999, 0.0041)   3( -0.9994, 0.0095) 
+   4( -0.9982, 0.0168)   5( -0.9956, 0.0263)   6( -0.9905, 0.0388) 
+   7( -0.9810, 0.0546)   8( -0.9643, 0.0742)   9( -0.9365, 0.0976) 
+  10( -0.8928, 0.1238)  11( -0.8287, 0.1507)  12( -0.7419, 0.1750) 
+  13( -0.6346, 0.1926)  14( -0.5146, 0.1999)  15( -0.3936, 0.1954) 
+  16( -0.2840, 0.1804)  17( -0.1938, 0.1581)  18( -0.1259, 0.1327) 
+  19( -0.0785, 0.1076)  20( -0.0473, 0.0849)  21( -0.0277, 0.0657) 
+  22( -0.0160, 0.0501)  23( -0.0090, 0.0378)  24( -0.0051, 0.0284) 
+  25( -0.0028, 0.0212)  26( -0.0015, 0.0157)  27( -0.0008, 0.0116) 
+  28( -0.0005, 0.0086)  29( -0.0003, 0.0064)  30( -0.0001, 0.0047) 
+  31( -0.0001, 0.0035)  32( -0.0000, 0.0026)  33( -0.0000, 0.0019) 
+  34( -0.0000, 0.0014)  35( -0.0000, 0.0010) 
+
+   file to be accessed=pot.dat                                                                                                                                                                                                                                                         
+
+   lattice constant
+   bravais=bcc   a=  5.41596   c/a= 1.0000   b/a= 1.0000
+   alpha=  90.00   beta=  90.00   gamma=  90.00
+   unit cell volume=    79.43203(a.u.)
+   volume filling=  68.0%
+
+   primitive translation vectors (in units of a)
+   a=( -0.50000  0.50000  0.50000)
+   b=(  0.50000 -0.50000  0.50000)
+   c=(  0.50000  0.50000 -0.50000)
+
+   reciprocal lattice vectors (in units of 2*pi/a)
+   ga=(  0.00000  1.00000  1.00000)
+   gb=(  1.00000  0.00000  1.00000)
+   gc=(  1.00000  1.00000  0.00000)
+
+   type of site
+   type=Mn0.25Al0.25Fe0.25Co0.25_2a_0  rmt= 0.43301 field=  0.000   lmxtyp=  2
+                  component= 1  anclr=  13.00  conc= 0.2500
+                  component= 2  anclr=  25.00  conc= 0.2500
+                  component= 3  anclr=  26.00  conc= 0.2500
+                  component= 4  anclr=  27.00  conc= 0.2500
+
+   atoms in the unit cell
+   position=   0.00000000   0.00000000   0.00000000  type=Mn0.25Al0.25Fe0.25Co0.25_2a_0
+ 
+ 

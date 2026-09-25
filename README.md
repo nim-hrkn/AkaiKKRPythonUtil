@@ -9,7 +9,7 @@ Python utilities for AkaiKKR
 
 # License
 
- Copyright (c) 2021-2023 AkaiKKRteam.
+ Copyright (c) 2021-2026 AkaiKKRteam.
  Distributed under the terms of the Apache License, Version 2.0.
 
 

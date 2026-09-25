@@ -1,0 +1,34 @@
+# ZnSe primitive; actual space group F-43m (216)
+# Explicit full-cell sites; CIF is serialized in P1; no symmetry reduction of sites.
+# Reconstructed from cited parameters; not DFT-relaxed.
+# Source [AaltoNDzincblende]: https://wiki.aalto.fi/spaces/SSC/pages/165133723/ZnS%2Bzinc%2Bblende
+# ZnSe: cubic a = 5.667 angstrom; zincblende structure.
+# Source [AFLOWND216]: https://aflow.org/p/AB_cF8_216_a_c-001/
+# Zincblende conventional-cell basis at (0,0,0), (1/4,1/4,1/4), with F centering.
+data_image0
+_chemical_formula_structural       ZnSe
+_chemical_formula_sum              "Zn1 Se1"
+_cell_length_a       4.007174128984165
+_cell_length_b       4.007174128984165
+_cell_length_c       4.007174128984165
+_cell_angle_alpha    59.99999999999999
+_cell_angle_beta     59.99999999999999
+_cell_angle_gamma    59.99999999999999
+
+_space_group_name_H-M_alt    "P 1"
+_space_group_IT_number       1
+
+loop_
+  _space_group_symop_operation_xyz
+  'x, y, z'
+
+loop_
+  _atom_site_type_symbol
+  _atom_site_label
+  _atom_site_symmetry_multiplicity
+  _atom_site_fract_x
+  _atom_site_fract_y
+  _atom_site_fract_z
+  _atom_site_occupancy
+  Zn  Zn1       1.0  0.0  0.0  0.0  1.0000
+  Se  Se1       1.0  0.25  0.25  0.25  1.0000

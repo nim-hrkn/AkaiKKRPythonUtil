@@ -1,0 +1,8 @@
+status  : finished
+ewidth  : 1.4175  tried: [1.2, 1.4175]
+gap used: [-2.2425, -1.2525]
+  ewidth 1.2000 new  converged={'fcc': True} coarse=[[-0.922, -0.562], [-2.243, -1.208]] fine=[[-0.892, -0.667], [-2.243, -1.252]] candidates=[1.4175]
+     note: sub-region [-0.892, -0.667]: candidate 0.7725 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region
+  ewidth 1.4175 old  converged={'fcc': True} coarse=[[-0.922, -0.562], [-2.243, -1.208]] fine=[[-0.877, -0.667], [-2.243, -1.252]] candidates=[1.4175]
+     note: sub-region [-0.877, -0.667]: candidate 0.7725 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region
+figure  : gaes_ewidth_SeMnFeCo_fcc.png

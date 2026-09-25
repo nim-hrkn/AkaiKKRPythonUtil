@@ -1,0 +1,20 @@
+#--- go potentialfile
+geom pot.dat
+#--- brvtyp a c/a b/a alpha beta gamma
+fcc 6.670735878543474 1.0 1.0 90.0 90.0 90.0
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 1.0 sra mjw nmag 2nd
+#--- outtyp bzqlty maxitr pmix
+update 6 0 0.02
+#--- ntyp
+1
+#--- type ncmp
+  Ni_4a_0 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+28 100.0
+#--- natm
+1
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Ni_4a_0

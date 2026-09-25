@@ -1,0 +1,390 @@
+ 24-Sep-2026
+    10:18:42
+ debug bnd2_type a
+ debug spmain go=cnd   
+    meshr   mse    ng   mxl
+      400     3    21     4
+
+
+
+   data read in
+   go=cnd     file=pot.dat                                                         
+   brvtyp=st      a=  5.20431  c/a= 1.28177  b/a= 1.00000
+   alpha= 90.0  beta= 90.0  gamma= 90.0
+   edelt= 1.0E-03  ewidth=  0.010  reltyp=sra    sdftyp=pbeasa   
+   magtyp=mag     record=2nd   outtyp=quit    bzqlty=40      
+   maxitr=  1  pmix= 0.02000  mixtyp=tchebyshev
+   ntyp=  2  natm=  2  ncmpx=  3
+
+
+   complex energy mesh
+   1( -0.005000, 0.001000)   2(  0.000000, 0.001000)   3(  0.005000, 0.001000) 
+
+   file to be accessed=pot.dat                                                                                                                                                                                                                                                         
+   rmt( 1)=   1.00000  rmt( 1)=   1.00000
+ ***wrn in chklat...given rmt's conflict; reduced
+   rmt( 1)=   0.50000  rmt( 2)=   0.50000
+ ***wrn in chklat...given rmt's conflict; reduced
+
+   lattice constant
+   bravais=st    a=  5.20431   c/a= 1.2818   b/a= 1.0000
+   alpha=  90.00   beta=  90.00   gamma=  90.00
+   unit cell volume=   180.67568(a.u.)
+   volume filling= 100.0%
+
+   primitive translation vectors (in units of a)
+   a=(  1.00000  0.00000  0.00000)
+   b=(  0.00000  1.00000  0.00000)
+   c=(  0.00000  0.00000  1.28177)
+
+   reciprocal lattice vectors (in units of 2*pi/a)
+   ga=(  1.00000  0.00000  0.00000)
+   gb=(  0.00000  1.00000  0.00000)
+   gc=(  0.00000  0.00000  0.78017)
+
+   type of site
+   type=Fe_1a_0                                   rmt= 0.53485 field=  0.000   lmxtyp=  3
+                  cmpnt  1  dsp= 0.0000 0.0000 0.0000  anclr=  26.00  x= 1.0000
+   type=Pt0.5Rh0.5_1d_1                           rmt= 0.53485 field=  0.000   lmxtyp=  3
+                  cmpnt  1  dsp= 0.0000 0.0000 0.0000  anclr=  45.00  x= 0.5000
+                  cmpnt  2  dsp= 0.0000 0.0000 0.0000  anclr=  78.00  x= 0.5000
+
+   atoms in the unit cell
+   position=   0.00000000   0.00000000   0.00000000  type=Fe_1a_0
+   position=   0.50000000   0.50000000   0.64088598  type=Pt0.5Rh0.5_1d_1
+
+ ***msg in spmain...new ew, ez generated
+   ew=   0.56086  ez=   0.70500
+
+   preta= 0.25969  eta= 0.25969
+
+   symop   E  C4*3   C2*3  C4^3*3   C3*4    C3^2*4      C2'*6
+     g     1  0 0 1  1 1 1  0 0 1  0 0 0 0  0 0 0 0  1 1 0 0 0 0
+     u     1  0 0 1  1 1 1  0 0 1  0 0 0 0  0 0 0 0  1 1 0 0 0 0
+
+   nfa= 43  nfb= 43  nfc= 33
+   last=  964   np=  27   nt= 317   nrpt= 239   nk=  33660   nd=    3
+
+   core configuration for Z= 26
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   core configuration for Z= 45
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  5  1  3  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  5  1  3  0  0  0  0  0  0  0  0  0  0
+
+   core configuration for Z= 78
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  5  1  3  5  1  3  7  0  0  0  0  0  0
+   down    1  1  3  1  3  5  1  3  5  1  3  7  0  0  0  0  0  0
+
+   ***** self-consistent iteration starts *****
+       Fe_1a_0 Pt0.5Rh0.5_1d_1
+ allocate spctrl(mse*nk3) as nk3=1
+   itr=  1 neu=  -17.2088  moment= -0.5312  te= -25747.60806623  err=  1.446
+   *** no convergence
+   interval=  1     cpu time=    117.41 sec
+   sdftyp=pbeas   reltyp=sra     dmpc= 0.02000
+       Fe_1a_0 Pt0.5Rh0.5_1d_1
+   itr=  1  neu-17.2088  chr,spn   1.6225  -0.5312  intc,ints  0.0000  0.0000
+   rms err=  1.434  1.444  1.332  1.418  1.446  1.337
+
+   ef=   0.5608551   0.5608551  def=     8.7823825    17.8439980
+   band energy=    0.914856321   total energy= -25747.608066229
+   magnetization=  -0.2312 T
+
+
+
+
+
+
+
+                             *** type-Fe_1a_0     Fe (z= 26.0) ***
+   core charge in the muffin-tin sphere =18.0000000
+   valence charge in the cell (spin up  ) =     0.02216(s)   0.02421(p)   0.16707(d)   0.00274(f)
+   valence charge in the cell (spin down) =     0.00527(s)   0.02429(p)   0.79611(d)   0.00836(f)
+   total charge=  19.05021   valence charge (up/down)=   0.21618   0.83403
+   spin moment=  -0.61785  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -513.2387810 Ry(1s)       -59.2261688 Ry(2s)       -50.2952538 Ry(2p) 
+        -5.9745267 Ry(3s)        -3.4774418 Ry(3p) 
+   core level  (spin down)
+      -513.2394029 Ry(1s)       -59.1143424 Ry(2s)       -50.2105979 Ry(2p) 
+        -5.7218933 Ry(3s)        -3.2306143 Ry(3p) 
+
+   hyperfine field of Fe
+     -267.578 kG (core=  -358.573 kG  valence=    90.995 kG  orbital=     0.000 kG )
+   core contribution
+       -7.313 kG(1s)     -718.717 kG(2s)      367.457 kG(3s)
+
+   charge density at the nucleus
+       15082.8429 (core=    15082.3733  valence=        0.3285 )
+   core contribution
+       13619.8893(1s)        1278.0163(2s)         184.4677(3s)
+
+
+
+                             *** type-Pt0.5Rh0.5_1d_1     Rh (z= 45.0) ***
+   core charge in the muffin-tin sphere =36.0000000
+   valence charge in the cell (spin up  ) =     0.01132(s)   0.03576(p)   0.40625(d)   0.00229(f)
+   valence charge in the cell (spin down) =     0.00426(s)   0.03949(p)   0.24447(d)   0.00946(f)
+   total charge=  36.75330   valence charge (up/down)=   0.45562   0.29768
+   spin moment=   0.15793  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+     -1691.6172223 Ry(1s)      -244.4746470 Ry(2s)      -218.9603171 Ry(2p) 
+       -42.9844531 Ry(3s)       -34.6053717 Ry(3p)       -21.2246008 Ry(3d) 
+        -5.2077577 Ry(4s)        -2.8470592 Ry(4p) 
+   core level  (spin down)
+     -1691.6175494 Ry(1s)      -244.4652392 Ry(2s)      -218.9533121 Ry(2p) 
+       -42.9799468 Ry(3s)       -34.6001946 Ry(3p)       -21.2162647 Ry(3d) 
+        -5.1679490 Ry(4s)        -2.8060018 Ry(4p) 
+
+   hyperfine field of Rh
+     -102.493 kG (core=  -184.656 kG  valence=    82.163 kG  orbital=     0.000 kG )
+   core contribution
+       -2.888 kG(1s)      -81.236 kG(2s)       35.549 kG(3s)     -136.080 kG(4s)
+
+   charge density at the nucleus
+      120708.7376 (core=   120705.3871  valence=        0.5613 )
+   core contribution
+      106135.5185(1s)       11956.4196(2s)        2210.3401(3s)         403.1089(4s)
+
+
+
+                             *** type-Pt0.5Rh0.5_1d_1     Pt (z= 78.0) ***
+   core charge in the muffin-tin sphere =68.0000000
+   valence charge in the cell (spin up  ) =     0.01288(s)   0.03899(p)   0.14906(d)   0.00244(f)
+   valence charge in the cell (spin down) =     0.00292(s)   0.03794(p)   0.13659(d)   0.01049(f)
+   total charge=  68.39131   valence charge (up/down)=   0.20337   0.18794
+   spin moment=   0.01542  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+     -5755.3684499 Ry(1s)     -1009.9769121 Ry(2s)      -875.1115806 Ry(2p) 
+      -236.6596659 Ry(3s)      -197.3984143 Ry(3p)      -154.8367064 Ry(3d) 
+       -50.2477393 Ry(4s)       -37.3726792 Ry(4p)       -21.7390564 Ry(4d) 
+        -6.6968331 Ry(5s)        -3.3338002 Ry(5p)        -4.3748064 Ry(4f) 
+   core level  (spin down)
+     -5755.3686769 Ry(1s)     -1009.9742035 Ry(2s)      -875.1094322 Ry(2p) 
+      -236.6587464 Ry(3s)      -197.3973796 Ry(3p)      -154.8348113 Ry(3d) 
+       -50.2452635 Ry(4s)       -37.3704158 Ry(4p)       -21.7364342 Ry(4d) 
+        -6.6786484 Ry(5s)        -3.3117591 Ry(5p)        -4.3708219 Ry(4f) 
+
+   hyperfine field of Pt
+      -37.437 kG (core=  -412.866 kG  valence=   375.429 kG  orbital=     0.000 kG )
+   core contribution
+       -3.426 kG(1s)      -51.087 kG(2s)        0.469 kG(3s)       57.788 kG(4s)
+     -416.611 kG(5s)
+
+   charge density at the nucleus
+     1941743.5263 (core=  1941658.4576  valence=        3.8665 )
+   core contribution
+     1628006.0654(1s)      241801.1135(2s)       55171.9236(3s)       13951.8574(4s)
+        2727.4977(5s)
+
+
+
+
+ cpu used       167.14 sec
+
+
+ elapsed time        19.66 sec ( 24 threads)
+
+
+
+   preta= 0.25969  eta= 0.25969
+
+   symop   E  C4*3   C2*3  C4^3*3   C3*4    C3^2*4      C2'*6
+     g     1  0 0 1  1 1 1  0 0 1  0 0 0 0  0 0 0 0  1 1 0 0 0 0
+     u     1  0 0 1  1 1 1  0 0 1  0 0 0 0  0 0 0 0  1 1 0 0 0 0
+
+   nfa= 43  nfb= 43  nfc= 33
+
+ non-zero current matrix element table
+ ntyp=  1
+ x
+   # J1 J2   coefficient
+ ------------------------
+   1  1  4     0.57735
+   2  2  5     0.44721
+   3  3  8     0.44721
+   4  4  7    -0.25820
+   5  4  9     0.44721
+   6  5 10     0.46291
+   7  5 12    -0.11952
+   8  6 11     0.37796
+   9  7 14     0.41404
+  10  8 13    -0.29277
+  11  8 15     0.37796
+  12  9 14    -0.11952
+  13  9 16     0.46291
+ 
+ y
+   # J1 J2   coefficient
+ ------------------------
+   1  1  2     0.57735
+   2  2  7    -0.25820
+   3  2  9    -0.44721
+   4  3  6     0.44721
+   5  4  5     0.44721
+   6  5 14    -0.11952
+   7  5 16    -0.46291
+   8  6 13    -0.29277
+   9  6 15    -0.37796
+  10  7 12     0.41404
+  11  8 11     0.37796
+  12  9 10     0.46291
+  13  9 12     0.11952
+ 
+ z
+   # J1 J2   coefficient
+ ------------------------
+   1  1  3     0.57735
+   2  2  6     0.44721
+   3  3  7     0.51640
+   4  4  8     0.44721
+   5  5 11     0.37796
+   6  6 12     0.47809
+   7  7 13     0.50709
+   8  8 14     0.47809
+   9  9 15     0.37796
+ 
+ ntyp=  2
+ x
+   # J1 J2   coefficient
+ ------------------------
+   1  1  4     0.57735
+   2  2  5     0.44721
+   3  3  8     0.44721
+   4  4  7    -0.25820
+   5  4  9     0.44721
+   6  5 10     0.46291
+   7  5 12    -0.11952
+   8  6 11     0.37796
+   9  7 14     0.41404
+  10  8 13    -0.29277
+  11  8 15     0.37796
+  12  9 14    -0.11952
+  13  9 16     0.46291
+ 
+ y
+   # J1 J2   coefficient
+ ------------------------
+   1  1  2     0.57735
+   2  2  7    -0.25820
+   3  2  9    -0.44721
+   4  3  6     0.44721
+   5  4  5     0.44721
+   6  5 14    -0.11952
+   7  5 16    -0.46291
+   8  6 13    -0.29277
+   9  6 15    -0.37796
+  10  7 12     0.41404
+  11  8 11     0.37796
+  12  9 10     0.46291
+  13  9 12     0.11952
+ 
+ z
+   # J1 J2   coefficient
+ ------------------------
+   1  1  3     0.57735
+   2  2  6     0.44721
+   3  3  7     0.51640
+   4  4  8     0.44721
+   5  5 11     0.37796
+   6  6 12     0.47809
+   7  7 13     0.50709
+   8  8 14     0.47809
+   9  9 15     0.37796
+ 
+   last=  964   np=  27   nt= 317   nrpt= 239   nk=  33660
+
+**********************************                                     
+ *** vertex correction made
+  1  1  2.96619E+00 -4.09760E+01  9.69409E+01 -1.98262E-01
+  1  2  9.37856E+00 -7.38985E+01  1.14378E+02 -2.61468E+00
+  2  1  1.61359E+00 -1.94583E+01  1.21955E+02 -5.29651E-01
+  2  2  5.11025E+00 -4.38990E+01  1.49984E+02 -4.93918E+00
+  3  1  1.30812E+00 -1.26851E+01  1.41818E+02  6.25763E-01
+  3  2  3.27752E+00 -3.73747E+01  1.79525E+02 -2.42154E+00
+
+ DOS of component 1
+     energy      sdosup      pdosup      ddosup      fdosup
+  -5.0000E-03  3.2660E-01  3.4793E-01  5.4233E+00  6.4310E-02
+   0.0000E+00  4.3351E-01  3.5606E-01  3.3248E+00  4.4489E-02
+   5.0000E-03  3.6570E-01  3.7092E-01  2.3498E+00  3.8221E-02
+
+ DOS of component 2
+     energy      sdosup      pdosup      ddosup      fdosup
+  -5.0000E-03  1.7440E-01  4.8498E-01  1.4172E+01  4.3451E-02
+   0.0000E+00  1.7186E-01  5.7228E-01  7.8246E+00  3.7584E-02
+   5.0000E-03  1.7067E-01  5.4992E-01  5.6200E+00  3.2701E-02
+
+ DOS of component 3
+     energy      sdosup      pdosup      ddosup      fdosup
+  -5.0000E-03  2.1946E-01  6.1536E-01  4.1564E+00  4.6703E-02
+   0.0000E+00  2.1808E-01  7.1117E-01  2.6173E+00  4.0710E-02
+   5.0000E-03  2.2039E-01  6.6745E-01  2.1263E+00  3.5501E-02
+
+ conductivity component=  3
+      energy      cndup
+  -5.000000E-03  1.576177E+00
+   0.000000E+00  1.963769E+00
+   5.000000E-03  2.296855E+00
+
+ cnd1               1.96377 (a.u.)
+   nfa= 43  nfb= 43  nfc= 33
+**********************************                                     
+ *** vertex correction made
+  1  1  2.96214E+00 -1.21324E+02  5.85861E+01 -5.72494E+00
+  1  2  8.35277E+00 -4.30671E+01  1.55298E+02 -3.78545E+00
+  2  1  2.33870E+00 -1.08094E+02  5.73752E+01 -3.66328E+00
+  2  2  6.90033E+00 -4.11597E+01  1.49891E+02 -3.43677E+00
+  3  1  2.56570E+00 -1.08441E+02  6.34040E+01  1.71314E-01
+  3  2  6.56412E+00 -4.17140E+01  1.53286E+02 -8.53210E-01
+
+ DOS of component 1
+     energy      sdosdn      pdosdn      ddosdn      fdosdn
+  -5.0000E-03  1.0940E-01  5.3744E-01  1.4560E+01  1.3988E-01
+   0.0000E+00  9.9535E-02  4.2848E-01  1.2836E+01  1.3649E-01
+   5.0000E-03  9.8303E-02  4.2309E-01  1.2677E+01  1.4067E-01
+
+ DOS of component 2
+     energy      sdosdn      pdosdn      ddosdn      fdosdn
+  -5.0000E-03  9.1912E-02  7.8500E-01  4.8244E+00  1.7019E-01
+   0.0000E+00  8.1202E-02  6.7569E-01  4.3399E+00  1.5589E-01
+   5.0000E-03  7.4400E-02  6.8659E-01  4.1093E+00  1.5765E-01
+
+ DOS of component 3
+     energy      sdosdn      pdosdn      ddosdn      fdosdn
+  -5.0000E-03  8.1820E-02  7.8228E-01  2.5412E+00  1.8743E-01
+   0.0000E+00  7.9615E-02  6.8642E-01  2.3487E+00  1.7266E-01
+   5.0000E-03  8.1128E-02  7.0508E-01  2.3035E+00  1.7574E-01
+
+ conductivity component=  3
+      energy      cnddown
+  -5.000000E-03  1.586999E+00
+   0.000000E+00  1.525731E+00
+   5.000000E-03  1.591373E+00
+
+ cnd2               1.52573 (a.u.)
+
+ *** summary ***
+ cnductivity        3.48950 (a.u.)
+ resistivity       12.46015 (micro ohm cm)
+ 
+ sbtime report
+  routine           1         2         3         4
+  count          1910       360       360         2
+  cpu(sec)    1066.19    740.34     58.76      0.01
+ 
+ total cpu          937.00 sec
+ elapsed time        76.08 sec ( 24 threads)
+
+

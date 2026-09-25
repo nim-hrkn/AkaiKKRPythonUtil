@@ -1,0 +1,3 @@
+pyakaikkr
+pymatgen>=2021.0.14
+spglib>=1.16.1

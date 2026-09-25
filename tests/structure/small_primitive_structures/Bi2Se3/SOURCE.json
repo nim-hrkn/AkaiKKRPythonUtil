@@ -1,0 +1,76 @@
+{
+  "material": "Bi2Se3",
+  "n_atoms": 5,
+  "spacegroup_number": 166,
+  "spacegroup_symbol": "R-3m",
+  "source_ids": [
+    "QuantumATK2016Bi2Se3"
+  ],
+  "source_parameters": {
+    "a_hex_angstrom": 4.138,
+    "c_hex_angstrom": 28.64,
+    "z_Bi_hex": 0.399,
+    "z_Se_hex": 0.206
+  },
+  "source_records": [
+    {
+      "title": "Bi2Se3 topological insulator",
+      "author": "Synopsys QuantumATK",
+      "url": "https://docs.quantumatk.com/tutorials/topological_insulator_bi2se3/topological_insulator_bi2se3.html",
+      "detail": "Tutorial version 2016.2, Build the Bi2Se3 crystal: hexagonal a=4.138, c=28.64 angstrom; Se 3a (0,0,0), Bi 6c z=0.399, Se 6c z=0.206. Reconstructed hexagonal cell then converted to primitive cell."
+    }
+  ],
+  "construction": "Reconstructed from cited parameters; no energy/force optimization performed.",
+  "cell_vectors_angstrom": [
+    [
+      2.0690000000000004,
+      1.1945377069533358,
+      9.546666666666667
+    ],
+    [
+      -2.0689999999999995,
+      1.1945377069533358,
+      9.546666666666667
+    ],
+    [
+      -6.6868732773173175e-16,
+      -2.3890754139066717,
+      9.546666666666667
+    ]
+  ],
+  "species": [
+    "Bi",
+    "Bi",
+    "Se",
+    "Se",
+    "Se"
+  ],
+  "fractional_positions": [
+    [
+      0.399,
+      0.399,
+      0.39899999999999985
+    ],
+    [
+      0.6009999999999999,
+      0.6010000000000002,
+      0.6009999999999999
+    ],
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.206,
+      0.20600000000000004,
+      0.20599999999999996
+    ],
+    [
+      0.7939999999999999,
+      0.7940000000000005,
+      0.7939999999999999
+    ]
+  ],
+  "verification": "CIF and POSCAR reread: atom count, symmetry, metric tensor, MIC distances passed; spglib primitive count verified."
+}

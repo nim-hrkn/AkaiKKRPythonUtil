@@ -1,0 +1,211 @@
+ 24-Sep-2026
+    11:15:03
+ debug bnd2_type a
+    meshr   mse    ng   mxl
+      400    35    21     3
+
+
+
+   data read in
+   go=go      file=pot.dat                                                         
+   brvtyp=aux     a=  4.69036  c/a= 0.00000  b/a= 0.00000
+   alpha=  0.0  beta=  0.0  gamma=  0.0
+   edelt= 1.0E-03  ewidth=  1.000  reltyp=sra    sdftyp=mjw      
+   magtyp=mag     record=init  outtyp=update  bzqlty=6       
+   maxitr=200  pmix= 0.02000  mixtyp=tchb-brydn
+   ntyp=  1  natm=  1  ncmpx=  1
+
+
+   complex energy mesh
+   1( -1.0000, 0.0000)   2( -0.9998, 0.0027)   3( -0.9990, 0.0062) 
+   4( -0.9971, 0.0107)   5( -0.9933, 0.0163)   6( -0.9862, 0.0234) 
+   7( -0.9738, 0.0319)   8( -0.9535, 0.0421)   9( -0.9220, 0.0536) 
+  10( -0.8757, 0.0660)  11( -0.8117, 0.0782)  12( -0.7292, 0.0889) 
+  13( -0.6307, 0.0965)  14( -0.5224, 0.0999)  15( -0.4130, 0.0985) 
+  16( -0.3115, 0.0926)  17( -0.2245, 0.0835)  18( -0.1553, 0.0724) 
+  19( -0.1037, 0.0610)  20( -0.0671, 0.0500)  21( -0.0424, 0.0403) 
+  22( -0.0262, 0.0320)  23( -0.0160, 0.0251)  24( -0.0096, 0.0195) 
+  25( -0.0057, 0.0151)  26( -0.0034, 0.0116)  27( -0.0020, 0.0089) 
+  28( -0.0012, 0.0069)  29( -0.0007, 0.0052)  30( -0.0004, 0.0040) 
+  31( -0.0002, 0.0031)  32( -0.0001, 0.0023)  33( -0.0001, 0.0018) 
+  34( -0.0000, 0.0014)  35( -0.0000, 0.0010) 
+
+   file to be accessed=pot.dat                                                                                                                                                                                                                                                         
+ ***wrn in chklat...given rmt's conflict; reduced
+
+   lattice constant
+   bravais=aux   a=  4.69036   c/a= 0.0000   b/a= 0.0000
+   alpha=   0.00   beta=   0.00   gamma=   0.00
+   unit cell volume=    79.43203(a.u.)
+   volume filling=  68.0%
+
+   primitive translation vectors (in units of a)
+   a=( -0.57735  0.57735  0.57735)
+   b=(  0.57735 -0.57735  0.57735)
+   c=(  0.57735  0.57735 -0.57735)
+
+   reciprocal lattice vectors (in units of 2*pi/a)
+   ga=(  0.00000  0.86603  0.86603)
+   gb=(  0.86603  0.00000  0.86603)
+   gc=(  0.86603  0.86603  0.00000)
+
+   type of site
+   type=Fe_0                                      rmt= 0.50000 field=  0.000   lmxtyp=  2
+                  component= 1  anclr=  26.00  conc= 1.0000
+
+   atoms in the unit cell
+   position=   0.00000000   0.00000000   0.00000000  type=Fe_0
+
+ ***msg in spmain...new ew, ez generated
+   ew=   0.19997  ez=   1.25000
+
+   preta= 0.30780  eta= 0.30780
+
+   symop   E  C4*3   C2*3  C4^3*3   C3*4    C3^2*4      C2'*6
+     g     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+     u     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+
+   last=  243   np=  19   nt= 273   nrpt= 169   nk=     72   nd=    1
+
+   atomic potential generated
+
+   itr=  1      rms error =  0.245
+   itr=  2      rms error = -0.412
+   itr=  3      rms error = -0.968
+   itr=  4      rms error = -1.457
+   itr=  5      rms error = -2.013
+   itr=  6      rms error = -1.939
+   itr=  7      rms error = -2.969
+   itr=  8      rms error = -2.905
+   itr=  9      rms error = -3.629
+   itr= 10      rms error = -4.314
+   itr= 11      rms error = -4.424
+   itr= 12      rms error = -4.622
+   itr= 13      rms error = -5.397
+   itr= 14      rms error = -5.756
+   itr= 15      rms error = -6.237
+   interval= 15     cpu time=      0.00 sec
+   nuclear charge=26.00
+
+         nl      cnf         energy
+    -----------------------------------
+         1s     2.000       -508.5203
+         2s     2.000        -59.2074
+         2p     6.000        -51.1807
+         3s     2.000         -6.8027
+         3p     6.000         -4.4563
+         3d     6.000         -0.6696
+         4s     2.000         -0.4930
+
+
+
+   record 1 will be overlaied by input and
+   record 2 will be replaced by new output.
+
+   core configuration for Z= 26
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   ***** self-consistent iteration starts *****
+       Fe_0
+ allocate spctrl as nk=1
+   itr=  1 neu=   -0.7453  moment=  2.8887  te=  -2541.01312508  err= -0.326
+   itr=  2 neu=   -0.1216  moment=  2.0720  te=  -2541.00834953  err= -0.411
+   itr=  3 neu=    0.0695  moment=  2.1913  te=  -2541.01322667  err= -0.559
+   itr=  4 neu=    0.1800  moment=  2.3203  te=  -2541.01815160  err= -0.850
+   itr=  5 neu=    0.1840  moment=  2.3675  te=  -2541.01973812  err= -1.011
+   itr=  6 neu=    0.1642  moment=  2.4153  te=  -2541.01989040  err= -1.094
+   itr=  7 neu=    0.1197  moment=  2.3238  te=  -2541.02000711  err= -1.135
+   itr=  8 neu=    0.0951  moment=  2.3056  te=  -2541.02033835  err= -1.140
+   itr=  9 neu=    0.0863  moment=  2.3084  te=  -2541.01979843  err= -1.247
+   itr= 10 neu=    0.0592  moment=  2.2943  te=  -2541.01986667  err= -1.251
+   itr= 11 neu=    0.0516  moment=  2.2977  te=  -2541.01999878  err= -1.325
+   itr= 12 neu=    0.0633  moment=  2.2845  te=  -2541.02066231  err= -1.646
+   itr= 13 neu=    0.0531  moment=  2.2926  te=  -2541.02073377  err= -1.672
+   itr= 14 neu=    0.0365  moment=  2.2996  te=  -2541.02068689  err= -1.708
+   itr= 15 neu=    0.0250  moment=  2.3053  te=  -2541.02067742  err= -1.742
+   itr= 16 neu=    0.0203  moment=  2.3130  te=  -2541.02069659  err= -1.726
+   itr= 17 neu=    0.0191  moment=  2.3090  te=  -2541.02067935  err= -1.673
+   itr= 18 neu=   -0.0093  moment=  2.3305  te=  -2541.02074371  err= -2.098
+   itr= 19 neu=   -0.0175  moment=  2.3310  te=  -2541.02075655  err= -2.531
+   itr= 20 neu=   -0.0149  moment=  2.3278  te=  -2541.02075273  err= -2.523
+   itr= 21 neu=   -0.0117  moment=  2.3261  te=  -2541.02075003  err= -2.467
+   itr= 22 neu=   -0.0116  moment=  2.3247  te=  -2541.02074852  err= -2.314
+   itr= 23 neu=   -0.0058  moment=  2.3224  te=  -2541.02074507  err= -2.576
+   itr= 24 neu=   -0.0020  moment=  2.3199  te=  -2541.02074116  err= -2.812
+   itr= 25 neu=   -0.0019  moment=  2.3193  te=  -2541.02074035  err= -2.910
+   itr= 26 neu=   -0.0014  moment=  2.3184  te=  -2541.02073880  err= -3.202
+   itr= 27 neu=   -0.0019  moment=  2.3186  te=  -2541.02073925  err= -3.574
+   itr= 28 neu=   -0.0019  moment=  2.3191  te=  -2541.02074043  err= -3.938
+   itr= 29 neu=   -0.0018  moment=  2.3194  te=  -2541.02074123  err= -4.297
+   itr= 30 neu=   -0.0015  moment=  2.3194  te=  -2541.02074135  err= -4.377
+   itr= 31 neu=   -0.0012  moment=  2.3194  te=  -2541.02074127  err= -4.398
+   itr= 32 neu=   -0.0008  moment=  2.3193  te=  -2541.02074106  err= -4.453
+   itr= 33 neu=   -0.0007  moment=  2.3193  te=  -2541.02074111  err= -4.591
+   itr= 34 neu=   -0.0005  moment=  2.3193  te=  -2541.02074098  err= -4.611
+   itr= 35 neu=   -0.0004  moment=  2.3193  te=  -2541.02074097  err= -4.633
+   itr= 36 neu=   -0.0003  moment=  2.3193  te=  -2541.02074101  err= -5.090
+   itr= 37 neu=   -0.0003  moment=  2.3193  te=  -2541.02074102  err= -5.275
+   itr= 38 neu=   -0.0002  moment=  2.3193  te=  -2541.02074107  err= -5.146
+   itr= 39 neu=   -0.0002  moment=  2.3193  te=  -2541.02074104  err= -4.970
+   itr= 40 neu=   -0.0001  moment=  2.3193  te=  -2541.02074106  err= -5.012
+   itr= 41 neu=   -0.0001  moment=  2.3192  te=  -2541.02074098  err= -4.923
+   itr= 42 neu=   -0.0001  moment=  2.3192  te=  -2541.02074101  err= -5.697
+   itr= 43 neu=   -0.0001  moment=  2.3192  te=  -2541.02074106  err= -5.776
+   itr= 44 neu=   -0.0000  moment=  2.3192  te=  -2541.02074100  err= -5.790
+   itr= 45 neu=   -0.0000  moment=  2.3192  te=  -2541.02074100  err= -5.785
+   itr= 46 neu=   -0.0000  moment=  2.3192  te=  -2541.02074099  err= -5.973
+   itr= 47 neu=   -0.0000  moment=  2.3192  te=  -2541.02074101  err= -6.341
+   interval= 47     cpu time=      0.29 sec
+   sdftyp=mjw     reltyp=sra     dmpc= 0.10000
+       Fe_0
+   itr= 47  neu -0.0000  chr,spn   8.0000   2.3192  intc,ints  0.9966 -0.0429
+   rms err= -6.341 -6.416
+   ef=   0.6827982   0.6974499  def=     8.4977837     8.5224005
+   band energy=    4.215248879   total energy=  -2541.020741005
+   magnetization=   2.2963 T
+
+
+
+
+
+
+
+                             *** type-Fe_0     Fe (z= 26.0) ***
+   core charge in the muffin-tin sphere =17.9835503
+   valence charge in the cell (spin up  ) =     0.20778(s)   0.20096(p)   4.28170(d)
+   valence charge in the cell (spin down) =     0.21381(s)   0.23126(p)   1.88431(d)
+   total charge=  25.00338   valence charge (up/down)=   4.69044   2.32938
+   spin moment=   2.36106  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -511.8898795 Ry(1s)       -58.8944668 Ry(2s)       -50.0662844 Ry(2p) 
+        -5.7248980 Ry(3s)        -3.2584417 Ry(3p) 
+   core level  (spin down)
+      -511.8748027 Ry(1s)       -58.7834568 Ry(2s)       -49.9773028 Ry(2p) 
+        -5.5137928 Ry(3s)        -3.0538132 Ry(3p) 
+
+   hyperfine field of Fe
+     -294.996 kG (core=  -260.349 kG  valence=   -34.647 kG  orbital=     0.000 kG )
+   core contribution
+      -20.144 kG(1s)     -550.941 kG(2s)      310.736 kG(3s)
+
+   charge density at the nucleus
+       15003.6271 (core=    14996.3618  valence=        7.0739 )
+   core contribution
+       13541.9808(1s)        1269.6535(2s)         184.7276(3s)
+
+
+
+
+ 
+ sbtime report
+  routine           1         2         3         4
+  count          1270      1240      1302        94
+  cpu(sec)       7.84      2.37      2.10      0.13
+ 
+ elapsed time         0.32 sec ( 14 threads)
+
+

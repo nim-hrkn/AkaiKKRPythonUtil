@@ -1,0 +1,62 @@
+{
+  "material": "ZnSe",
+  "n_atoms": 2,
+  "spacegroup_number": 216,
+  "spacegroup_symbol": "F-43m",
+  "source_ids": [
+    "AaltoNDzincblende",
+    "AFLOWND216"
+  ],
+  "source_parameters": {
+    "a_cubic_angstrom": 5.667
+  },
+  "source_records": [
+    {
+      "title": "ZnS (zinc blende)",
+      "author": "Aalto University, Solid State Chemistry",
+      "url": "https://wiki.aalto.fi/spaces/SSC/pages/165133723/ZnS%2Bzinc%2Bblende",
+      "detail": "ZnSe: cubic a = 5.667 angstrom; zincblende structure."
+    },
+    {
+      "title": "Zincblende structure, AB_cF8_216_a_c-001",
+      "author": "AFLOW Encyclopedia of Crystallographic Prototypes",
+      "url": "https://aflow.org/p/AB_cF8_216_a_c-001/",
+      "detail": "Zincblende conventional-cell basis at (0,0,0), (1/4,1/4,1/4), with F centering."
+    }
+  ],
+  "construction": "Reconstructed from cited parameters; no energy/force optimization performed.",
+  "cell_vectors_angstrom": [
+    [
+      0.0,
+      2.8335,
+      2.8335
+    ],
+    [
+      2.8335,
+      0.0,
+      2.8335
+    ],
+    [
+      2.8335,
+      2.8335,
+      0.0
+    ]
+  ],
+  "species": [
+    "Zn",
+    "Se"
+  ],
+  "fractional_positions": [
+    [
+      0.0,
+      0.0,
+      0.0
+    ],
+    [
+      0.25,
+      0.25,
+      0.25
+    ]
+  ],
+  "verification": "CIF and POSCAR reread: atom count, symmetry, metric tensor, MIC distances passed; spglib primitive count verified."
+}

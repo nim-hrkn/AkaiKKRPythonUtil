@@ -1,0 +1,41 @@
+#--- go potentialfile
+dos pot.dat
+#--- brvtyp
+aux
+1.0 0.0 0.0
+-0.5 0.8660254037844386 0.0
+0.0 0.0 0.7978723404255319
+9.414619305071838
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 2.0 srals mjwasa mag 2nd
+#--- outtyp bzqlty maxitr pmix
+update 6 200 0.02
+#--- ntyp
+3
+#--- type ncmp
+  Sm_0 1
+#- rmt field mxl
+0.0 0.0 3
+#- anclr conc
+62 100.0
+#--- type ncmp
+  Co_1 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+27 100.0
+#--- type ncmp
+  Co_2 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+27 100.0
+#--- natm
+6
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Sm_0
+0.50000000a 0.00000000b 0.50000000c Co_1
+0.00000000a 0.50000000b 0.50000000c Co_1
+0.50000000a 0.50000000b 0.50000000c Co_1
+0.33333333a 0.66666667b 0.00000000c Co_2
+0.66666667a 0.33333333b 0.00000000c Co_2

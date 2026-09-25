@@ -1,0 +1,3 @@
+[console_scripts]
+kkr-gaes = pyakaikkr.gaes.cli:main
+kkr-report = pyakaikkr.report:main

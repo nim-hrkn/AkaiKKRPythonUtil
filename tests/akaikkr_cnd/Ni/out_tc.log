@@ -1,0 +1,157 @@
+ 24-Sep-2026
+    10:16:38
+ debug bnd2_type a
+ debug spmain go=tc    
+    meshr   mse    ng   mxl
+      400    35    21     3
+
+
+
+   data read in
+   go=tc      file=pot.dat                                                         
+   brvtyp=fcc     a=  6.67074  c/a= 1.00000  b/a= 1.00000
+   alpha= 90.0  beta= 90.0  gamma= 90.0
+   edelt= 1.0E-03  ewidth=  1.000  reltyp=sra    sdftyp=mjw      
+   magtyp=mag     record=2nd   outtyp=quit    bzqlty=6       
+   maxitr=  1  pmix= 0.02000  mixtyp=tchb-brydn
+   ntyp=  1  natm=  1  ncmpx=  1
+
+
+   complex energy mesh
+   1( -1.000000, 0.000000)   2( -0.999815, 0.002717)   3( -0.999033, 0.006215) 
+   4( -0.997138, 0.010685)   5( -0.993284, 0.016335)   6( -0.986154, 0.023370) 
+   7( -0.973798, 0.031947)   8( -0.953532, 0.042099)   9( -0.922017, 0.053629) 
+  10( -0.875689, 0.065987)  11( -0.811687, 0.078192)  12( -0.729192, 0.088875) 
+  13( -0.630698, 0.096523)  14( -0.522384, 0.099900)  15( -0.412995, 0.098474) 
+  16( -0.311475, 0.092619)  17( -0.224533, 0.083455)  18( -0.155329, 0.072444) 
+  19( -0.103660, 0.060964)  20( -0.067115, 0.050044)  21( -0.042389, 0.040295) 
+  22( -0.026247, 0.031974)  23( -0.015999, 0.025094)  24( -0.009634, 0.019536) 
+  25( -0.005747, 0.015118)  26( -0.003403, 0.011648)  27( -0.002004, 0.008945) 
+  28( -0.001175, 0.006853)  29( -0.000687, 0.005240)  30( -0.000401, 0.004002) 
+  31( -0.000233, 0.003053)  32( -0.000135, 0.002328)  33( -0.000079, 0.001774) 
+  34( -0.000046, 0.001351)  35( -0.000026, 0.001028) 
+
+   file to be accessed=pot.dat                                                                                                                                                                                                                                                         
+   rmt( 1)=   1.00000  rmt( 1)=   1.00000
+ ***wrn in chklat...given rmt's conflict; reduced
+
+   lattice constant
+   bravais=fcc   a=  6.67074   c/a= 1.0000   b/a= 1.0000
+   alpha=  90.00   beta=  90.00   gamma=  90.00
+   unit cell volume=    74.20980(a.u.)
+   volume filling=  74.0%
+
+   primitive translation vectors (in units of a)
+   a=(  0.00000  0.50000  0.50000)
+   b=(  0.50000  0.00000  0.50000)
+   c=(  0.50000  0.50000  0.00000)
+
+   reciprocal lattice vectors (in units of 2*pi/a)
+   ga=( -1.00000  1.00000  1.00000)
+   gb=(  1.00000 -1.00000  1.00000)
+   gc=(  1.00000  1.00000 -1.00000)
+
+   type of site
+   type=Ni_4a_0                                   rmt= 0.35355 field=  0.000   lmxtyp=  2
+                  cmpnt  1  dsp= 0.0000 0.0000 0.0000  anclr=  28.00  x= 1.0000
+
+   atoms in the unit cell
+   position=   0.00000000   0.00000000   0.00000000  type=Ni_4a_0
+
+   ew=   0.19997  ez=   1.25000
+
+   preta= 0.44780  eta= 0.44780
+
+   symop   E  C4*3   C2*3  C4^3*3   C3*4    C3^2*4      C2'*6
+     g     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+     u     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+
+   last=  243   np=  15   nt= 283   nrpt= 177   nk=     72   nd=    1
+
+   core configuration for Z= 28
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   ***** self-consistent iteration starts *****
+       Ni_4a_0
+ allocate spctrl(mse*nk3) as nk3=1
+   itr=  1 neu=   -0.0001  moment=  0.6607  te=  -3036.60260019  err= -6.016
+   interval=  1     cpu time=      0.11 sec
+   sdftyp=mjw     reltyp=sra     dmpc= 0.10000
+       Ni_4a_0
+   itr=  1  neu -0.0001  chr,spn  10.0000   0.6607  intc,ints  0.7141 -0.0259
+   rms err= -6.016 -6.153
+   ef=   0.6464463   0.6585492  def=     1.2848237    28.1217239
+   band energy=    4.807905536   total energy=  -3036.602600185
+   magnetization=   0.7002 T
+
+
+
+
+
+
+
+                             *** type-Ni_4a_0     Ni (z= 28.0) ***
+   core charge in the muffin-tin sphere =17.9938754
+   valence charge in the cell (spin up  ) =     0.24385(s)   0.23040(p)   4.51505(d)
+   valence charge in the cell (spin down) =     0.24654(s)   0.24893(p)   3.80729(d)
+   total charge=  27.28594   valence charge (up/down)=   4.98930   4.30277
+   spin moment=   0.68653  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -600.9272359 Ry(1s)       -70.7522637 Ry(2s)       -60.7713161 Ry(2p) 
+        -6.9059410 Ry(3s)        -4.0262259 Ry(3p) 
+   core level  (spin down)
+      -600.9148513 Ry(1s)       -70.7063376 Ry(2s)       -60.7331982 Ry(2p) 
+        -6.8321028 Ry(3s)        -3.9544498 Ry(3p) 
+
+   hyperfine field of Ni
+      -92.991 kG (core=   -81.704 kG  valence=   -11.287 kG  orbital=     0.000 kG )
+   core contribution
+       -8.611 kG(1s)     -198.629 kG(2s)      125.536 kG(3s)
+
+   charge density at the nucleus
+       19486.6511 (core=    19478.3131  valence=        8.0626 )
+   core contribution
+       17541.8382(1s)        1687.6542(2s)         248.8207(3s)
+
+
+
+   BZ-mesh regenerated
+   last=  243   np=  15   nt= 283   nrpt= 177   nk=    868   nd=    1
+
+
+
+
+   Tc calculation starts
+
+   Molecular field on each sublattice in
+   the assumed magnetic configuration
+
+   sublat cmpnt   Hmf(Ry)     Hmf(meV)
+   -------------------------------------
+      1     1     0.008755  119.124581
+ 
+   Tc (in mean field approximation) =   460.794K
+
+
+
+
+ cpu used         5.41 sec
+
+
+ elapsed time         0.27 sec ( 24 threads)
+
+
+ 
+ sbtime report
+  routine           1         2         3         4
+  count           623       624        47         2
+  cpu(sec)       1.33      1.08      0.04      0.00
+ 
+ total cpu            5.41 sec
+ elapsed time         0.27 sec ( 24 threads)
+
+

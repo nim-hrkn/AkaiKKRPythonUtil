@@ -1,0 +1,35 @@
+# Bi2Se3 primitive; actual space group R-3m (166)
+# Explicit full-cell sites; CIF is serialized in P1; no symmetry reduction of sites.
+# Reconstructed from cited parameters; not DFT-relaxed.
+# Source [QuantumATK2016Bi2Se3]: https://docs.quantumatk.com/tutorials/topological_insulator_bi2se3/topological_insulator_bi2se3.html
+# Tutorial version 2016.2, Build the Bi2Se3 crystal: hexagonal a=4.138, c=28.64 angstrom; Se 3a (0,0,0), Bi 6c z=0.399, Se 6c z=0.206. Reconstructed hexagonal cell then converted to primitive cell.
+data_image0
+_chemical_formula_structural       Bi2Se3
+_chemical_formula_sum              "Bi2 Se3"
+_cell_length_a       9.841063244272835
+_cell_length_b       9.841063244272835
+_cell_length_c       9.841063244272835
+_cell_angle_alpha    24.27301147910316
+_cell_angle_beta     24.27301147910318
+_cell_angle_gamma    24.27301147910316
+
+_space_group_name_H-M_alt    "P 1"
+_space_group_IT_number       1
+
+loop_
+  _space_group_symop_operation_xyz
+  'x, y, z'
+
+loop_
+  _atom_site_type_symbol
+  _atom_site_label
+  _atom_site_symmetry_multiplicity
+  _atom_site_fract_x
+  _atom_site_fract_y
+  _atom_site_fract_z
+  _atom_site_occupancy
+  Bi  Bi1       1.0  0.399  0.399  0.39899999999999985  1.0000
+  Bi  Bi2       1.0  0.6009999999999999  0.6010000000000002  0.6009999999999999  1.0000
+  Se  Se1       1.0  0.0  0.0  0.0  1.0000
+  Se  Se2       1.0  0.206  0.20600000000000004  0.20599999999999996  1.0000
+  Se  Se3       1.0  0.7939999999999999  0.7940000000000005  0.7939999999999999  1.0000

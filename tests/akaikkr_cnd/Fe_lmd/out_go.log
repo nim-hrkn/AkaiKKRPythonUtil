@@ -1,0 +1,238 @@
+ 24-Sep-2026
+    10:20:54
+ debug bnd2_type a
+ debug spmain go=go    
+    meshr   mse    ng   mxl
+      400    35    21     3
+
+
+
+   data read in
+   go=go      file=pot.dat                                                         
+   brvtyp=bcc     a=  5.41596  c/a= 1.00000  b/a= 1.00000
+   alpha= 90.0  beta= 90.0  gamma= 90.0
+   edelt= 1.0E-03  ewidth=  1.000  reltyp=sra    sdftyp=mjw      
+   magtyp=lmd     record=init  outtyp=update  bzqlty=6       
+   maxitr=200  pmix= 0.02000  mixtyp=tchb-brydn
+   ntyp=  1  natm=  1  ncmpx=  2
+
+
+   complex energy mesh
+   1( -1.000000, 0.000000)   2( -0.999815, 0.002717)   3( -0.999033, 0.006215) 
+   4( -0.997138, 0.010685)   5( -0.993284, 0.016335)   6( -0.986154, 0.023370) 
+   7( -0.973798, 0.031947)   8( -0.953532, 0.042099)   9( -0.922017, 0.053629) 
+  10( -0.875689, 0.065987)  11( -0.811687, 0.078192)  12( -0.729192, 0.088875) 
+  13( -0.630698, 0.096523)  14( -0.522384, 0.099900)  15( -0.412995, 0.098474) 
+  16( -0.311475, 0.092619)  17( -0.224533, 0.083455)  18( -0.155329, 0.072444) 
+  19( -0.103660, 0.060964)  20( -0.067115, 0.050044)  21( -0.042389, 0.040295) 
+  22( -0.026247, 0.031974)  23( -0.015999, 0.025094)  24( -0.009634, 0.019536) 
+  25( -0.005747, 0.015118)  26( -0.003403, 0.011648)  27( -0.002004, 0.008945) 
+  28( -0.001175, 0.006853)  29( -0.000687, 0.005240)  30( -0.000401, 0.004002) 
+  31( -0.000233, 0.003053)  32( -0.000135, 0.002328)  33( -0.000079, 0.001774) 
+  34( -0.000046, 0.001351)  35( -0.000026, 0.001028) 
+
+   file to be accessed=pot.dat                                                                                                                                                                                                                                                         
+   created
+   rmt( 1)=   1.00000  rmt( 1)=   1.00000
+ ***wrn in chklat...given rmt's conflict; reduced
+
+   lattice constant
+   bravais=bcc   a=  5.41596   c/a= 1.0000   b/a= 1.0000
+   alpha=  90.00   beta=  90.00   gamma=  90.00
+   unit cell volume=    79.43203(a.u.)
+   volume filling=  68.0%
+
+   primitive translation vectors (in units of a)
+   a=( -0.50000  0.50000  0.50000)
+   b=(  0.50000 -0.50000  0.50000)
+   c=(  0.50000  0.50000 -0.50000)
+
+   reciprocal lattice vectors (in units of 2*pi/a)
+   ga=(  0.00000  1.00000  1.00000)
+   gb=(  1.00000  0.00000  1.00000)
+   gc=(  1.00000  1.00000  0.00000)
+
+   type of site
+   type=Fe_2a_0                                   rmt= 0.43301 field=  0.000   lmxtyp=  2
+                  cmpnt  1  dsp= 0.0000 0.0000 0.0000  anclr=  26.00  x= 0.5000
+                  cmpnt  2  dsp= 0.0000 0.0000 0.0000  anclr=  26.00  x= 0.5000
+
+   atoms in the unit cell
+   position=   0.00000000   0.00000000   0.00000000  type=Fe_2a_0
+pair  1:   1  2
+
+ ***msg in spmain...new ew, ez generated
+   ew=   0.19997  ez=   1.25000
+
+   preta= 0.35542  eta= 0.35542
+
+   symop   E  C4*3   C2*3  C4^3*3   C3*4    C3^2*4      C2'*6
+     g     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+     u     1  1 1 1  1 1 1  1 1 1  1 1 1 1  1 1 1 1  1 1 1 1 1 1
+
+   last=  243   np=  19   nt= 273   nrpt= 169   nk=     72   nd=    1
+
+   itr=  1      rms error =  0.245
+   itr=  2      rms error = -0.412
+   itr=  3      rms error = -0.968
+   itr=  4      rms error = -1.457
+   itr=  5      rms error = -2.013
+   itr=  6      rms error = -1.939
+   itr=  7      rms error = -2.969
+   itr=  8      rms error = -2.905
+   itr=  9      rms error = -3.629
+   itr= 10      rms error = -4.314
+   itr= 11      rms error = -4.424
+   itr= 12      rms error = -4.622
+   itr= 13      rms error = -5.397
+   itr= 14      rms error = -5.756
+   itr= 15      rms error = -6.237
+   interval= 15     cpu time=      0.02 sec
+
+         nl      cnf         energy
+    -----------------------------------
+         1s     2.000       -508.5203
+         2s     2.000        -59.2074
+         2p     6.000        -51.1807
+         3s     2.000         -6.8027
+         3p     6.000         -4.4563
+         3d     6.000         -0.6696
+         4s     2.000         -0.4930
+
+
+
+   record 1 will be overlaied by input and
+   record 2 will be replaced by new output.
+
+   core configuration for Z= 26
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   core configuration for Z= 26
+   state  1s 2s 2p 3s 3p 3d 4s 4p 4d 5s 5p 4f 5d 6s 6p 5f 6d 7s
+    up     1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+   down    1  1  3  1  3  0  0  0  0  0  0  0  0  0  0  0  0  0
+
+   ***** self-consistent iteration starts *****
+       Fe_2a_0
+ allocate spctrl(mse*nk3) as nk3=1
+   itr=  1 neu=   -0.7453  moment=  2.8887  te=  -2541.01312444  err= -0.326
+   itr=  2 neu=   -0.7524  moment= -0.0000  te=  -2540.99200540  err= -0.487
+   itr=  3 neu=   -0.1598  moment=  0.0000  te=  -2540.99493951  err= -0.600
+   itr=  4 neu=    0.1108  moment=  0.0000  te=  -2541.00020750  err= -0.755
+   itr=  5 neu=    0.2266  moment=  0.0000  te=  -2541.00365106  err= -0.901
+   itr=  6 neu=    0.2456  moment=  0.0000  te=  -2541.00516881  err= -1.064
+   itr=  7 neu=    0.2074  moment= -0.0000  te=  -2541.00536173  err= -1.174
+   itr=  8 neu=    0.1604  moment= -0.0000  te=  -2541.00523716  err= -1.205
+   itr=  9 neu=    0.0728  moment=  0.0000  te=  -2541.00615691  err= -1.263
+   itr= 10 neu=    0.0378  moment=  0.0000  te=  -2541.00587020  err= -1.106
+   itr= 11 neu=    0.0223  moment= -0.0000  te=  -2541.00576668  err= -1.079
+   itr= 12 neu=    0.1460  moment=  0.0000  te=  -2541.00684432  err= -2.087
+   itr= 13 neu=    0.1291  moment= -0.0000  te=  -2541.00672114  err= -2.410
+   itr= 14 neu=    0.1022  moment=  0.0000  te=  -2541.00656615  err= -2.452
+   itr= 15 neu=    0.0733  moment=  0.0000  te=  -2541.00645033  err= -2.740
+   itr= 16 neu=    0.0558  moment= -0.0000  te=  -2541.00639428  err= -2.942
+   itr= 17 neu=    0.0458  moment= -0.0000  te=  -2541.00636356  err= -3.266
+   itr= 18 neu=    0.0373  moment= -0.0000  te=  -2541.00634123  err= -3.769
+   itr= 19 neu=    0.0300  moment= -0.0000  te=  -2541.00632548  err= -3.972
+   itr= 20 neu=    0.0241  moment= -0.0000  te=  -2541.00631458  err= -4.074
+   itr= 21 neu=    0.0195  moment=  0.0000  te=  -2541.00630692  err= -4.318
+   itr= 22 neu=    0.0156  moment=  0.0000  te=  -2541.00630181  err= -4.487
+   itr= 23 neu=    0.0125  moment=  0.0000  te=  -2541.00629822  err= -4.565
+   itr= 24 neu=    0.0100  moment= -0.0000  te=  -2541.00629572  err= -4.672
+   itr= 25 neu=    0.0079  moment=  0.0000  te=  -2541.00629404  err= -5.013
+   itr= 26 neu=    0.0063  moment= -0.0000  te=  -2541.00629283  err= -5.391
+   itr= 27 neu=    0.0050  moment=  0.0000  te=  -2541.00629186  err= -5.510
+   itr= 28 neu=    0.0040  moment=  0.0000  te=  -2541.00629114  err= -5.498
+   itr= 29 neu=    0.0032  moment=  0.0000  te=  -2541.00629062  err= -5.287
+   itr= 30 neu=    0.0026  moment=  0.0000  te=  -2541.00629024  err= -5.316
+   itr= 31 neu=    0.0020  moment=  0.0000  te=  -2541.00629004  err= -5.249
+   itr= 32 neu=    0.0016  moment=  0.0000  te=  -2541.00628973  err= -5.993
+   itr= 33 neu=    0.0013  moment=  0.0000  te=  -2541.00628957  err= -6.192
+   interval= 33     cpu time=     21.17 sec
+   sdftyp=mjw     reltyp=sra     dmpc= 0.10000
+       Fe_2a_0
+   itr= 33  neu  0.0013  chr,spn   8.0000   0.0000  intc,ints  0.9861  0.0000
+   rms err= -6.192 -6.265 -6.265 -6.192
+   ef=   0.7109193   0.7109193  def=    10.6478505    10.6478505
+   band energy=    4.225573819   total energy=  -2541.006289565
+   magnetization=   0.0000 T
+
+
+
+
+
+
+
+                             *** type-Fe_2a_0     Fe (z= 26.0) ***
+   core charge in the muffin-tin sphere =17.9836588
+   valence charge in the cell (spin up  ) =     0.22100(s)   0.22938(p)   4.12614(d)
+   valence charge in the cell (spin down) =     0.20767(s)   0.21499(p)   2.03104(d)
+   total charge=  25.01388   valence charge (up/down)=   4.57652   2.45370
+   spin moment=   2.12282  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -511.8919665 Ry(1s)       -58.8920301 Ry(2s)       -50.0651906 Ry(2p) 
+        -5.7133250 Ry(3s)        -3.2470643 Ry(3p) 
+   core level  (spin down)
+      -511.8910610 Ry(1s)       -58.8086803 Ry(2s)       -50.0007052 Ry(2p) 
+        -5.5427665 Ry(3s)        -3.0817814 Ry(3p) 
+
+   hyperfine field of Fe
+     -112.506 kG (core=  -230.386 kG  valence=   117.880 kG  orbital=     0.000 kG )
+   core contribution
+      -18.401 kG(1s)     -473.785 kG(2s)      261.799 kG(3s)
+
+   charge density at the nucleus
+       15003.8120 (core=    14996.4160  valence=        7.2046 )
+   core contribution
+       13541.9625(1s)        1269.6380(2s)         184.8156(3s)
+
+
+
+                             *** type-Fe_2a_0     Fe (z= 26.0) ***
+   core charge in the muffin-tin sphere =17.9836588
+   valence charge in the cell (spin up  ) =     0.20767(s)   0.21499(p)   2.03104(d)
+   valence charge in the cell (spin down) =     0.22100(s)   0.22938(p)   4.12614(d)
+   total charge=  25.01388   valence charge (up/down)=   2.45370   4.57652
+   spin moment=  -2.12282  orbital moment=   0.00000
+   orbital current (up/down)=   0.00000   0.00000
+
+   core level  (spin up  )
+      -511.8910610 Ry(1s)       -58.8086803 Ry(2s)       -50.0007052 Ry(2p) 
+        -5.5427665 Ry(3s)        -3.0817814 Ry(3p) 
+   core level  (spin down)
+      -511.8919665 Ry(1s)       -58.8920301 Ry(2s)       -50.0651906 Ry(2p) 
+        -5.7133250 Ry(3s)        -3.2470643 Ry(3p) 
+
+   hyperfine field of Fe
+      112.506 kG (core=   230.386 kG  valence=  -117.880 kG  orbital=     0.000 kG )
+   core contribution
+       18.401 kG(1s)      473.785 kG(2s)     -261.799 kG(3s)
+
+   charge density at the nucleus
+       15003.8120 (core=    14996.4160  valence=        7.2046 )
+   core contribution
+       13541.9625(1s)        1269.6380(2s)         184.8156(3s)
+
+
+
+
+ cpu used        21.85 sec
+
+
+ elapsed time         0.93 sec ( 24 threads)
+
+
+ 
+ sbtime report
+  routine           1         2         3         4
+  count         16899     16283     17408        66
+  cpu(sec)      33.16      7.31      8.52      0.37
+ 
+ total cpu           21.85 sec
+ elapsed time         0.93 sec ( 24 threads)
+
+
