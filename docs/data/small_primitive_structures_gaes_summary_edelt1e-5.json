@@ -1,0 +1,285 @@
+{
+ "Bi2Se3": {
+  "status": "finished",
+  "ewidth": 1.2825,
+  "tried": [
+   1.2,
+   1.2825
+  ],
+  "gap": [
+   -1.6575,
+   -1.0725
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.877, -0.818] (DOS < 0.02) is 0.060 Ry wide < eth 0.30",
+    "region [-0.652, -0.412] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [-0.007, 0.022] (DOS < 0.02) is 0.030 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-0.877, -0.818] (DOS < 0.02) is 0.060 Ry wide < eth 0.30",
+    "region [-0.652, -0.412] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [0.007, 0.022] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "sub-region [-2.243, -1.823] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ]
+  ],
+  "seconds": 90,
+  "brvtyp": "rhb",
+  "natm": 5,
+  "types": [
+   "Bi_6c_0",
+   "Se_3a_6",
+   "Se_6c_7"
+  ]
+ },
+ "InAs": {
+  "status": "finished",
+  "ewidth": 1.3725,
+  "tried": [
+   1.2,
+   1.0875,
+   1.3725
+  ],
+  "gap": [
+   -2.2425,
+   -1.1775
+  ],
+  "flags": [
+   "new",
+   "new",
+   "old",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "sub-region [-0.713, -0.443]: candidate 0.6375 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region"
+   ],
+   [
+    "region [-1.117, -0.877] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [0.022, 0.037] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "sub-region [-0.728, -0.427]: candidate 0.6225 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region"
+   ],
+   [
+    "region [-0.968, -0.877] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.022, 0.037] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "sub-region [-0.713, -0.412]: candidate 0.6225 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region"
+   ],
+   [
+    "region [-1.058, -0.877] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
+    "sub-region [-0.728, -0.427]: candidate 0.6225 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region"
+   ]
+  ],
+  "seconds": 20,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "In_4a_0",
+   "As_4c_4"
+  ]
+ },
+ "InP": {
+  "status": "finished",
+  "ewidth": 1.3575,
+  "tried": [
+   1.2,
+   1.0575,
+   1.3575
+  ],
+  "gap": [
+   -2.2425,
+   -1.1925
+  ],
+  "flags": [
+   "new",
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.667, -0.412] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [0.022, 0.052] (DOS < 0.02) is 0.030 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-1.103, -0.848] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [-0.682, -0.427] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [0.007, 0.052] (DOS < 0.02) is 0.045 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-1.087, -0.848] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [-0.682, -0.412] (DOS < 0.02) is 0.270 Ry wide < eth 0.30",
+    "region [0.007, 0.052] (DOS < 0.02) is 0.045 Ry wide < eth 0.30"
+   ]
+  ],
+  "seconds": 14,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "In_4a_0",
+   "P_4c_4"
+  ]
+ },
+ "InSb": {
+  "status": "finished",
+  "ewidth": 1.0125,
+  "tried": [
+   1.2,
+   1.0125
+  ],
+  "gap": [
+   -1.0575,
+   -0.8025
+  ],
+  "flags": [
+   "new",
+   "old",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-2.243, -2.183] (DOS < 0.02) is 0.060 Ry wide < eth 0.30",
+    "region [-0.652, -0.443] (DOS < 0.02) is 0.210 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-2.243, -2.197] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "region [-0.667, -0.443] (DOS < 0.02) is 0.225 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-2.243, -2.183] (DOS < 0.02) is 0.060 Ry wide < eth 0.30",
+    "region [-0.652, -0.427] (DOS < 0.02) is 0.225 Ry wide < eth 0.30"
+   ]
+  ],
+  "seconds": 12,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "In_4a_0",
+   "Sb_4c_4"
+  ]
+ },
+ "RbCl": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.8225,
+   -0.9975
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.938, -0.713] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "sub-region [-0.007, 0.263]: candidate -0.0525 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region",
+    "sub-region [-0.608, -0.172]: candidate 0.3525 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region",
+    "sub-region [-2.243, -1.897] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ]
+  ],
+  "seconds": 4,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "Rb_4a_0",
+   "Cl2_4b_4"
+  ]
+ },
+ "SnSe2": {
+  "status": "finished",
+  "ewidth": 1.2375,
+  "tried": [
+   1.2,
+   1.2375
+  ],
+  "gap": [
+   -1.6725,
+   -1.0425
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.863, -0.608] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "sub-region [-2.243, -1.823] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ],
+   [
+    "region [-0.863, -0.608] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "sub-region [-2.243, -1.823] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ]
+  ],
+  "seconds": 19,
+  "brvtyp": "hcp",
+  "natm": 3,
+  "types": [
+   "Sn_1a_0",
+   "Se_2d_1"
+  ]
+ },
+ "ZnSe": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -2.2425,
+   -1.0125
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.922, -0.713] (DOS < 0.02) is 0.210 Ry wide < eth 0.30",
+    "region [-0.652, -0.398] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [-0.022, 0.068] (DOS < 0.02) is 0.090 Ry wide < eth 0.30"
+   ]
+  ],
+  "seconds": 2,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "Zn_4a_0",
+   "Se_4c_4"
+  ]
+ }
+}
