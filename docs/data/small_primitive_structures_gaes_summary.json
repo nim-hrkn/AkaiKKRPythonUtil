@@ -1,28 +1,46 @@
 {
  "Bi2Se3": {
-  "status": "ewidth_fail",
-  "ewidth": 1.2,
+  "status": "finished",
+  "ewidth": 1.2825,
   "tried": [
-   1.2
+   1.2,
+   1.2675,
+   1.2825
   ],
-  "gap": null,
+  "gap": [
+   -1.4175,
+   -1.1475
+  ],
   "flags": [
-   "fail"
+   "new",
+   "new",
+   "old"
   ],
   "converged": {
    "prim": true
   },
-  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [1.0, 2.0]: region [-3.319, -3.229] (DOS < 0.02) is 0.090 Ry wide < eth 0.30; region [-3.004, -2.846] (DOS < 0.02) is 0.158 Ry wide < eth 0.30; region [-0.641, -0.416] (DOS < 0.02) is 0.225 Ry wide < eth 0.30; coarse region [-1.564, -1.069]: no sub-region with DOS < 0.002 (minimum DOS 5.36e-03); coarse region [-2.374, -1.811]: no sub-region with DOS < 0.002 (minimum DOS 6.07e-03)",
+  "message": "",
   "reasons": [
    [
-    "region [-3.319, -3.229] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
-    "region [-3.004, -2.846] (DOS < 0.02) is 0.158 Ry wide < eth 0.30",
-    "region [-0.641, -0.416] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
-    "coarse region [-1.564, -1.069]: no sub-region with DOS < 0.002 (minimum DOS 5.36e-03)",
-    "coarse region [-2.374, -1.811]: no sub-region with DOS < 0.002 (minimum DOS 6.07e-03)"
+    "region [-0.863, -0.818] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "region [-0.652, -0.412] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [0.007, 0.022] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "sub-region [-2.243, -2.002] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ],
+   [
+    "region [-0.863, -0.818] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "region [-0.652, -0.412] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [0.007, 0.022] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "sub-region [-2.243, -2.018] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ],
+   [
+    "region [-0.863, -0.818] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "region [-0.652, -0.412] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [0.007, 0.022] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "sub-region [-2.243, -2.018] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
    ]
   ],
-  "seconds": 41,
+  "seconds": 122,
   "brvtyp": "rhb",
   "natm": 5,
   "types": [
@@ -33,14 +51,14 @@
  },
  "InAs": {
   "status": "finished",
-  "ewidth": 1.7275,
+  "ewidth": 1.5475,
   "tried": [
    1.2,
-   1.7275
+   1.5475
   ],
   "gap": [
-   -2.1525,
-   -1.5975
+   -2.2425,
+   -1.3575
   ],
   "flags": [
    "new",
@@ -52,12 +70,12 @@
   "message": "",
   "reasons": [
    [
-    "region [-1.133, -0.877] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
-    "region [-0.728, -0.443] (DOS < 0.02) is 0.285 Ry wide < eth 0.30"
+    "region [-1.163, -0.877] (DOS < 0.02) is 0.285 Ry wide < eth 0.30",
+    "sub-region [-0.667, -0.502]: candidate 0.6375 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region"
    ],
    [
-    "region [-1.012, -0.877] (DOS < 0.02) is 0.135 Ry wide < eth 0.30",
-    "coarse region [-0.728, -0.427]: no sub-region with DOS < 0.002 (minimum DOS 2.97e-03)"
+    "region [-0.983, -0.877] (DOS < 0.02) is 0.105 Ry wide < eth 0.30",
+    "sub-region [-0.637, -0.502] excluded by ediff 0.20 (E_F - ewidth must be below -0.627 = coarse upper edge -0.427 - ediff); ediff < 0.200 would give a candidate near 0.6275"
    ]
   ],
   "seconds": 3,
@@ -70,14 +88,14 @@
  },
  "InP": {
   "status": "finished",
-  "ewidth": 1.6975,
+  "ewidth": 1.5325,
   "tried": [
    1.2,
-   1.6975
+   1.5325
   ],
   "gap": [
    -2.2425,
-   -1.5675
+   -1.4325
   ],
   "flags": [
    "new",
@@ -89,17 +107,17 @@
   "message": "",
   "reasons": [
    [
-    "region [-1.133, -0.848] (DOS < 0.02) is 0.285 Ry wide < eth 0.30",
     "region [-0.667, -0.427] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
-    "region [0.022, 0.052] (DOS < 0.02) is 0.030 Ry wide < eth 0.30"
+    "region [0.007, 0.052] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "sub-region [-0.983, -0.877] excluded by ediff 0.20 (E_F - ewidth must be below -1.048 = coarse upper edge -0.848 - ediff); ediff < 0.125 would give a candidate near 0.9725"
    ],
    [
-    "region [-0.998, -0.848] (DOS < 0.02) is 0.150 Ry wide < eth 0.30",
+    "region [-1.058, -0.848] (DOS < 0.02) is 0.210 Ry wide < eth 0.30",
     "region [-0.667, -0.412] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
-    "region [0.022, 0.052] (DOS < 0.02) is 0.030 Ry wide < eth 0.30"
+    "region [0.007, 0.052] (DOS < 0.02) is 0.045 Ry wide < eth 0.30"
    ]
   ],
-  "seconds": 4,
+  "seconds": 3,
   "brvtyp": "fcc",
   "natm": 2,
   "types": [
@@ -128,12 +146,14 @@
   "message": "",
   "reasons": [
    [
-    "region [-0.637, -0.458] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
-    "coarse region [-1.133, -0.802]: no sub-region with DOS < 0.002 (minimum DOS 3.17e-03)"
+    "region [-2.243, -2.228] (DOS < 0.02) is 0.015 Ry wide < eth 0.30",
+    "region [-0.652, -0.443] (DOS < 0.02) is 0.210 Ry wide < eth 0.30",
+    "sub-region [-0.998, -0.848] excluded by ediff 0.20 (E_F - ewidth must be below -1.002 = coarse upper edge -0.802 - ediff); ediff < 0.185 would give a candidate near 0.9875"
    ],
    [
-    "region [-1.073, -0.802] (DOS < 0.02) is 0.270 Ry wide < eth 0.30",
-    "region [-0.637, -0.443] (DOS < 0.02) is 0.195 Ry wide < eth 0.30"
+    "region [-2.243, -2.212] (DOS < 0.02) is 0.030 Ry wide < eth 0.30",
+    "region [-0.652, -0.443] (DOS < 0.02) is 0.210 Ry wide < eth 0.30",
+    "sub-region [-0.907, -0.877] excluded by ediff 0.20 (E_F - ewidth must be below -1.002 = coarse upper edge -0.802 - ediff); ediff < 0.095 would give a candidate near 0.8975"
    ]
   ],
   "seconds": 4,
@@ -146,17 +166,15 @@
  },
  "RbCl": {
   "status": "finished",
-  "ewidth": 1.2625,
+  "ewidth": 1.2,
   "tried": [
-   1.2,
-   1.2625
+   1.2
   ],
   "gap": [
-   -1.4925,
-   -1.2525
+   -1.7025,
+   -1.1175
   ],
   "flags": [
-   "new",
    "old"
   ],
   "converged": {
@@ -165,19 +183,13 @@
   "message": "",
   "reasons": [
    [
-    "region [-0.907, -0.743] (DOS < 0.02) is 0.165 Ry wide < eth 0.30",
-    "region [-0.007, 0.247] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
-    "coarse region [-0.593, -0.172]: no sub-region with DOS < 0.002 (minimum DOS 3.09e-03)",
-    "sub-region [-2.243, -2.047] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
-   ],
-   [
-    "region [-0.907, -0.667] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
-    "region [-0.022, 0.263] (DOS < 0.02) is 0.285 Ry wide < eth 0.30",
-    "coarse region [-0.532, -0.172]: no sub-region with DOS < 0.002 (minimum DOS 3.85e-03)",
-    "sub-region [-2.243, -1.958] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+    "region [-0.907, -0.728] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
+    "region [-0.037, 0.247] (DOS < 0.02) is 0.285 Ry wide < eth 0.30",
+    "sub-region [-0.472, -0.292]: candidate 0.3525 is outside [min_ewidth, max_ewidth] = [1.0, 2.0] and the bound is not inside the sub-region",
+    "sub-region [-2.243, -1.972] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
    ]
   ],
-  "seconds": 6,
+  "seconds": 3,
   "brvtyp": "fcc",
   "natm": 2,
   "types": [
@@ -187,18 +199,16 @@
  },
  "SnSe2": {
   "status": "finished",
-  "ewidth": 1.2525,
+  "ewidth": 1.2375,
   "tried": [
    1.2,
-   1.2375,
-   1.2525
+   1.2375
   ],
   "gap": [
-   -1.3575,
-   -1.2075
+   -1.4775,
+   -1.1175
   ],
   "flags": [
-   "new",
    "new",
    "old"
   ],
@@ -208,25 +218,19 @@
   "message": "",
   "reasons": [
    [
-    "region [-0.833, -0.608] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "region [-0.848, -0.608] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
     "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
     "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
-    "sub-region [-2.243, -2.212] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+    "sub-region [-2.243, -1.988] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
    ],
    [
-    "region [-0.833, -0.608] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "region [-0.848, -0.608] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
     "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
     "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
-    "sub-region [-2.243, -2.212] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
-   ],
-   [
-    "region [-0.833, -0.608] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
-    "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
-    "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
-    "sub-region [-2.243, -2.212] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+    "sub-region [-2.243, -1.988] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
    ]
   ],
-  "seconds": 23,
+  "seconds": 16,
   "brvtyp": "hcp",
   "natm": 3,
   "types": [
@@ -236,14 +240,14 @@
  },
  "ZnSe": {
   "status": "finished",
-  "ewidth": 1.2775,
+  "ewidth": 1.2225,
   "tried": [
    1.2,
-   1.2775
+   1.2225
   ],
   "gap": [
    -2.2425,
-   -1.2525
+   -1.1325
   ],
   "flags": [
    "new",
@@ -255,17 +259,16 @@
   "message": "",
   "reasons": [
    [
-    "region [-0.892, -0.757] (DOS < 0.02) is 0.135 Ry wide < eth 0.30",
-    "region [-0.562, -0.412] (DOS < 0.02) is 0.150 Ry wide < eth 0.30",
-    "region [-0.022, 0.022] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
-    "region [0.037, 0.068] (DOS < 0.02) is 0.030 Ry wide < eth 0.30",
+    "region [-0.907, -0.728] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
+    "region [-0.593, -0.412] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
+    "region [-0.022, 0.068] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
     "region [0.083, 0.098] (DOS < 0.02) is 0.015 Ry wide < eth 0.30"
    ],
    [
-    "region [-0.907, -0.667] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
-    "region [-0.472, -0.427] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
-    "region [-0.037, 0.022] (DOS < 0.02) is 0.060 Ry wide < eth 0.30",
-    "region [0.037, 0.052] (DOS < 0.02) is 0.015 Ry wide < eth 0.30"
+    "region [-0.907, -0.728] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
+    "region [-0.608, -0.412] (DOS < 0.02) is 0.195 Ry wide < eth 0.30",
+    "region [-0.022, 0.068] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.083, 0.098] (DOS < 0.02) is 0.015 Ry wide < eth 0.30"
    ]
   ],
   "seconds": 3,

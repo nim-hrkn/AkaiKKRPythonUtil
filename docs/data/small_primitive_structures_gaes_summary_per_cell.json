@@ -1,0 +1,279 @@
+{
+ "Bi2Se3": {
+  "status": "ewidth_fail",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": null,
+  "flags": [
+   "fail"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [1.0, 2.0]: region [-3.319, -3.229] (DOS < 0.02) is 0.090 Ry wide < eth 0.30; region [-3.004, -2.846] (DOS < 0.02) is 0.158 Ry wide < eth 0.30; region [-0.641, -0.416] (DOS < 0.02) is 0.225 Ry wide < eth 0.30; coarse region [-1.564, -1.069]: no sub-region with DOS < 0.002 (minimum DOS 5.36e-03); coarse region [-2.374, -1.811]: no sub-region with DOS < 0.002 (minimum DOS 6.07e-03)",
+  "reasons": [
+   [
+    "region [-3.319, -3.229] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [-3.004, -2.846] (DOS < 0.02) is 0.158 Ry wide < eth 0.30",
+    "region [-0.641, -0.416] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "coarse region [-1.564, -1.069]: no sub-region with DOS < 0.002 (minimum DOS 5.36e-03)",
+    "coarse region [-2.374, -1.811]: no sub-region with DOS < 0.002 (minimum DOS 6.07e-03)"
+   ]
+  ],
+  "seconds": 41,
+  "brvtyp": "rhb",
+  "natm": 5,
+  "types": [
+   "Bi_6c_0",
+   "Se_3a_6",
+   "Se_6c_7"
+  ]
+ },
+ "InAs": {
+  "status": "finished",
+  "ewidth": 1.7275,
+  "tried": [
+   1.2,
+   1.7275
+  ],
+  "gap": [
+   -2.1525,
+   -1.5975
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-1.133, -0.877] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [-0.728, -0.443] (DOS < 0.02) is 0.285 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-1.012, -0.877] (DOS < 0.02) is 0.135 Ry wide < eth 0.30",
+    "coarse region [-0.728, -0.427]: no sub-region with DOS < 0.002 (minimum DOS 2.97e-03)"
+   ]
+  ],
+  "seconds": 3,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "In_4a_0",
+   "As_4c_4"
+  ]
+ },
+ "InP": {
+  "status": "finished",
+  "ewidth": 1.6975,
+  "tried": [
+   1.2,
+   1.6975
+  ],
+  "gap": [
+   -2.2425,
+   -1.5675
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-1.133, -0.848] (DOS < 0.02) is 0.285 Ry wide < eth 0.30",
+    "region [-0.667, -0.427] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [0.022, 0.052] (DOS < 0.02) is 0.030 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-0.998, -0.848] (DOS < 0.02) is 0.150 Ry wide < eth 0.30",
+    "region [-0.667, -0.412] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "region [0.022, 0.052] (DOS < 0.02) is 0.030 Ry wide < eth 0.30"
+   ]
+  ],
+  "seconds": 4,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "In_4a_0",
+   "P_4c_4"
+  ]
+ },
+ "InSb": {
+  "status": "finished",
+  "ewidth": 1.6225,
+  "tried": [
+   1.2,
+   1.6225
+  ],
+  "gap": [
+   -1.7775,
+   -1.5225
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.637, -0.458] (DOS < 0.02) is 0.180 Ry wide < eth 0.30",
+    "coarse region [-1.133, -0.802]: no sub-region with DOS < 0.002 (minimum DOS 3.17e-03)"
+   ],
+   [
+    "region [-1.073, -0.802] (DOS < 0.02) is 0.270 Ry wide < eth 0.30",
+    "region [-0.637, -0.443] (DOS < 0.02) is 0.195 Ry wide < eth 0.30"
+   ]
+  ],
+  "seconds": 4,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "In_4a_0",
+   "Sb_4c_4"
+  ]
+ },
+ "RbCl": {
+  "status": "finished",
+  "ewidth": 1.2625,
+  "tried": [
+   1.2,
+   1.2625
+  ],
+  "gap": [
+   -1.4925,
+   -1.2525
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.907, -0.743] (DOS < 0.02) is 0.165 Ry wide < eth 0.30",
+    "region [-0.007, 0.247] (DOS < 0.02) is 0.255 Ry wide < eth 0.30",
+    "coarse region [-0.593, -0.172]: no sub-region with DOS < 0.002 (minimum DOS 3.09e-03)",
+    "sub-region [-2.243, -2.047] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ],
+   [
+    "region [-0.907, -0.667] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [-0.022, 0.263] (DOS < 0.02) is 0.285 Ry wide < eth 0.30",
+    "coarse region [-0.532, -0.172]: no sub-region with DOS < 0.002 (minimum DOS 3.85e-03)",
+    "sub-region [-2.243, -1.958] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ]
+  ],
+  "seconds": 6,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "Rb_4a_0",
+   "Cl2_4b_4"
+  ]
+ },
+ "SnSe2": {
+  "status": "finished",
+  "ewidth": 1.2525,
+  "tried": [
+   1.2,
+   1.2375,
+   1.2525
+  ],
+  "gap": [
+   -1.3575,
+   -1.2075
+  ],
+  "flags": [
+   "new",
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.833, -0.608] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "sub-region [-2.243, -2.212] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ],
+   [
+    "region [-0.833, -0.608] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "sub-region [-2.243, -2.212] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ],
+   [
+    "region [-0.833, -0.608] (DOS < 0.02) is 0.225 Ry wide < eth 0.30",
+    "region [-0.443, -0.352] (DOS < 0.02) is 0.090 Ry wide < eth 0.30",
+    "region [0.158, 0.203] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "sub-region [-2.243, -2.212] touches the window bottom: less than eth 0.30 of low DOS verified below E_F - ewidth (usable part above -1.943 is empty)"
+   ]
+  ],
+  "seconds": 23,
+  "brvtyp": "hcp",
+  "natm": 3,
+  "types": [
+   "Sn_1a_0",
+   "Se_2d_1"
+  ]
+ },
+ "ZnSe": {
+  "status": "finished",
+  "ewidth": 1.2775,
+  "tried": [
+   1.2,
+   1.2775
+  ],
+  "gap": [
+   -2.2425,
+   -1.2525
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "prim": true
+  },
+  "message": "",
+  "reasons": [
+   [
+    "region [-0.892, -0.757] (DOS < 0.02) is 0.135 Ry wide < eth 0.30",
+    "region [-0.562, -0.412] (DOS < 0.02) is 0.150 Ry wide < eth 0.30",
+    "region [-0.022, 0.022] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "region [0.037, 0.068] (DOS < 0.02) is 0.030 Ry wide < eth 0.30",
+    "region [0.083, 0.098] (DOS < 0.02) is 0.015 Ry wide < eth 0.30"
+   ],
+   [
+    "region [-0.907, -0.667] (DOS < 0.02) is 0.240 Ry wide < eth 0.30",
+    "region [-0.472, -0.427] (DOS < 0.02) is 0.045 Ry wide < eth 0.30",
+    "region [-0.037, 0.022] (DOS < 0.02) is 0.060 Ry wide < eth 0.30",
+    "region [0.037, 0.052] (DOS < 0.02) is 0.015 Ry wide < eth 0.30"
+   ]
+  ],
+  "seconds": 3,
+  "brvtyp": "fcc",
+  "natm": 2,
+  "types": [
+   "Zn_4a_0",
+   "Se_4c_4"
+  ]
+ }
+}
