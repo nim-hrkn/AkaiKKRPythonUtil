@@ -605,3 +605,101 @@ Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore
 - valence 帯の底は core 準位からは出ないので、DOS を完全に省くことはできない。A は「どこに置いてはいけないか」を決める段。
 - `*` 付きの準位は ewidth で動くので、A の予測は ±0.1 Ry の不確かさを持つ。禁止区間の幅で吸収する。
 - 2022.0721 の akaikkr ビルドでは Hf 4f のように準位そのものが 2019 年版と 0.6 Ry 違う場合がある。予測は同じビルドの go 出力から行う。
+
+## 15. 軌道の valence / core 指定から ewidth の範囲を決める（仕様、2026-09-25、branch `ewidth_select_orbital`）
+
+ユーザー要望: 「ある元素のある軌道を occupied / unoccupied にするように指定できるか。軌道準位が分かるので min_ewidth が決まるはず。例: Rb 4p、Se 4s、Bi 6s」。
+
+### 15.1 用語と意味
+
+積分路 [E_F − ewidth, E_F] に入る状態は valence として自己無撞着に扱われ、積分路より下（ebtm より下）の core 配置の状態は core として固定される（§0、[core_levels_vs_dos.md](core_levels_vs_dos.md) §1 の `*`）。ユーザーの語をこれに対応させる。
+
+| ユーザーの語 | 正準名 | 意味 | specx 出力での確認 |
+|---|---|---|---|
+| occupied | `valence` | その軌道を積分路に入れる（E_F − ewidth を準位より **下** に置く） | out_go.log の core level 表でその準位に `*` が付く（core 配置に無い軌道は表に出ず、常に valence） |
+| unoccupied | `core` | その軌道を積分路から外す（E_F − ewidth を準位より **上** に置く） | 同じ表で `*` が付かない |
+
+「occupied / unoccupied」は「積分路が占める / 占めない」の意味であり、電子の占有数のことではない（core も占有されている）。API は `valence` / `core` を正準とし、`occupied` / `unoccupied` を別名として受け付ける。
+
+指定できる軌道は、その元素の **core 配置にある軌道**（out_go.log の `core configuration` 表、`docs/data/atomic_core_levels_dsp.csv` に載る軌道）だけ。core 配置に無い軌道（Cd 4d、遷移金属の 3d など）は常に valence なので、`valence` 指定は無条件に満たされ（制約無し）、`core` 指定は満たせない（`GaesError`: specx には ewidth 以外に軌道を core に固定する手段が無い）。
+
+### 15.2 規則: 準位から範囲を決める
+
+軌道 (元素 X, 軌道 nl) の準位を ε = E − E_F（< 0）とする。
+
+- `valence`: ewidth ≥ |ε| + ediff。準位のすぐ下に積分路の下端を置くと、準位の裾（`*` 準位は幅 0.05〜0.1 Ry のピーク）を切るので、ediff（既定 0.2 Ry）の余裕を取る。→ **min_ewidth_orb = |ε| + ediff**。
+- `core`: ewidth ≤ |ε| − ediff。→ **max_ewidth_orb = |ε| − ediff**。
+- 複数の指定は AND: min_ewidth = max(min_ewidth_orb)、max_ewidth = min(max_ewidth_orb)。
+- 軌道指定から出た範囲は **既定の [1.0, 2.0] を置き換える**（既定値は「指定が無いときの規定」）。ユーザーが `min_ewidth` / `max_ewidth` を明示して同時に与えた場合は両方を満たす範囲（共通部分）を使い、空なら `GaesError` で両方の値を示す。
+- min_ewidth > max_ewidth になったら（例: Rb 4p を core、Se 4s を valence）`GaesError`。矛盾した組を示す。
+- 範囲を決めた後の動作は §4.3 と同じ: ギャップ区間の判定は範囲に依らず窓全体で行い、ewidth の **選択** だけを範囲で絞る。範囲内にギャップの候補が無ければ `fail`（message に範囲と、範囲内の DOS の最小値を書く）。§4.3 の `old` 判定に **−ewidth が範囲内にあること** を条件として加える（現状は範囲を見ずに `old` を返すので、例えば Rb 4p を core と指定しても現在の 1.2 がギャップに入っていれば `old` になってしまう。§15.5 の表の「現状」列）。
+
+準位は次の順で取る。上のものが無ければ下へ。
+
+1. **実行中**: 直前の go の out_go.log の成分ブロックから、その元素・軌道の準位（E − E_F = 準位 − ef、`*`）。判定のたびに読み直す（`*` 準位は ewidth で 0.05〜0.1 Ry 動く、§14.5）。SCF が収束していなくても使う（core 準位は数十反復で mRy まで落ち着く、§14.2）。
+2. **段階 0（最初の go の前）**: `docs/data/converged_core_levels_2019.csv`（E − E_F の中央値、§14.1.1 表 A）。表 A に無い元素・軌道は `docs/data/atomic_core_levels_dsp.csv`（表 B、muffin-tin ゼロ基準の絶対値）から ε ≈ energy_Ry − ef_assumed（既定 0.6 Ry）で見積もる。表 B は原子の初期ポテンシャルの値で、収束値より 0.2〜0.5 Ry 深い（Rb 4p: 表 B −0.862 Ry、18 系の E_F 0.245 で ε ≈ −1.11 に対し収束値 −0.94）。したがって表 B から決めた範囲は **初期 ewidth の選択にだけ** 使い、最初の go の後は必ず 1. の値で決め直す。表 A の値も系による散らばり ±0.05 Ry があるので同様に決め直す。
+
+初期 ewidth（`ewidth_init`）は範囲の中に無ければ範囲の中央に置き換える。
+
+### 15.3 確認と再判定
+
+各 go の後に、指定した軌道の `*` を読み、指定と一致するか確かめる。
+
+- `valence` 指定なのに `*` が無い（積分路が準位より上に来た）、または `core` 指定なのに `*` が付く → 準位が動いて範囲の外に出た。範囲を 1. の準位で決め直し、`new` として次の ewidth へ（`max_ew` まで）。history に `orbital_mismatch` を記録する。
+- 一致していれば通常の判定。
+
+`finished` の条件に「指定した全軌道の `*` が指定と一致」を加える。
+
+### 15.4 API
+
+pyakaikkr（`pyakaikkr.gaes.orbital`、新規）:
+
+```python
+@dataclass
+class OrbitalRule:
+    element: str        # "Rb"
+    orbital: str        # "4p"
+    role: str           # "valence" | "core"
+
+parse_orbital_rules(["Rb4p=occupied", "Se4s:core", "Bi 6s valence"]) -> [OrbitalRule, ...]
+    # 区切りは "=", ":", 空白のどれでもよい。元素記号 + n + l（s/p/d/f）。role は
+    # valence|occupied|core|unoccupied（大文字小文字を区別しない）。
+levels_from_go(outfile) -> {(element, orbital): (E_minus_EF, star)}     # AkaikkrJob.get_core_levels_by_component
+levels_from_tables(elements, ef_assumed=0.6) -> {(element, orbital): E_minus_EF}   # 表 A、無ければ表 B
+bounds_from_rules(rules, levels, ediff=0.2, user_min=None, user_max=None)
+    -> Bounds(min_ewidth, max_ewidth, details=[(rule, level, bound), ...])   # 矛盾は GaesError
+check_rules(rules, levels) -> [(rule, star)]   # 不一致の一覧（§15.3）
+```
+
+`Gaes(..., orbitals=["Rb4p=valence"])`、`kkr-gaes run/site/hea --orbital Rb4p=occupied --orbital Bi6s=core`（複数可）。`Judgement` に `orbital_bounds: [min, max]`、`orbital_levels: {"Rb4p": [E, star]}`、`orbital_mismatch: [..]` を追加。`KeyResult.parameters` に `orbitals` を残す。
+
+aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 go の後に `levels_from_go` を parser 出力（`results` に成分ごとの core level を加える: 新規 parser 項目 `core_levels`）から取り、history に同じ項目を書く。CLI `submit-gaes --orbital`、MCP `kkr_submit_gaes(orbitals=[...])`。
+
+### 15.5 例（X-Mn-Fe-Co fcc、§13.3 の最終 DOS で判定し直した値、ediff 0.2）
+
+| 指定 | 準位 ε (Ry) | 範囲 | 現在の ewidth | 結果（範囲を選択に使うだけ） | 備考 |
+|---|---|---|---|---|---|
+| Rb 4p valence | −0.936 `*` | [1.14, —] | 1.2 | `old`（ギャップ [−1.93, −1.18]） | 現状と同じ |
+| Rb 4p core | −0.936 `*` | [—, 0.74] | 1.2 | 候補 0.59（ギャップ [−0.65, −0.5]）→ 0.59 で go | 現状は `old` を返す（§15.2 の条件追加で `new`） |
+| Se 4s valence | −1.042 `*` | [1.24, —] | 1.414 | `old` | 現状と同じ |
+| Se 4s core | −1.042 `*` | [—, 0.84] | 1.414 | 候補 0.76 | 4s の上の低 DOS 区間 |
+| Bi 6s valence | −0.954 `*` | [1.15, —] | 1.373 | `old` | 現状と同じ |
+| Bi 6s core | −0.954 `*` | [—, 0.75] | 1.373 | 候補無し（eth 0.3）→ `fail`；eth 0.2 なら 0.73 | 6s と valence 帯の間の区間は幅 0.27 |
+| Te 5s core | −0.987 `*` | [—, 0.79] | 1.403 | 候補無し → `fail` | 区間幅 0.24 |
+| In 4d core | −1.128 `*` | [—, 0.93] | 1.506 | 候補無し → `fail` | 区間幅 0.27〜0.29 |
+
+`core` 指定では、その軌道と valence 帯の底の間に幅 eth のギャップが要る。Bi 6s、Te 5s、In 4d のように幅が 0.24〜0.29 Ry しか無い系では eth を 0.2 に下げないと `fail` になる。この場合の `fail` は仕様どおり（指定を満たす積分路が無い）で、message に範囲と区間幅を出す。
+
+### 15.6 実装しないこと
+
+- 軌道の準位を DOS の判定（§4）に混ぜること。ギャップ判定は DOS の値だけで行う（§0.2）。準位は範囲を決めるためだけに使う。
+- 準位そのものを specx に指示すること（specx に軌道を core に固定する入力は無い）。
+- Committee（§5）への対応は範囲を members の ewidth 列に掛けるだけで済むので、逐次方式の実装後に行う。
+
+### 15.7 実装の順序
+
+1. `AkaikkrJob.get_core_levels_by_component(outfile)`（[core_levels_vs_dos.md](core_levels_vs_dos.md) §5 の未実装項目）。
+2. `pyakaikkr.gaes.orbital`（parse / levels / bounds / check）とオフラインテスト（§13.3 の out_go.log を fixture に使う）。
+3. `choose_ewidth` / `choose_ewidth2` の `old` 判定に範囲の条件を追加（既存テストの期待値を確認）。
+4. `Gaes` と CLI に `orbitals` を通し、Judgement / KeyResult に記録。Rb 4p core（→ 0.59）、Se 4s core（→ 0.76）、Bi 6s core（→ `fail`、eth 0.2 で 0.73）で実走テスト。
+5. aiida-akaikkr（parser の `core_levels`、WorkChain、CLI、MCP、docs/gaes_workchain.md）。
