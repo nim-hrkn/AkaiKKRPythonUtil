@@ -37,8 +37,8 @@ for row, (name, keys, runs) in enumerate(PAIRS):
         for k, v in lv.items():
             if v.e > e[0] and k not in keys: ax.axvline(v.e, color="0.6", lw=0.8, ls="--" if v.star else "-")
         ax.set_yscale("log"); ax.set_ylim(1e-4, 3e2); ax.set_xlim(-2.9, 0.9)
-        ax.set_title("%s: ewidth %.4f, %s (itr %s, log10 rms %s), gap judgement: %s, window [%.2f, %.2f]" % (
-            name, ew, "converged" if conv else "NOT converged", n, err, flag, e[0], e[-1]), fontsize=9, loc="left",
+        ax.set_title("%s: ewidth %.4f, %s (itr %s, log10 rms %s), gap judgement: %s" % (
+            name, ew, "converged" if conv else "NOT converged", n, err, flag), fontsize=8, loc="left",
             color="k" if conv else "darkred")
 for ax in axes[-1]: ax.set_xlabel("E - EF (Ry)")
 fig.suptitle("SCF convergence flips with ewidth: red = -ewidth (contour bottom), blue = the level concerned (dashed = * valence), gray = other core levels; green / blue shade = coarse / fine gap regions (Method 2)", fontsize=10)
