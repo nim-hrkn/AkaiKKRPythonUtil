@@ -388,11 +388,14 @@ class GoDos(GoGo):
             self.param.update(args)
 
     def postscript(self):
+        # ewidth of the go run (out_go.log in the same directory) marks
+        # the bottom of the SCF energy contour on the DOS/PDOS plots.
+        go_outfile = _make_outputcard("go")
         dosplotter = DosEXPlotter(
-            self.directory, self.outputcard, self.directory)
+            self.directory, self.outputcard, self.directory, go_outfile=go_outfile)
         dosplotter.make()
         pdosplotter = PDosEXPlotter(
-            self.directory, self.outputcard, self.directory)
+            self.directory, self.outputcard, self.directory, go_outfile=go_outfile)
         pdosplotter.make()
 
 

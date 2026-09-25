@@ -389,10 +389,14 @@ def Jij(filename, outputpath, outputtype):
 def dos(filename, outputpath,):
     """Generate DOS and PDOS plot
     """
-    job = AkaikkrJob(".")
+    s = os.path.split(filename)
+    dir_part = os.path.join(*s[:-1]) if s[0] else "."
+    filename_ = s[-1]
     os.makedirs(outputpath, exist_ok=True)
-    dosplot = DosEXPlotter(directory=".", outfile=filename)
-    dosplot.make_dos(output_directory=outputpath)
+    # ewidth of the go run is read from out_go.log in the same directory
+    dosplot = DosEXPlotter(directory=dir_part, outfile=filename_,
+                           output_directory=outputpath)
+    dosplot.make()
 
 
 @ cmd.command()

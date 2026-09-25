@@ -4,6 +4,7 @@
 |---|---|---|
 | [ase_calculator_usage.md](ase_calculator_usage.md) | 使い方 | `pyakaikkr.ase.AkaiKKR`（ASE calculator）。純物質・混晶（CPA）の指定、単位、パラメータ、ポテンシャル再利用、落とし穴 |
 | [testscript_usage.md](testscript_usage.md) | 使い方 | `tests/akaikkr*/testrun.py` と `testrun_ase.py`。参照ファイル、backend、環境、既知の最終桁差 |
+| [dos_plot_ewidth_line.md](dos_plot_ewidth_line.md) | 使い方 | DOS / PDOS 図の E − E_F = −|ewidth_go| の線。go の ewidth を使う理由、`ewidth_go` / `go_outfile` / `read_go_outfile` の優先順 |
 | [akaikkr_option_keys.md](akaikkr_option_keys.md) | リファレンス | AkaiKKR の `begin_option` ブロックのキー（mse, tol, ng, dex, ...）の意味と既定値、読まれる場所 |
 | [ase_calculator_spec.md](ase_calculator_spec.md) | 仕様書 | ASE calculator の設計仕様（2026-09-24 実装、末尾に実装メモと後日談） |
 | [testscript_ase_spec.md](testscript_ase_spec.md) | 仕様書 | テストスクリプトの ASE backend の設計仕様（同上） |

@@ -15,7 +15,7 @@ python testrun_ase.py /path/to/AkaiKKRprogram.2022.0721.ifort            # ASE b
 - `<program_path>` は `akaikkr/specx`、`akaikkr_cnd/specx` などを含むディレクトリです。
 - `--set` は `testsets.py` の `make_exe()` で定義した集合名（`all`, `Cu`, `Fe`, `Co`, `Ni`, `NiFe`, `AlMnFeCo`, `Fe2RhPt`, `Fe_lmd`, ...）。
 - `--create_ref` は結果を `reference/<compiler>[_<backend>].json` に書きます。通常実行は同じファイルと比較して `SHORT SUMMARY` を出します（O 合格、X 不合格、- 参照無し）。
-- 各物質のディレクトリ（`Cu/`, `Fe/`, ...）に inputcard、出力、図（dos.png、Awk_up.png ...）が残ります。`result.json` に今回の値、`Awk_both.png` がトップに出るのは既知の不便です。
+- 各物質のディレクトリ（`Cu/`, `Fe/`, ...）に inputcard、出力、図（dos.png、Awk_up.png ...）が残ります。`result.json` に今回の値、`Awk_both.png` がトップに出るのは既知の不便です。 dos.png / pdos_*.png の赤い一点鎖線は go の ewidth（同じディレクトリの `out_go.log` から読む）で、SCF の積分路の下端です（[dos_plot_ewidth_line.md](dos_plot_ewidth_line.md)）。
 
 ## 2. backend
 
