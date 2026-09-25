@@ -33,5 +33,5 @@ for row, (name, keys, runs) in enumerate(PAIRS):
             name, ew, "converged" if conv else "NOT converged", n, err, flag, roles), fontsize=8, loc="left",
             color="k" if conv else "darkred")
 for ax in axes[-1]: ax.set_xlabel("E - EF (Ry)")
-fig.suptitle("SCF convergence flips with ewidth (second title line: how specx treated the orbital in that go, CORE or VALENCE *). " + legend_text(), fontsize=9)
-fig.tight_layout(rect=(0, 0, 1, 0.98)); fig.savefig("conv_pairs_dos.png", dpi=120); print("saved conv_pairs_dos.png")
+fig.suptitle("SCF convergence flips with ewidth. Second title line: how specx treated the orbital in that go (CORE, or VALENCE *).\n" + legend_text(), fontsize=9)
+fig.tight_layout(rect=(0, 0, 1, 0.965)); fig.savefig("conv_pairs_dos.png", dpi=120); print("saved conv_pairs_dos.png")
