@@ -3,7 +3,7 @@ import json, glob, os, sys, textwrap
 import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pyakaikkr import AkaikkrJob
-from pyakaikkr.gaes import dos_curves_from_outputs, levels_from_go
+from pyakaikkr.gaes import dos_curves_from_outputs, levels_from_go, per_atom
 from pyakaikkr.gaes.ewidth import choose_ewidth2
 from pyakaikkr.gaes.plot import draw_gaes_dos, legend_text
 # newest run of each tag wins (RUN_orb2 < ... < RUN_orb6); GLOB overrides the search pattern
@@ -21,16 +21,20 @@ for ax, tag in zip(axes, order):
     jf = d["judgements"][-1]; dd = list(jf["directories"].values())[0]
     e, c, _ = dos_curves_from_outputs([(AkaikkrJob(dd), "out_dos.log")]); lv = levels_from_go(dd + "/out_go.log")
     lo, hi = jf.get("orbital_bounds") or (pr.get("min_ewidth"), pr.get("max_ewidth"))
-    dec = choose_ewidth2(e, c, jf["ewidth"], dosth=pr["dosth"], dosth2=pr["dosth2"], eth=pr["eth"], ediff=pr["ediff"],
+    natm = jf.get("natm") if jf.get("dos_unit") == "per_atom" else None   # judge per atom, display per cell
+    dec = choose_ewidth2(e, per_atom(c, natm), jf["ewidth"], dosth=pr["dosth"], dosth2=pr["dosth2"], eth=pr["eth"], ediff=pr["ediff"],
                          margin=pr["margin"], dosth2_relax=pr["dosth2_relax"], min_ewidth=lo, max_ewidth=hi)
     # highlight the rule orbitals, or (without rules) every level inside the window
     hl = [r.split("=")[0] for r in rules] or [k for k, v in lv.items() if v.e > e[0]]
     draw_gaes_dos(ax, e, c[0], ewidth=jf["ewidth"], decision=dec, bounds=(lo, hi), levels=lv, highlight=hl, xlim=(-2.9, 0.9))
     why = ("\n" + "\n".join(textwrap.fill("why: " + r, 120) for r in dec.reasons)) if dec.flag == "fail" else ""
     conv = ",".join("%s" % v for v in d["converged"].values()) if d["converged"] else None
-    ax.set_title("%s: %s, ewidth %.4f, conv=%s, bounds [%s, %s], tried %s%s" % (
-        tag, d["status"], jf["ewidth"], conv, lo and round(lo, 3), hi and round(hi, 3),
+    unit = " (judged per atom, natm %d)" % natm if natm else ""
+    ax.set_title("%s: %s, ewidth %.4f, conv=%s, bounds [%s, %s], tried %s%s%s" % (
+        tag, d["status"], jf["ewidth"], conv, lo and round(lo, 3), hi and round(hi, 3), unit,
         [round(t, 3) for t in d["ewidth_tried"]], why), fontsize=8, loc="left")
+    for th, ls in ((pr.get("dosth", 2e-2), "--"), (pr.get("dosth2", 1e-3), ":")):   # thresholds in the displayed unit
+        ax.axhline(th * (natm or 1), color="0.4", lw=0.6, ls=ls)
 for ax in axes[len(order):]: ax.axis("off")
 for ax in axes[-ncol:]: ax.set_xlabel("E - EF (Ry)")
 fig.suptitle(os.environ.get("TITLE", "GAES with orbital rules (X-Mn-Fe-Co fcc)") + ": last judgement DOS. " + legend_text(), fontsize=9)

@@ -115,6 +115,23 @@ def dos_curves_from_outputs(jobs_and_files, spin_sum=True):
     return energies[0], curves, labels
 
 
+def natm_of_output(job, outfile, default=None):
+    """number of atoms in the unit cell of a specx output (the 'atoms in the unit cell' table)."""
+    try:
+        _coords, names = job.get_atom_coord(outfile)
+        return len(names) or default
+    except Exception:  # noqa: BLE001 - old outputs without the table
+        return default
+
+
+def per_atom(curves, natm):
+    """DOS curves divided by the number of atoms in the cell (gap thresholds are per atom by
+    default; the 2019 thresholds were set on one-atom CPA cells). natm None or < 1: unchanged."""
+    if not natm or natm < 1:
+        return list(curves)
+    return [np.asarray(c, dtype=float) / float(natm) for c in curves]
+
+
 def pdos_curves_from_output(job, outfile, l_sum=True, spin_sum=True):
     """PDOS curves of every component of one dos output (entry point of the PDOS extension).
 

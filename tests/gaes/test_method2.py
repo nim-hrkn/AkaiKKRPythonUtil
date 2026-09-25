@@ -124,3 +124,21 @@ def test_fail_carries_reasons():
     assert m.flag == "fail" and any("< eth 0.30" in r for r in m.reasons)
     m = choose_ewidth2(e, [np.full_like(e, 5.0)], 1.1, dosth=2e-2)
     assert m.flag == "fail" and any("no region with DOS <" in r for r in m.reasons)
+
+
+def test_per_atom_normalisation_changes_the_judgement_of_a_multi_atom_cell():
+    """Bi2Se3 case: a 5-atom cell whose gap floor is 5e-3 per cell (1e-3 per atom)."""
+    from pyakaikkr.gaes import per_atom, Gaes
+    e = np.linspace(-2.2425, 0.7425, 400)
+    d = np.full_like(e, 5.4e-3)                     # gap floor per cell
+    d[e > -1.05] = 30.0                             # valence band
+    d[(e > -1.75) & (e < -1.55)] = 200.0            # Bi 5d
+    d[e < -1.75] = 5.6e-3
+    assert choose_ewidth2(e, [d], 1.2, dosth=2e-2, dosth2=1e-3).flag == "fail"
+    m = choose_ewidth2(e, per_atom([d], 5), 1.2, dosth=2e-2, dosth2=1e-3)
+    assert m.flag == "new" and m.relaxed and 1.2 < m.ewidth < 1.4   # 1.08e-3 per atom: found with the relaxed 2e-3; -1.2 is within ediff of the top
+    assert np.allclose(per_atom([d], None)[0], d)                   # no natm: unchanged
+    g = Gaes("specx")
+    assert g.dos_per_atom and g.parameters()["dos_per_atom"] is True
+    assert Gaes("specx", dos_per_atom=False).dos_per_atom is False
+    assert Gaes("specx", compat=True).dos_per_atom is False        # 2019 behaviour judges per cell

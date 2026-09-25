@@ -40,6 +40,7 @@ print(res.status, res.ewidth_final, res.gap_used, [j.flag for j in res.judgement
 - ディレクトリ名は `key_<key>,ew_<n>-<ewidth>,ed_<n>-<edelt>,polytyp_<p>,pm_<n>-<pmix>`。同じ inputcard で正常終了した出力があれば再実行しない。
 - `ref` は使うビルドの dos の窓に合わせる（akaikkr 0.75、cpa2021v01 / cnd 0.5）。ずれていれば `RUN/kkr-gaes.log` に警告が出る。
 - `ewidth_dos` は E_F − ewidth_go − eth − ediff まで届くよう自動で広げる（`ewidth_dos_auto=True`）。specx が dos で止まれば狭めて再試行する。
+- ギャップ区間の判定は既定で **原子あたり** の DOS（total DOS / natm）で行う（`dos_per_atom=True`、CLI `--dos-per-cell` で生の胞あたり）。閾値 2e-2 / 1e-3 は 1 原子胞で決めた値なので、多原子胞ではこの正規化が要る（Bi2Se3 の 5 原子胞では胞あたりだと fail）。図の DOS は胞あたりのままで、閾値の線だけ natm 倍される。
 
 CLI:
 

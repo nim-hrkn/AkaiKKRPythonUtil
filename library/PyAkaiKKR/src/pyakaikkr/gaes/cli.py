@@ -12,7 +12,7 @@ from ..AkaiKkr import AkaikkrJob
 from .composition import SiteComposition, make_single_site_param, check_type_name
 from .ewidth import decide, ETH, EDIFF, MARGIN
 from .orbital import EF_ASSUMED, parse_orbital_rules, levels_from_go, bounds_from_rules, check_rules, levels_as_dict
-from .gap import dos_curves_from_outputs
+from .gap import dos_curves_from_outputs, natm_of_output, per_atom
 from .layout import Layout
 from .legacy_hea import heakey_to_composition, composition_to_heakey, load_heakeylist
 from .scheme import Gaes, collect, collect_legacy
@@ -32,6 +32,8 @@ def _add_scheme_options(p):
                    help="per-orbital rule, e.g. Rb4p=valence (occupied: inside the contour) or Bi6s=core "
                         "(unoccupied: below the contour); repeatable. Derives the ewidth range from the core levels")
     p.add_argument("--ef-assumed", type=float, default=EF_ASSUMED, help="E_F assumed with the atomic level table (step 0)")
+    p.add_argument("--dos-per-cell", action="store_true",
+                   help="judge the raw DOS per cell (2019 behaviour); default: DOS per atom (total DOS / natm)")
     p.add_argument("--ewidth-init", type=float, default=1.2)
     p.add_argument("--ewidth-dos", type=float, default=3.0)
     p.add_argument("--ref", type=float, default=0.75, help="cemesr ref of the build (akaikkr 0.75, akaikkr_cnd 0.5)")
@@ -58,7 +60,7 @@ def _gaes(args):
     layout = Layout(args.prefix, version=1 if args.compat else 2)
     return Gaes(args.exe, layout, ewidth_init=args.ewidth_init, ewidth_dos=args.ewidth_dos, ref=args.ref,
                 method=args.method, dosth=args.dosth, dosth2=args.dosth2, min_ewidth=args.min_ewidth, max_ewidth=args.max_ewidth,
-                orbitals=args.orbital, ef_assumed=args.ef_assumed,
+                orbitals=args.orbital, ef_assumed=args.ef_assumed, dos_per_atom=not args.dos_per_cell,
                 max_ew=args.max_ew, max_pm_iter=args.max_pm_iter, maxitr_init=args.maxitr_init,
                 edelt_init=args.edelt_init, edelt_dos=args.edelt_dos, edelt_steps=tuple(args.edelt_steps),
                 with_j=not args.no_j, compat=args.compat)
@@ -106,6 +108,10 @@ def cmd_check(args):
         d, f = os.path.split(path)
         pairs.append((AkaikkrJob(d or "."), f))
     energy, curves, labels = dos_curves_from_outputs(pairs)
+    if not args.dos_per_cell:
+        natm = max(natm_of_output(job, f, 1) or 1 for job, f in pairs)
+        curves = per_atom(curves, natm)
+        print("DOS judged per atom (natm = {}); pass --dos-per-cell for the raw DOS".format(natm))
     lo, hi = args.min_ewidth, args.max_ewidth
     if args.orbital:
         rules = parse_orbital_rules(args.orbital)
@@ -179,6 +185,7 @@ def main(argv=None):
     s.add_argument("--ediff", type=float, default=EDIFF)
     s.add_argument("--min-ewidth", type=float, default=None); s.add_argument("--max-ewidth", type=float, default=None)
     s.add_argument("--go", nargs="+", default=[], help="out_go.log file(s) for the core levels of --orbital")
+    s.add_argument("--dos-per-cell", action="store_true", help="judge the raw DOS per cell instead of per atom")
     s.add_argument("--orbital", action="append", default=[], metavar="Xnl=ROLE", help="per-orbital rule (see run --orbital)")
     s.set_defaults(func=cmd_check)
     s = sub.add_parser("collect", help="collect key_*.json (or the 2019 RUN with --legacy) into a CSV")

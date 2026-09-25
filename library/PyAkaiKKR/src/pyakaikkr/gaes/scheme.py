@@ -22,7 +22,7 @@ from .convergence import is_converging
 from .ewidth import decide, ETH, EDIFF, MARGIN, DOSTH2, DOSTH2_RELAX
 from .orbital import (parse_orbital_rules, levels_from_go, levels_for_step0, bounds_from_rules, check_rules,
                       initial_ewidth, levels_as_dict, EF_ASSUMED)
-from .gap import dos_curves_from_outputs
+from .gap import dos_curves_from_outputs, natm_of_output, per_atom
 from .layout import Layout, RunPoint
 from .runner import KkrRunner
 
@@ -52,6 +52,8 @@ class Judgement:
     orbital_bounds: Optional[list] = None                            # [min_ewidth, max_ewidth] used for this judgement
     orbital_mismatch: List[dict] = field(default_factory=list)      # rules the go output does not satisfy
     reasons: List[str] = field(default_factory=list)                # why regions gave no candidate (fail diagnosis)
+    dos_unit: str = "per_cell"                                     # DOS unit of the judgement: per_atom (default) or per_cell
+    natm: Optional[int] = None                                      # atoms per cell used for per_atom
 
 
 @dataclass
@@ -91,7 +93,7 @@ class Gaes:
                  pmix_steps=(1e-2, 5e-3, 1e-3, 5e-4, 1e-4), pmix_init=0.005,
                  maxitr_init=500, maxitr_2nd=200, maxitr_pm=300, max_pm_iter=20, max_ew=10,
                  fresh_retry=True, bzqlty_steps=("+4",),
-                 with_j=True, compat=False, tighten_before_fail=False, logger=None):
+                 with_j=True, compat=False, tighten_before_fail=False, dos_per_atom=True, logger=None):
         self.akaikkr_exe = akaikkr_exe
         self.layout = layout if layout is not None else Layout("RUN", version=1 if compat else 2)
         self.ewidth_init = ewidth_init
@@ -133,6 +135,10 @@ class Gaes:
         # convergence, and the gap moves with ewidth. tighten_before_fail=True instead runs
         # STEP2 before accepting "fail" on an unconverged run.
         self.tighten_before_fail = tighten_before_fail and not compat
+        # gap thresholds (dosth, dosth2) apply to the DOS per atom (total DOS / natm) by default, so that
+        # the 2019 values set on one-atom CPA cells carry over to multi-atom cells (Bi2Se3: 5 atoms).
+        # False judges the raw DOS per cell (2019 behaviour). Figures keep the per-cell unit.
+        self.dos_per_atom = dos_per_atom and not compat
         self.logger = logger or logging.getLogger("pyakaikkr.gaes")
 
     # ---------------------------------------------------------------- helpers
@@ -141,7 +147,7 @@ class Gaes:
                                                "eth", "ediff", "margin", "min_ewidth", "max_ewidth", "edelt_init", "edelt_dos", "edelt_steps", "pmix_steps",
                                                "pmix_init", "maxitr_init", "maxitr_2nd", "maxitr_pm",
                                                "max_pm_iter", "max_ew", "fresh_retry", "bzqlty_steps", "with_j", "compat",
-                                               "tighten_before_fail")} | {"orbitals": [str(r) for r in self.orbitals],
+                                               "tighten_before_fail", "dos_per_atom")} | {"orbitals": [str(r) for r in self.orbitals],
                                                                           "ef_assumed": self.ef_assumed}
 
     def _bounds(self, levels, strict=True):
@@ -218,6 +224,10 @@ class Gaes:
                     raise GaesError("no dos output for polytyp {} in {}".format(p, r.directory))
                 pairs.append((r.job, r.files["out_dos"]))
             energy, curves, _ = dos_curves_from_outputs(pairs)
+            natm = None
+            if self.dos_per_atom:
+                natm = max(natm_of_output(r.job, r.files["out_dos"], r.param_go.get("natm")) or 1 for r in runners.values())
+                curves = per_atom(curves, natm)
             dec = decide(self.method, energy, curves, ewidth, dosth=self.dosth, dosth2=self.dosth2, eth=self.eth,
                          ediff=self.ediff, margin=self.margin, dosth2_relax=self.dosth2_relax, min_ewidth=bounds.min_ewidth,
                          max_ewidth=bounds.max_ewidth)
@@ -255,7 +265,7 @@ class Gaes:
                       method=self.method, fine_regions=[list(f.as_tuple()) for f in dec.fine], relaxed=dec.relaxed,
                       dosth2_used=dec.dosth2_used, window_limited=dec.window_limited,
                       orbital_levels=levels_as_dict(levels), orbital_bounds=bounds.as_list(), orbital_mismatch=mismatch,
-                      reasons=list(dec.reasons))
+                      reasons=list(dec.reasons), dos_unit="per_atom" if self.dos_per_atom else "per_cell", natm=natm)
         for p, r in runners.items():
             if r.ref_effective is not None and abs(r.ref_effective - self.ref) > 0.05:
                 self.logger.warning("polytyp %s: dos window gives ref=%.3f but Gaes(ref=%.3f); the window "
