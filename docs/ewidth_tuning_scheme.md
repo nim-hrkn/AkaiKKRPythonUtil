@@ -698,15 +698,32 @@ aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 g
 
 - **core 扱いと valence 扱いで準位が 0.7〜0.9 Ry 違う**。Bi 6s は valence（`*`）なら −0.96 Ry、core なら −1.83 Ry。Rb 4p は −0.94 / −1.68 Ry、Se 4s は −0.97 / −1.05 Ry。ある go の準位だけから範囲を決めると、core 扱いの go の後は範囲が緩み（Bi: max 1.63）、次の go で準位が valence に戻って振動する。そこで **その key で見た準位をすべて記録し、core 指定には最も浅い値、valence 指定には最も深い値** を使う（`Gaes._levels_seen`、WorkChain の `ctx.levels_seen`）。
 - 新規ポテンシャルで始める go では、reconf が原子の初期準位（表 B に相当）と ebtm を比べて `*` を決める。表 B が 0.2〜0.5 Ry 深いため、段階 0 を表 B で決めると valence 指定の初期 ewidth が深すぎる（Rb 4p valence: 1.2 → 1.86 で `old`、範囲内なので受理されてしまう）。段階 0 は **表 A（2019 年の収束値）だけ** で決め、表に無い元素は `ewidth_init` のまま始めて最初の判定で直す（`levels_for_step0`）。表に無い元素の core 指定も段階 0 では誤りにしない（`strict=False`）。
+- **段階 0 は ewidth_init を深くする方向にしか動かさない**（`initial_ewidth`）。core 指定の上限に合わせて浅くすると（Tl 5d core: 表 A から 0.39、Ga 3d 0.61、In 4d 0.64）積分路が valence 帯の中に入り、SCF が発散する（Tl: rms 1.0、5d が −3.2 Ry へ）か、ギャップの無い DOS になる。ewidth_init（1.2）で 1 回 go を回せば、その DOS から範囲内の候補が取れる（Bi 6s core, eth 0.2: 0.4 → 1.40 → 0.73 の 3 回が、1.2 → 0.7275 の 2 回になった）。
+- valence 指定の下限が今の積分路より深いとき、dos の窓を E_F − min_ewidth − eth − ediff まで広げてから判定する（Rb 4s valence: min 2.3 → ewidth_dos 3.73）。
 - 結果:
 
   | 指定 | ewidth の経過 | 範囲の経過 | 結果 |
   |---|---|---|---|
   | Rb 4p valence | 1.2 | [1.14, —] | `finished` 1.2（Rb 4p は `*`） |
   | Bi 6s core | 0.4（表 A から）→ 1.4025 → | [—, 1.63] → [—, 0.754] | `ewidth_fail`（eth 0.3 では 6s と valence 帯の間に幅 0.3 の区間が無い） |
-  | Bi 6s core, eth 0.2 | 0.4 → 1.4025 → 0.7275 | [—, 1.63] → [—, 0.754] → [—, 0.754] | `finished` 0.7275（Bi 6s は core、−0.96 Ry、SCF 収束） |
+  | Bi 6s core, eth 0.2 | 0.4 → 1.4025 → 0.7275（修正版: 1.2 → 0.7275） | [—, 1.63] → [—, 0.754] → [—, 0.754] | `finished` 0.7275（Bi 6s は core、−0.96 Ry、SCF 収束） |
   | Rb 4p core | 1.2 → 0.5875 | [—, 0.736] → [—, 0.736] | `ewidth_fail`（0.5875 で SCF 発散、rms 0.95 / 500 反復、低 DOS 区間無し。積分路の下端 −0.59 が valence 帯の底 −0.58 に接する。Rb 4p を core にした解はこの系に無い） |
   | Se 4s core | 1.2 → 0.7725 | [—, 0.844] → [—, 0.844] | `finished` 0.7725（Se 4s は core、−1.05 Ry、SCF 収束、ギャップ [−0.89, −0.67]） |
+
+  他の元素（同じ X-Mn-Fe-Co fcc、ewidth_init 1.2、修正版）:
+
+  | 指定 | 準位（1.2 の go、E − E_F） | 範囲 | ewidth の経過 | 結果 |
+  |---|---|---|---|---|
+  | Pr 5p valence | −1.41（core） | [1.65, —] | 1.2 → 1.7775 | `finished`（5p は `*`、−1.40 Ry、5p 帯の下のギャップ [−2.27, −1.66]） |
+  | Ce 5p valence | −1.56（core） | [1.76, —] | 1.2 → 1.9125 | `finished`（5p は `*`、−1.55 Ry） |
+  | La 5p core | −1.32 `*` | [—, 1.11] | 1.2 → 0.8125 | `finished`（5p は core、−1.33 Ry、ギャップ [−0.98, −0.80]） |
+  | Ba 5p core | −1.06 `*` | [—, 0.86] | 1.2 → 0.6375 | `finished`（5p は core、−1.08 Ry。STEP1 未収束、STEP2 edelt 1e-2 で収束） |
+  | In 4d core | −1.11 `*` | [—, 0.91] | 1.2 | `ewidth_fail`（4d と valence 帯の間の区間は幅 0.27〜0.29 < eth） |
+  | Tl 5d core | −0.94 `*` | [—, 0.74] | 1.2 | `ewidth_fail`（同上） |
+  | Ga 3d core | −1.08 `*` | [—, 0.88] | 1.2 | `ewidth_fail`（同上） |
+  | Rb 4s valence | −2.10（core） | [2.30, —] | 1.2 | `ewidth_fail`（窓を 3.73 に広げても [−2.8, −2.3] に DOS < 2e-2 の幅 0.3 の区間が無い） |
+
+  `core` 指定が通るのは、その準位と valence 帯の間に幅 eth のギャップがある系（La、Ba、Se、Bi は eth 0.2）だけで、In / Tl / Ga のように準位が valence 帯に近い系では `fail` になる。`valence` 指定は準位の下にギャップがあれば通る（Pr、Ce）。
 
   aiida-akaikkr の `AkaikkrGaesWorkChain`（SLURM、specx-akaikkr@mygardenx2-slurm）でも同じ: Se 4s core は pk 3565 で 1.2 → 0.7725 `finished`、Rb 4p core は pk 3539 で 1.2 → 0.5875 `ewidth_fail`（終了コード 420）。図 `~/aiida_work/figures/gaes_orbital/pk3565_gaes01_dos.png`（斜線帯 [—, 0.844]、Se 4s の準位線）。
 

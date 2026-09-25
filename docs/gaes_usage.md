@@ -60,7 +60,7 @@ kkr-gaes check --dos RUN/.../out_dos.log --go RUN/.../out_go.log --ewidth 1.2 --
 `Rb4p=valence`（別名 `occupied`: 積分路に入れる）、`Rb4p=core`（別名 `unoccupied`: 積分路から外す）のように、元素・軌道ごとに指定できる（仕様: ewidth_tuning_scheme.md §15）。
 
 - 範囲: valence → `min_ewidth = |E − E_F| + ediff`、core → `max_ewidth = |E − E_F| − ediff`。準位は各 go の `out_go.log` の成分ブロック（`AkaikkrJob.get_core_levels_by_component`）から判定のたびに読む。core 扱いの準位は valence 扱いより 0.7〜0.9 Ry 深く出るので、その key で見た値のうち core 指定には最も浅い値、valence 指定には最も深い値を使う。
-- 最初の go の前は `converged_core_levels_2019.csv`（2019 年の収束値）だけで範囲を決め、`ewidth_init` が外れていれば範囲の中へ動かす。表に無い元素は `ewidth_init` のまま始め、最初の判定で直す。
+- 最初の go の前は `converged_core_levels_2019.csv`（2019 年の収束値）だけで範囲を決め、valence 指定の下限より `ewidth_init` が浅ければ下限 + ediff へ深くする。core 指定のために浅くはしない（最初の go の DOS から範囲内の候補を取る）。表に無い元素は `ewidth_init` のまま始め、最初の判定で直す。valence 指定の下限が深いときは dos の窓をそこまで広げる。
 - 指定があると既定の [1.0, 2.0] は使わない。`--min-ewidth` / `--max-ewidth` を明示すれば共通部分を取る。矛盾（min > max）や core 配置に無い軌道の `core` 指定は `GaesError`（status `error`）。
 - ギャップの判定は範囲に依らず窓全体で行い、範囲は ewidth の選択だけに使う。範囲を外れた ewidth は `old` にならない（2026-09-25 修正）。go の `*` が指定と食い違えば（準位が積分路をまたいだ）、範囲を決め直して次の候補へ。
 - `KeyResult.judgements[i].orbital_levels / orbital_bounds / orbital_mismatch`、`parameters["orbital_bounds_step0"]` に記録される。
