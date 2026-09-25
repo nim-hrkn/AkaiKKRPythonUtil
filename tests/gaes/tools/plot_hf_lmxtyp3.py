@@ -27,9 +27,13 @@ for row, ew in enumerate(EWS):
         draw_gaes_dos(ax, e, c[0], ewidth=ew, decision=dec, bounds=(1.0, 2.0), levels=lv, highlight=["Hf4f", "Hf5p", "Sn4d"], xlim=(-2.4, 0.9))
         try:
             pe, pc, labels = pdos_curves_from_output(AkaikkrJob(d), "out_dos.log", l_sum=False)
+            # PDOS columns are s, p, d[, f], total: the f column exists only with lmxtyp=3
             for lab, curve in zip(labels, pc):
-                if "Hf" in lab and curve.ndim == 2 and curve.shape[1] >= 4:
-                    ax.plot(pe, curve[:, 3] * 0.25, color="tab:purple", lw=1.0, label="Hf f-PDOS x conc (l=3 column)")
+                if "Hf" in lab and curve.ndim == 2:
+                    if curve.shape[1] == 5:
+                        ax.plot(pe, curve[:, 3] * 0.25, color="tab:purple", lw=1.0, label="Hf f-PDOS x conc")
+                    else:
+                        ax.text(0.99, 0.05, "no f channel (lmxtyp=2)", transform=ax.transAxes, fontsize=8, ha="right", color="tab:purple")
         except Exception as ex:
             ax.text(0.02, 0.05, "pdos: %s" % ex, transform=ax.transAxes, fontsize=7)
         roles = ", ".join("%s: %s (%.2f)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in ("Hf4f",) if k in lv)
