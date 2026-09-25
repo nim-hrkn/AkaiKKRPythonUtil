@@ -461,6 +461,33 @@ specx が必要（`AKAIKKR_PROGRAM_PATH`）:
 - 2022.0721 では go の既定 mse / ng が 2019 年版と違う（Cu 相当で mse 43 / ng 21、2019 年は 65 / 15）ので、全エネルギーは 2019 年の値と 0.04 Ry 程度ずれる。`begin_option` の `mse=`, `ng=` で揃えられる。
 - inputcard の末尾に改行が無い状態で `begin_option` を追記すると原子行に連結され `ty2ity...type not defined` になる。`make_inputcard` は末尾改行を付けないので、手で追記するときは注意。
 
+#### 13.1.1 Hf 4f と reconf の詳細（2026-09-25、cpa2021v01 ビルド、AlSiSnHf bcc）
+
+out_go.log から分かること:
+
+- Hf の core 配置は 4f が up 7 / down 7（14 電子すべて core）。入力の `lmxtyp=2` では valence 基底が s, p, d までなので、`valence charge in the cell` に (f) は無く、DOS / PDOS に 4f の帯は現れない。
+- `cstate.f` の `rearth=(nclr-57)*(nclr-71)*(nclr-89)*(nclr-103) .le. 0` は La〜Lu、Ac〜Lr だけを真にし、Hf（Z = 72）は偽。したがって「open f-core」（`reconf.f` 先頭の `opnc .and. rearth .and. jj .eq. 4` で占有を固定する分岐）は Hf には効かず、`noc` / `nopnc` も無関係。Hf 4f は他の semicore と同じく、準位が ebtm = E_F − ewidth より上に来ると reconf の再配置対象になる。2019 年の RUN には「open f-core」の表示も `4f)*` も無い（reconf 以前の版）。
+- `total charge` は muffin-tin 球内の core 電荷 + セル内の valence 電荷で、球の外の core の裾は含まない。Hf の 70.7〜70.9（Z = 72）、Sn の 48.9〜49.1（Z = 50）は 2019 年の収束した走行でも同じで、欠損ではない。脱占有の量は `core charge in the muffin-tin sphere` の差で見る。
+
+ewidth を振った結果（2022.0721 cpa2021v01、E_F 基準の 4f 準位は絶対値 − ef）:
+
+| lmxtyp | ewidth | ebtm（絶対値） | 4f 準位（絶対値、up / down） | `*` | 球内 core 電荷 | valence (f) | SCF |
+|---|---|---|---|---|---|---|---|
+| 2 | 0.9 | −0.357 | −0.370 / −0.370 | down | 67.925 | — | 収束（152） |
+| 2 | 1.2 | −0.676 | −0.678 / −0.678 | 両方 | 67.941 | — | 未収束 |
+| 2 | 1.5 | −1.013 | −1.151 / −1.058 | down | 67.955 | — | 未収束 |
+| 3 | 0.9 | −0.355 | −0.368 / −0.368 | 両方 | 67.925 | 0.005 / spin | 収束（168） |
+| 3 | 1.2 | −0.679 | −0.871 / −0.806 | 両方 | 67.947 | 0.016 | 未収束（rms 0.22） |
+| 3 | 1.5 | −1.022 | −1.081 / −1.004 | down | **60.956** | 0.015 | 発散（rms 1.0） |
+
+読み方:
+
+- 4f 準位は ewidth を変えると ebtm に追随して動く（0.9 で −0.37、1.2 で −0.68〜−0.87、1.5 で −1.0〜−1.15）。部分的に空いた 4f がポテンシャルを変え、準位が積分路の下端に張り付く自己無撞着な帰結で、2019 年版の −1.84 Ry（E_F 基準）とはまったく違う位置にある。
+- 準位が ebtm のすぐ下にある間（0.9、1.2）は、reconf の幅 3 mRy のなましで脱占有は 0.02〜0.03 電子にとどまり、0.9 は収束、1.2 は振動する。1.5（lmxtyp=3）では down スピンの 4f が ebtm より上に出て 7 電子がまるごと core から外れ（球内 core 電荷 60.96）、valence の f には 0.015 電子しか入らないので発散する。
+- `lmxtyp=3` で f を valence 基底に入れても、4f は core 配置のままなので valence の f 帯にはならず、収束の可否も変わらない。**Hf を含む系を 2022.0721 で扱うには、4f が ebtm から十分離れる小さい ewidth（この系では 0.9 が収束）を選ぶか、§15 の `Hf4f=core` 指定で max_ewidth を |E_4f − E_F| − ediff に抑えるしかない**。ただし準位が ebtm に追随するため、`core` 指定でも 1 回の go ごとに範囲を決め直す必要がある（§15.2 の「見た準位のうち最も浅い値」）。
+
+図 `docs/data/hf_lmxtyp3_AlSiSnHf_dos.png`（左 lmxtyp=2、右 lmxtyp=3、上から ewidth 0.9 / 1.2 / 1.5。紫 = Hf の f-PDOS × 濃度）、出力 `tests/gaes/RUN_Hf_stopped/AlSiSnHf_bcc_lmxtyp3/ew_*/`、スクリプト `tests/gaes/tools/plot_hf_lmxtyp3.py`。
+
 ### 13.2 Bi 系のテスト（2026-09-25）
 
 Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore の 3 系 AlSiRhBi fcc（key 13144583）、AlSiGeBi fcc（13143283、Ge 3d も）、AlScNiBi fcc（13212883）を、初期 ewidth 1.6（Bi 5d ピーク −1.75 Ry の肩）で走らせた（`tests/gaes/test_gaes_run.py`、`GAES_EWIDTH_INIT`、`GAES_DOSTH`、akaikkr ビルド、ref 0.75、ewidth_dos 3.0）。
