@@ -4,6 +4,7 @@ import numpy as np, matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pyakaikkr import AkaikkrJob
 from pyakaikkr.gaes import dos_curves_from_outputs
+from pyakaikkr.gaes.ewidth import choose_ewidth2
 tableA = {}
 for r in csv.DictReader(open("/home/kino/kino/Claude/Project/AKAIKKR/AkaiKKRPythonUtil/docs/data/converged_core_levels_2019.csv")):
     tableA.setdefault(r["element"], []).append((r["orbital"], float(r["E_minus_EF_median_Ry"])))
@@ -36,9 +37,16 @@ for ax, name in zip(axes, names):
         ax.set_title("%s: %s (no dos)" % (name, d["status"]), fontsize=9); continue
     e, c, _ = dos_curves_from_outputs([(AkaikkrJob(dd), "out_dos.log")]); ef, lv = own_levels(dd)
     ax.plot(e, c[0], color="k", lw=1.1)
-    for a, b in jf["regions"]: ax.axvspan(a, b, color="tab:green", alpha=0.10)
-    for a, b in jf["fine_regions"]: ax.axvspan(a, b, color="tab:blue", alpha=0.15)
-    pr = d.get("parameters", {}); lo, hi = pr.get("min_ewidth"), pr.get("max_ewidth")
+    # re-judge the stored DOS with the current rules (regions touching the window bottom are examined too)
+    pr = d.get("parameters", {})
+    dec = choose_ewidth2(e, c, jf["ewidth"], dosth=pr.get("dosth", 2e-2), dosth2=pr.get("dosth2", 1e-3), eth=pr.get("eth", 0.3),
+                         ediff=pr.get("ediff", 0.2), margin=pr.get("margin", 0.01), dosth2_relax=pr.get("dosth2_relax", 2.0),
+                         min_ewidth=pr.get("min_ewidth"), max_ewidth=pr.get("max_ewidth"))
+    for g in dec.coarse: ax.axvspan(g.e1, g.e2, color="tab:green", alpha=0.10)
+    for g in dec.fine: ax.axvspan(g.e1, g.e2, color="tab:blue", alpha=0.15)
+    if dec.flag != jf["flag"] or [round(x, 4) for x in dec.candidates] != [round(x, 4) for x in jf.get("candidates", [])]:
+        print("re-judged %s: stored %s %s -> now %s %s" % (name, jf["flag"], jf.get("candidates"), dec.flag, dec.candidates))
+    lo, hi = pr.get("min_ewidth"), pr.get("max_ewidth")
     if lo is not None and hi is not None:
         ax.axvspan(-hi, -lo, facecolor="none", edgecolor="0.4", hatch="///", lw=0, alpha=0.25)
     if d["ewidth_final"]: ax.axvline(-d["ewidth_final"], color="red", ls="-.", lw=1.2)
