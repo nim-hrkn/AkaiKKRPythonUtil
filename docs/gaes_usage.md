@@ -50,7 +50,20 @@ kkr-gaes run  --exe /path/to/specx --input params.json                          
 kkr-gaes collect --prefix RUN -o result.csv        # key_*.json を表に
 kkr-gaes collect --prefix run0/RUN --legacy -o legacy.csv   # 2019 年の RUN を読む
 kkr-gaes comp Rh0.5Pt0.5_1 13142122               # 組成・type 名・heakey の相互変換と 40 文字検査
+kkr-gaes site --exe ... --comp RbMnFeCo --polytyp fcc --orbital Rb4p=core        # Rb 4p を積分路の外（core）に
+kkr-gaes site --exe ... --comp BiMnFeCo --polytyp fcc --orbital Bi6s=occupied --orbital Bi5d=core
+kkr-gaes check --dos RUN/.../out_dos.log --go RUN/.../out_go.log --ewidth 1.2 --orbital Rb4p=core   # 範囲と準位を表示
 ```
+
+## 軌道の valence / core 指定（`--orbital`、`Gaes(orbitals=[...])`）
+
+`Rb4p=valence`（別名 `occupied`: 積分路に入れる）、`Rb4p=core`（別名 `unoccupied`: 積分路から外す）のように、元素・軌道ごとに指定できる（仕様: ewidth_tuning_scheme.md §15）。
+
+- 範囲: valence → `min_ewidth = |E − E_F| + ediff`、core → `max_ewidth = |E − E_F| − ediff`。準位は各 go の `out_go.log` の成分ブロック（`AkaikkrJob.get_core_levels_by_component`）から判定のたびに読む。core 扱いの準位は valence 扱いより 0.7〜0.9 Ry 深く出るので、その key で見た値のうち core 指定には最も浅い値、valence 指定には最も深い値を使う。
+- 最初の go の前は `converged_core_levels_2019.csv`（2019 年の収束値）だけで範囲を決め、`ewidth_init` が外れていれば範囲の中へ動かす。表に無い元素は `ewidth_init` のまま始め、最初の判定で直す。
+- 指定があると既定の [1.0, 2.0] は使わない。`--min-ewidth` / `--max-ewidth` を明示すれば共通部分を取る。矛盾（min > max）や core 配置に無い軌道の `core` 指定は `GaesError`（status `error`）。
+- ギャップの判定は範囲に依らず窓全体で行い、範囲は ewidth の選択だけに使う。範囲を外れた ewidth は `old` にならない（2026-09-25 修正）。go の `*` が指定と食い違えば（準位が積分路をまたいだ）、範囲を決め直して次の候補へ。
+- `KeyResult.judgements[i].orbital_levels / orbital_bounds / orbital_mismatch`、`parameters["orbital_bounds_step0"]` に記録される。
 
 ## 2019 年の RUN との互換
 

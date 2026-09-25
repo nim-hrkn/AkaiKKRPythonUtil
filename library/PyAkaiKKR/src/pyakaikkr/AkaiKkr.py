@@ -1915,6 +1915,39 @@ StructureWriter.poscar(struc)."""
         # accept that they are none
         return core_exist, core_level
 
+    def get_core_levels_by_component(self, outfile):
+        """core levels of every component block (``*** type-<type> <element> (z= Z) ***``).
+
+        Args:
+            outfile (str): output of go (or dos / j) to analyze
+
+        Returns:
+            list[dict]: one entry per component, spin and orbital with the keys type, element, z,
+            spin ("up" / "down"), orbital ("4p"), level_Ry (absolute, muffin-tin zero),
+            e_minus_ef_Ry (level - E_F of the same spin), ef_Ry and star (True when specx marked
+            the level with ``*``: a core-configured state above E_F - ewidth whose occupation was
+            moved to the valence side). Empty when the output has no component block.
+        """
+        text = "\n".join(self._read(outfile))
+        efs = re.findall(r"\n\s+ef=\s*(-?\d+\.\d+)\s+(-?\d+\.\d+)", text)
+        ef = {"up": float(efs[-1][0]), "down": float(efs[-1][1])} if efs else {"up": float("nan"), "down": float("nan")}
+        out = []
+        for block in re.split(r"\*\*\* type-", text)[1:]:
+            head = re.match(r"(\S+)\s+(\S+)\s+\(z=\s*([\d.]+)\)", block)
+            if head is None:
+                continue
+            block = block.split("hyperfine field")[0]
+            for spin_name, spin_key in (("spin up", "up"), ("spin down", "down")):
+                sec = re.search(r"core level\s+\(" + spin_name + r"\s*\)(.*?)(?=core level\s+\(|\Z)", block, re.S)
+                if sec is None:
+                    continue
+                for value, orbital, star in re.findall(r"(-?\d+\.\d+) Ry\((\d[spdf])\)(\*?)", sec.group(1)):
+                    level = float(value)
+                    out.append({"type": head.group(1), "element": head.group(2), "z": float(head.group(3)),
+                                "spin": spin_key, "orbital": orbital, "level_Ry": level,
+                                "e_minus_ef_Ry": level - ef[spin_key], "ef_Ry": ef[spin_key], "star": bool(star)})
+        return out
+
     def _jij_lines_dataframe(self, lines):
         """convert jij lines to dataframe
 

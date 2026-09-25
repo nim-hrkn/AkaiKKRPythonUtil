@@ -690,6 +690,26 @@ aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 g
 
 `core` 指定では、その軌道と valence 帯の底の間に幅 eth のギャップが要る。Bi 6s、Te 5s、In 4d のように幅が 0.24〜0.29 Ry しか無い系では eth を 0.2 に下げないと `fail` になる。この場合の `fail` は仕様どおり（指定を満たす積分路が無い）で、message に範囲と区間幅を出す。
 
+### 15.5.1 実装と実走の記録（2026-09-25、branch `ewidth_select_orbital`）
+
+実装: `pyakaikkr.gaes.orbital`（`OrbitalRule`, `parse_orbital_rules`, `levels_from_go` / `levels_from_records`, `levels_from_tables`, `levels_for_step0`, `bounds_from_rules`, `check_rules`, `initial_ewidth`）、`AkaikkrJob.get_core_levels_by_component`、`Gaes(orbitals=..., ef_assumed=...)`、`kkr-gaes ... --orbital`、`kkr-gaes check --go --orbital`、aiida-akaikkr（parser `results["core_levels"]`、`AkaikkrGaesWorkChain` の `gaes.orbitals`、`submit-gaes --orbital`、`kkr_submit_gaes(orbital=...)`、終了コード 423、`plot --gaes-pk` の判定ごとの範囲と準位）。§15.2 の `old` 判定の範囲条件も入れた（`within_bounds`、Method 1 / 2 とも）。テスト `tests/gaes/test_orbital.py`（fixture `tests/gaes/data/out_go_RbMnFeCo_fcc_ew1.2.log`）。
+
+実走で分かったこと（X-Mn-Fe-Co fcc、akaikkr ビルド、Method 2、ediff 0.2）:
+
+- **core 扱いと valence 扱いで準位が 0.7〜0.9 Ry 違う**。Bi 6s は valence（`*`）なら −0.96 Ry、core なら −1.83 Ry。Rb 4p は −0.94 / −1.68 Ry、Se 4s は −0.97 / −1.05 Ry。ある go の準位だけから範囲を決めると、core 扱いの go の後は範囲が緩み（Bi: max 1.63）、次の go で準位が valence に戻って振動する。そこで **その key で見た準位をすべて記録し、core 指定には最も浅い値、valence 指定には最も深い値** を使う（`Gaes._levels_seen`、WorkChain の `ctx.levels_seen`）。
+- 新規ポテンシャルで始める go では、reconf が原子の初期準位（表 B に相当）と ebtm を比べて `*` を決める。表 B が 0.2〜0.5 Ry 深いため、段階 0 を表 B で決めると valence 指定の初期 ewidth が深すぎる（Rb 4p valence: 1.2 → 1.86 で `old`、範囲内なので受理されてしまう）。段階 0 は **表 A（2019 年の収束値）だけ** で決め、表に無い元素は `ewidth_init` のまま始めて最初の判定で直す（`levels_for_step0`）。表に無い元素の core 指定も段階 0 では誤りにしない（`strict=False`）。
+- 結果:
+
+  | 指定 | ewidth の経過 | 範囲の経過 | 結果 |
+  |---|---|---|---|
+  | Rb 4p valence | 1.2 | [1.14, —] | `finished` 1.2（Rb 4p は `*`） |
+  | Bi 6s core | 0.4（表 A から）→ 1.4025 → | [—, 1.63] → [—, 0.754] | `ewidth_fail`（eth 0.3 では 6s と valence 帯の間に幅 0.3 の区間が無い） |
+  | Bi 6s core, eth 0.2 | 0.4 → 1.4025 → 0.7275 | [—, 1.63] → [—, 0.754] → [—, 0.754] | `finished` 0.7275（Bi 6s は core、−0.96 Ry、SCF 収束） |
+  | Rb 4p core | RUN_orb3 参照（下） | | |
+  | Se 4s core | RUN_orb3 参照（下） | | |
+
+  最初の版（各 go の準位だけ、表 B も段階 0 に使用）では Rb 4p core が 1.2 → 0.5875 で SCF 発散（500 反復、rms 0.95）、DOS に低 DOS 区間が無く `ewidth_fail`。積分路の下端 −0.59 が valence 帯の底（DOS が 1e-3 を超える −0.58）に接していた。Se 4s core は 0.955 → 0.7275 → 0.7725 で `finished`（Se 4s は core、−1.05 Ry）。
+
 ### 15.6 実装しないこと
 
 - 軌道の準位を DOS の判定（§4）に混ぜること。ギャップ判定は DOS の値だけで行う（§0.2）。準位は範囲を決めるためだけに使う。

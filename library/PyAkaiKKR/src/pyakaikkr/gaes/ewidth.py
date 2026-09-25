@@ -26,6 +26,12 @@ def check_ewidth(regions, ewidth, eth=ETH, ediff=EDIFF):
     return None
 
 
+def within_bounds(ewidth, min_ewidth=None, max_ewidth=None, tol=1e-9):
+    """True when min_ewidth <= ewidth <= max_ewidth (None = no bound)."""
+    return ((min_ewidth is None or ewidth >= min_ewidth - tol)
+            and (max_ewidth is None or ewidth <= max_ewidth + tol))
+
+
 def _clip_candidate(ew, lo, hi, min_ewidth, max_ewidth):
     """candidate ew (Ry) with -ew allowed in the open interval (lo, hi): if ew is outside
     [min_ewidth, max_ewidth] it is moved to the nearest bound provided -bound still lies
@@ -64,7 +70,10 @@ def choose_ewidth(regions, ewidth, eth=ETH, ediff=EDIFF, margin=MARGIN, min_ewid
         proposed, ("fail", None, []) when no region is wide enough.
     """
     cands = ewidth_candidates(regions, eth=eth, ediff=ediff, margin=margin, min_ewidth=min_ewidth, max_ewidth=max_ewidth)
-    if ewidth is not None and check_ewidth(regions, ewidth, eth=eth, ediff=ediff) is not None:
+    # "old" only inside [min_ewidth, max_ewidth]: an ewidth that is anchored in a gap but violates
+    # a bound (e.g. one derived from an orbital rule, section 15) must move
+    if (ewidth is not None and within_bounds(ewidth, min_ewidth, max_ewidth)
+            and check_ewidth(regions, ewidth, eth=eth, ediff=ediff) is not None):
         return "old", ewidth, cands
     if not cands:
         return "fail", None, []
@@ -110,7 +119,8 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
        with at least eth of verified low DOS below them (-ewidth >= e_min + eth) are used, and
        Decision.window_limited is set when that leaves nothing (the caller may widen the window);
     3. the upper margin is measured from the coarse region's upper edge: top = e2 - ediff;
-    4. "old" if -ewidth lies in a fine sub-region and below top;
+    4. "old" if -ewidth lies in a fine sub-region and below top, and ewidth is inside
+       [min_ewidth, max_ewidth] (a bound violated by the current ewidth forces a move);
     5. candidates: -(min(f2, top) - margin) for each fine sub-region [f1, f2] when it lies above f1;
        a candidate outside [min_ewidth, max_ewidth] is moved to the bound if E_F - bound is still
        inside the sub-region (below top), otherwise dropped.
@@ -127,6 +137,7 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
     dec = Decision(flag="fail", ewidth=None, coarse=coarse, dosth2_used=dosth2)
     cands = []
     e_min = float(np.min(energy))
+    may_keep = ewidth is not None and within_bounds(ewidth, min_ewidth, max_ewidth)
     for g in coarse:
         # a region touching the bottom of the dos window has a real upper edge but an unknown
         # lower edge: it may anchor or propose an ewidth only if at least eth of low DOS is
@@ -145,7 +156,7 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
         dec.fine.extend(fine)
         for f in fine:
             lo = f.e1 if floor is None else max(f.e1, floor)
-            if ewidth is not None and dec.gap_used is None and lo < -ewidth < f.e2 and -ewidth < top:
+            if may_keep and dec.gap_used is None and lo < -ewidth < f.e2 and -ewidth < top:
                 dec.gap_used = f
             hi = min(f.e2, top)
             if hi - margin > lo:

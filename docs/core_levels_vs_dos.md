@@ -98,6 +98,7 @@ Pt、Au、Hg は 5d が valence 帯の中（Hg 5d は −0.7 Ry 付近の山）�
 
 - ギャップ判定は DOS の値だけで行う（[ewidth_tuning_scheme.md](ewidth_tuning_scheme.md) §0.2）が、**E_F − ewidth_go が core 準位に衝突していないか**は go の出力だけで、dos を回す前に検査できる。Hf 4f（2022 版で −1.2 Ry）や Pb 5d（−1.29 Ry）のように、2019 年の初期値 1.2 がちょうど準位の上に乗る場合は SCF が収束しない、または収束しても積分路が semicore を切っている。
 - 実装案（未実装）: 成分ごとの core 準位（E − E_F）を幅 0.1 Ry 程度の擬似ピークとして `gap_regions` の曲線列に加える。窓の外の準位や、`*` で valence に切り替わる準位の位置も判定に入る。
+- 実装済み（2026-09-25）: 準位から ewidth の **範囲** を決める軌道指定（`Rb4p=valence` / `core`、ewidth_tuning_scheme.md §15）。ギャップ判定そのものは DOS のまま。
 - `*` 付きの準位は ewidth を変えると 0.05〜0.1 Ry 動く（In 4d: ewidth 1.2 → 1.46 → 1.53 で −1.10 → −1.17 → −1.13 Ry）。判定のたびに読み直す。
 
 ## 5. pyakaikkr での読み方（現状）
@@ -115,4 +116,4 @@ for block in re.split(r"\*\*\* type-", txt)[1:]:
         print(m.group(2), orbital, float(value) - ef, "valence" if star else "core")
 ```
 
-成分ごとの core 準位を `*` 付きで返す `AkaikkrJob.get_core_levels_by_component(outfile)` は未実装（GAES の core 準位判定を入れるときに追加する）。
+成分ごとの core 準位を `*` 付きで返す `AkaikkrJob.get_core_levels_by_component(outfile)` を実装した（2026-09-25、branch ewidth_select_orbital）。返り値は成分・スピン・軌道ごとの dict（type, element, z, spin, orbital, level_Ry, e_minus_ef_Ry, ef_Ry, star）。`pyakaikkr.gaes.levels_from_go` がこれを元素・軌道ごとにまとめ（両スピン・複数成分の最深・最浅値を保持）、GAES の軌道指定（ewidth_tuning_scheme.md §15）が使う。

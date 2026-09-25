@@ -20,6 +20,8 @@ from typing import Dict, List, Optional
 from ..Error import GaesError, KKRFailedExecutionError
 from .convergence import is_converging
 from .ewidth import decide, ETH, EDIFF, MARGIN, DOSTH2, DOSTH2_RELAX
+from .orbital import (parse_orbital_rules, levels_from_go, levels_for_step0, bounds_from_rules, check_rules,
+                      initial_ewidth, levels_as_dict, EF_ASSUMED)
 from .gap import dos_curves_from_outputs
 from .layout import Layout, RunPoint
 from .runner import KkrRunner
@@ -46,6 +48,9 @@ class Judgement:
     relaxed: bool = False                                    # Method 2: dosth2 was relaxed
     dosth2_used: Optional[float] = None
     window_limited: bool = False
+    orbital_levels: Dict[str, list] = field(default_factory=dict)   # 'Rb4p': [E - E_F, star] from the go outputs
+    orbital_bounds: Optional[list] = None                            # [min_ewidth, max_ewidth] used for this judgement
+    orbital_mismatch: List[dict] = field(default_factory=list)      # rules the go output does not satisfy
 
 
 @dataclass
@@ -71,13 +76,17 @@ class KeyResult:
             json.dump(self.to_dict(), f, indent=1, default=str)
 
 
+DEFAULT_MIN_EWIDTH = 1.0   # Ry, user-set defaults (2026-09-25)
+DEFAULT_MAX_EWIDTH = 2.0
+
+
 class Gaes:
     """sequential Gap-Anchored Ewidth Search (port of run_scheme2 of the 2019 HEA run)."""
 
     def __init__(self, akaikkr_exe, layout=None, *, ewidth_init=1.2, ewidth_dos=3.0,
                  ewidth_dos_auto=True, ewidth_dos_max=4.5, ref=0.75, method=2, dosth=2e-2, dosth2=DOSTH2, dosth2_relax=DOSTH2_RELAX,
                  eth=ETH, ediff=EDIFF, margin=MARGIN,
-                 min_ewidth=1.0, max_ewidth=2.0, edelt_init=1e-4, edelt_dos=1e-4, edelt_steps=(1e-2, 1e-3, 1e-4),
+                 min_ewidth=None, max_ewidth=None, orbitals=None, ef_assumed=EF_ASSUMED, edelt_init=1e-4, edelt_dos=1e-4, edelt_steps=(1e-2, 1e-3, 1e-4),
                  pmix_steps=(1e-2, 5e-3, 1e-3, 5e-4, 1e-4), pmix_init=0.005,
                  maxitr_init=500, maxitr_2nd=200, maxitr_pm=300, max_pm_iter=20, max_ew=10,
                  fresh_retry=True, bzqlty_steps=("+4",),
@@ -93,8 +102,14 @@ class Gaes:
         self.dosth = 2e-2 if compat else dosth
         self.dosth2, self.dosth2_relax = dosth2, dosth2_relax
         self.eth, self.ediff, self.margin = eth, ediff, margin
-        self.min_ewidth = min_ewidth   # candidates shallower than this are dropped (default 1.0 Ry)
-        self.max_ewidth = max_ewidth   # candidates deeper than this are dropped (default 2.0 Ry)
+        # ewidth is chosen inside [min_ewidth, max_ewidth] (candidates outside are moved to the bound,
+        # "old" requires the current ewidth inside); gap regions are judged independently of the bounds.
+        # None = the defaults 1.0 / 2.0 Ry, which per-orbital rules (section 15) replace.
+        self._user_min, self._user_max = min_ewidth, max_ewidth
+        self.min_ewidth = DEFAULT_MIN_EWIDTH if min_ewidth is None else min_ewidth
+        self.max_ewidth = DEFAULT_MAX_EWIDTH if max_ewidth is None else max_ewidth
+        self.orbitals = parse_orbital_rules(orbitals)   # e.g. ["Rb4p=valence", "Bi6s=core"]
+        self.ef_assumed = ef_assumed                    # E_F assumed with the atomic table (step 0)
         self.edelt_init = edelt_init          # STEP1 (2019: 1e-4)
         # edelt of every dos used for the gap judgement, independent of the go edelt of STEP2:
         # a large edelt broadens the DOS and shrinks the gap regions, which would change the
@@ -125,7 +140,14 @@ class Gaes:
                                                "eth", "ediff", "margin", "min_ewidth", "max_ewidth", "edelt_init", "edelt_dos", "edelt_steps", "pmix_steps",
                                                "pmix_init", "maxitr_init", "maxitr_2nd", "maxitr_pm",
                                                "max_pm_iter", "max_ew", "fresh_retry", "bzqlty_steps", "with_j", "compat",
-                                               "tighten_before_fail")}
+                                               "tighten_before_fail")} | {"orbitals": [str(r) for r in self.orbitals],
+                                                                          "ef_assumed": self.ef_assumed}
+
+    def _bounds(self, levels, strict=True):
+        """[min_ewidth, max_ewidth] for the decision: the orbital rules applied to `levels`, else the
+        (user or default) bounds. strict=False at step 0 (a level missing from the tables is no error)."""
+        return bounds_from_rules(self.orbitals, levels, self.ediff, self._user_min, self._user_max,
+                                 self.min_ewidth, self.max_ewidth, strict=strict)
 
     def _ewidth_dos_for(self, ewidth_go):
         """dos window wide enough to see a gap of width eth below E_F - ewidth_go."""
@@ -161,6 +183,22 @@ class Gaes:
         dos window, the dos is recomputed with a wider window (x1.5, up to ewidth_dos_max) and
         judged again."""
         widened = 0
+        levels = {}
+        mismatch = []
+        if self.orbitals:
+            # the levels of this go decide the mismatch; the bounds use every level seen so far in this
+            # key (a state treated as core sits 0.7-0.9 Ry deeper than the same state treated as
+            # valence, so the shallowest value seen bounds a core rule, the deepest a valence rule)
+            levels = levels_from_go([(r.job, r.files["out_go"]) for r in runners.values() if r.has("go")])
+            mismatch = check_rules(self.orbitals, levels)
+            for k, v in levels.items():
+                seen = self._levels_seen.get(k)
+                if seen is None:
+                    self._levels_seen[k] = v
+                else:
+                    seen.e_min, seen.e_max = min(seen.e_min, v.e_min), max(seen.e_max, v.e_max)
+                    seen.e, seen.star = 0.5 * (seen.e_min + seen.e_max), v.star
+        bounds = self._bounds(self._levels_seen if self.orbitals else {})
         while True:
             pairs = []
             for p, r in runners.items():
@@ -169,8 +207,8 @@ class Gaes:
                 pairs.append((r.job, r.files["out_dos"]))
             energy, curves, _ = dos_curves_from_outputs(pairs)
             dec = decide(self.method, energy, curves, ewidth, dosth=self.dosth, dosth2=self.dosth2, eth=self.eth,
-                         ediff=self.ediff, margin=self.margin, dosth2_relax=self.dosth2_relax, min_ewidth=self.min_ewidth,
-                         max_ewidth=self.max_ewidth)
+                         ediff=self.ediff, margin=self.margin, dosth2_relax=self.dosth2_relax, min_ewidth=bounds.min_ewidth,
+                         max_ewidth=bounds.max_ewidth)
             if not (dec.flag == "fail" and dec.window_limited and self.method == 2):
                 break
             current = max(r.ewidth_dos_used or r.ewidth_dos for r in runners.values())
@@ -189,6 +227,13 @@ class Gaes:
                 for r in runners.values():
                     r.run_dos(ewidth_dos=current, force=True)
                 break
+        if mismatch and dec.flag == "old":
+            # the go output does not treat the orbitals as asked (a level moved across E_F - ewidth):
+            # the bounds were re-derived from the new levels above, so move to the next candidate
+            self.logger.info("orbital rules not satisfied at ewidth %.4f: %s; bounds now %s", ewidth, mismatch, bounds.as_list())
+            dec.flag = "new" if dec.candidates else "fail"
+            dec.ewidth = dec.candidates[0] if dec.candidates else None
+            dec.gap_used = None
         flag, next_ew, cands = dec.flag, dec.ewidth if dec.flag == "new" else (ewidth if dec.flag == "old" else None), dec.candidates
         j = Judgement(step=step, iew=iew, ied=ied, ewidth=ewidth, converged=dict(converged),
                       regions=[list(g.as_tuple()) for g in dec.coarse], flag=flag, next_ewidth=next_ew,
@@ -196,15 +241,16 @@ class Gaes:
                       directories={p: r.directory for p, r in runners.items()},
                       ewidth_dos=next(iter(runners.values())).ewidth_dos_used if runners else None,
                       method=self.method, fine_regions=[list(f.as_tuple()) for f in dec.fine], relaxed=dec.relaxed,
-                      dosth2_used=dec.dosth2_used, window_limited=dec.window_limited)
+                      dosth2_used=dec.dosth2_used, window_limited=dec.window_limited,
+                      orbital_levels=levels_as_dict(levels), orbital_bounds=bounds.as_list(), orbital_mismatch=mismatch)
         for p, r in runners.items():
             if r.ref_effective is not None and abs(r.ref_effective - self.ref) > 0.05:
                 self.logger.warning("polytyp %s: dos window gives ref=%.3f but Gaes(ref=%.3f); the window "
                                     "[%.3f, %.3f] may not reach E_F - ewidth_go - eth - ediff = %.3f",
                                     p, r.ref_effective, self.ref, energy.min(), energy.max(),
                                     -ewidth - self.eth - self.ediff)
-        self.logger.info("judge %s iew=%d ied=%d ewidth=%.4f converged=%s regions=%s -> %s %s",
-                         step, iew, ied, ewidth, converged, j.regions, flag, next_ew)
+        self.logger.info("judge %s iew=%d ied=%d ewidth=%.4f converged=%s regions=%s bounds=%s -> %s %s",
+                         step, iew, ied, ewidth, converged, j.regions, bounds.as_list(), flag, next_ew)
         return j
 
     # ---------------------------------------------------------------- steps
@@ -300,6 +346,9 @@ class Gaes:
 
     def _finish(self, res, status, ewidth, runners, converged, judgement):
         res.status = status
+        if status == "ewidth_fail" and judgement is not None and judgement.orbital_bounds and not res.message:
+            res.message = "no gap candidate inside [min_ewidth, max_ewidth] = {}{}".format(
+                judgement.orbital_bounds, " (orbital rules {})".format([str(r) for r in self.orbitals]) if self.orbitals else "")
         res.ewidth_final = ewidth
         res.converged = dict(converged)
         res.final = {p: r.directory for p, r in runners.items()}
@@ -314,6 +363,17 @@ class Gaes:
 
     def _run(self, key, params, res):
         ewidth = self.ewidth_init
+        self._levels_seen = {}
+        if self.orbitals:
+            # step 0: the converged table gives a first range; the go outputs replace it at every judgement
+            levels0 = levels_for_step0({r.element for r in self.orbitals}, self.ef_assumed)
+            bounds0 = self._bounds(levels0, strict=False)
+            ewidth = initial_ewidth(self.ewidth_init, bounds0, self.ediff)
+            res.parameters["orbital_bounds_step0"] = bounds0.as_list()
+            res.parameters["orbital_levels_step0"] = {k: [round(v.e, 4), v.source] for k, v in levels0.items()}
+            self.logger.info("key %s: orbital rules %s -> step-0 bounds %s from %s; first ewidth %.4f", key,
+                             [str(r) for r in self.orbitals], bounds0.as_list(),
+                             {k: v.source for k, v in levels0.items()}, ewidth)
         tried = set()
         iew = 0
         runners, converged, judgement = {}, {}, None

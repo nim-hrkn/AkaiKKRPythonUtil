@@ -11,6 +11,7 @@ import sys
 from ..AkaiKkr import AkaikkrJob
 from .composition import SiteComposition, make_single_site_param, check_type_name
 from .ewidth import decide, ETH, EDIFF, MARGIN
+from .orbital import EF_ASSUMED, parse_orbital_rules, levels_from_go, bounds_from_rules, check_rules, levels_as_dict
 from .gap import dos_curves_from_outputs
 from .layout import Layout
 from .legacy_hea import heakey_to_composition, composition_to_heakey, load_heakeylist
@@ -23,8 +24,14 @@ def _add_scheme_options(p):
     p.add_argument("--method", type=int, default=2, choices=(1, 2), help="1: single threshold (2019), 2: two thresholds")
     p.add_argument("--dosth", type=float, default=2e-2, help="threshold (Method 1) / coarse threshold (Method 2)")
     p.add_argument("--dosth2", type=float, default=1e-3, help="fine threshold of Method 2")
-    p.add_argument("--min-ewidth", type=float, default=1.0, help="drop candidates shallower than this (Ry)")
-    p.add_argument("--max-ewidth", type=float, default=2.0, help="drop candidates deeper than this (Ry)")
+    p.add_argument("--min-ewidth", type=float, default=None,
+                   help="lower bound of the chosen ewidth (Ry; default 1.0 unless --orbital gives the range)")
+    p.add_argument("--max-ewidth", type=float, default=None,
+                   help="upper bound of the chosen ewidth (Ry; default 2.0 unless --orbital gives the range)")
+    p.add_argument("--orbital", action="append", default=[], metavar="Xnl=ROLE",
+                   help="per-orbital rule, e.g. Rb4p=valence (occupied: inside the contour) or Bi6s=core "
+                        "(unoccupied: below the contour); repeatable. Derives the ewidth range from the core levels")
+    p.add_argument("--ef-assumed", type=float, default=EF_ASSUMED, help="E_F assumed with the atomic level table (step 0)")
     p.add_argument("--ewidth-init", type=float, default=1.2)
     p.add_argument("--ewidth-dos", type=float, default=3.0)
     p.add_argument("--ref", type=float, default=0.75, help="cemesr ref of the build (akaikkr 0.75, akaikkr_cnd 0.5)")
@@ -51,6 +58,7 @@ def _gaes(args):
     layout = Layout(args.prefix, version=1 if args.compat else 2)
     return Gaes(args.exe, layout, ewidth_init=args.ewidth_init, ewidth_dos=args.ewidth_dos, ref=args.ref,
                 method=args.method, dosth=args.dosth, dosth2=args.dosth2, min_ewidth=args.min_ewidth, max_ewidth=args.max_ewidth,
+                orbitals=args.orbital, ef_assumed=args.ef_assumed,
                 max_ew=args.max_ew, max_pm_iter=args.max_pm_iter, maxitr_init=args.maxitr_init,
                 edelt_init=args.edelt_init, edelt_dos=args.edelt_dos, edelt_steps=tuple(args.edelt_steps),
                 with_j=not args.no_j, compat=args.compat)
@@ -98,8 +106,21 @@ def cmd_check(args):
         d, f = os.path.split(path)
         pairs.append((AkaikkrJob(d or "."), f))
     energy, curves, labels = dos_curves_from_outputs(pairs)
+    lo, hi = args.min_ewidth, args.max_ewidth
+    if args.orbital:
+        rules = parse_orbital_rules(args.orbital)
+        if not args.go:
+            raise SystemExit("--orbital needs --go <out_go.log> to read the core levels")
+        levels = levels_from_go(list(args.go))
+        b = bounds_from_rules(rules, levels, args.ediff, lo, hi)
+        lo, hi = b.min_ewidth, b.max_ewidth
+        print("core levels (E - E_F, star):", levels_as_dict(levels))
+        for d in b.details:
+            print("  {}: level {} -> {} {}".format(d["rule"], d["level"], d["side"], d["bound"]))
+        bad = check_rules(rules, levels)
+        print("bounds from orbital rules: [{}, {}]{}".format(lo, hi, "; NOT satisfied by this go: {}".format(bad) if bad else ""))
     dec = decide(args.method, energy, curves, args.ewidth, dosth=args.dosth, dosth2=args.dosth2, eth=args.eth,
-                 ediff=args.ediff, margin=MARGIN)
+                 ediff=args.ediff, margin=MARGIN, min_ewidth=lo, max_ewidth=hi)
     print("window: [{:.4f}, {:.4f}] Ry, {} points; method {}".format(energy.min(), energy.max(), len(energy), args.method))
     print("gap regions (DOS < {:g}{}):".format(args.dosth, ", wider than eth" if args.method == 2 else ""))
     for g in dec.coarse:
@@ -153,7 +174,11 @@ def main(argv=None):
     s.add_argument("--method", type=int, default=2, choices=(1, 2))
     s.add_argument("--dosth", type=float, default=2e-2); s.add_argument("--dosth2", type=float, default=1e-3)
     s.add_argument("--eth", type=float, default=ETH)
-    s.add_argument("--ediff", type=float, default=EDIFF); s.set_defaults(func=cmd_check)
+    s.add_argument("--ediff", type=float, default=EDIFF)
+    s.add_argument("--min-ewidth", type=float, default=None); s.add_argument("--max-ewidth", type=float, default=None)
+    s.add_argument("--go", nargs="+", default=[], help="out_go.log file(s) for the core levels of --orbital")
+    s.add_argument("--orbital", action="append", default=[], metavar="Xnl=ROLE", help="per-orbital rule (see run --orbital)")
+    s.set_defaults(func=cmd_check)
     s = sub.add_parser("collect", help="collect key_*.json (or the 2019 RUN with --legacy) into a CSV")
     s.add_argument("--prefix", default="RUN"); s.add_argument("--legacy", action="store_true")
     s.add_argument("-o", "--output", default="result.csv"); s.set_defaults(func=cmd_collect)
