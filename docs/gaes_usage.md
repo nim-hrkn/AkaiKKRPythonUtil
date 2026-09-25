@@ -82,6 +82,42 @@ fig.suptitle(legend_text())
 - ギャップの判定は範囲に依らず窓全体で行い、範囲は ewidth の選択だけに使う。範囲を外れた ewidth は `old` にならない（2026-09-25 修正）。go の `*` が指定と食い違えば（準位が積分路をまたいだ）、範囲を決め直して次の候補へ。
 - `KeyResult.judgements[i].orbital_levels / orbital_bounds / orbital_mismatch`、`parameters["orbital_bounds_step0"]` に記録される。
 
+Python から:
+
+```python
+from pyakaikkr.gaes import Gaes, Layout, SiteComposition, make_single_site_param
+comp = SiteComposition.from_elements(["Rb", "Mn", "Fe", "Co"])
+params = {"fcc": make_single_site_param(comp, "fcc", type_name="HEA")}
+g = Gaes("/path/to/specx", Layout("RUN_orb", version=2), ewidth_init=1.2, ref=0.75,
+         orbitals=["Rb4p=core"],          # 複数可: ["Bi6s=occupied", "Bi5d=core"]。occupied = valence、unoccupied = core
+         with_j=False)                    # min_ewidth / max_ewidth は指定すれば共通部分、指定しなければ規則が決める
+res = g.run("RbMnFeCo", params)
+print(res.status, res.ewidth_final)      # finished / ewidth_fail / error（規則の矛盾、core 配置に無い軌道の core 指定）
+print(res.message)                       # ewidth_fail のとき: 範囲と、区間ごとに候補が出なかった理由
+for j in res.judgements:
+    print(j.ewidth, j.flag, j.orbital_bounds,            # この判定に使った [min_ewidth, max_ewidth]
+          j.orbital_levels["Rb4p"],                      # [E - E_F, star]  star=True は valence（*）
+          j.orbital_mismatch,                            # go の扱いが指定と違った軌道
+          j.reasons)                                     # fail のとき、区間ごとの理由
+print(res.parameters["orbitals"], res.parameters.get("orbital_bounds_step0"))
+```
+
+`kkr-gaes check` は既存の go / dos 出力に対して同じ判定だけを行い、`note:` 行に理由を出す:
+
+```
+$ kkr-gaes check --dos RUN_orb/.../out_dos.log --go RUN_orb/.../out_go.log --ewidth 0.641 --orbital In4d=core
+core levels (E - E_F, star): {'In4d': [-1.3473, False], ...}
+  In4d=core: level -1.3473 -> max 1.1473
+bounds from orbital rules: [None, 1.1473]
+...
+ewidth 0.6410: fail
+candidates:
+  note: sub-region [-1.103, -0.938] excluded by ediff 0.20 (E_F - ewidth must be below -1.123 = coarse upper edge -0.922 - ediff); ediff < 0.170 would give a candidate near 1.0925
+  note: sub-region [-2.243, -1.657]: candidate 1.6675 is outside [min_ewidth, max_ewidth] = [None, 1.1473] and the bound is not inside the sub-region
+```
+
+図: `python tests/gaes/tools/plot_orbital_rules.py <tag> ...`（RUN_orb*/<tag>/key_*.json を読み、最終判定の DOS に規則の準位・範囲・理由を重ねる。`OUT=file.png` で出力名）。例は docs/data の `hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 例）と `hea_XMnFeCo_fcc_orbital_pairs_dos.png`（Rb 4p / Se 4s / Bi 6s の valence と core の対）。
+
 ## 2019 年の RUN との互換
 
 `Gaes(compat=True)` は 2019 年の挙動（ディレクトリ名 v1、dosth 2e-2 = スピン平均 1e-2、dos / j を常に実行、`fail` で即終了、新 ewidth でも同じディレクトリを再利用）を再現する。検証用で、新規計算には使わない。
