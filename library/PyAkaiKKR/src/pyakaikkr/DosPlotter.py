@@ -13,41 +13,21 @@ from .BasePlotter import BaseEXPlotter
 from .AkaiKkr import AkaikkrJob
 from .Error import KKRValueAquisitionError
 
-# style of the vertical line at E - EF = -|ewidth_go|
-_EWIDTH_LINE_STYLE = {"color": "tab:red", "lw": 1.0, "ls": "-."}
-_EWIDTH_LINE_LABEL = "$-$ewidth (go)"
+from .plot import mark_ewidth_go, plot_dos as _draw_dos, plot_pdos as _draw_pdos, EWIDTH_LINE_LABEL
+
+_EWIDTH_LINE_LABEL = EWIDTH_LINE_LABEL   # label of the ewidth line (kept for callers and tests)
+
 _DEFAULT_GO_OUTFILE = "out_go.log"
 
 
 def _mark_ewidth_go(ax, energy, ewidth_go):
-    """draw a dash-dot vertical line at E - EF = -|ewidth_go|.
+    """dash-dot vertical line at E - EF = -|ewidth_go| (see pyakaikkr.plot.mark_ewidth_go).
 
-    AkaiKKR integrates the charge over [EF - ewidth, EF] in the go run,
-    so the line shows the bottom of the SCF energy contour. The dos run
-    itself uses another ewidth to define its energy mesh
-    [EF - ref*ewidth, EF + (1 - ref)*ewidth], so the ewidth of the go run,
-    not of the dos run, must be given.
-
-    If the line lies below the energy mesh, the x range is widened to show it.
-
-    Args:
-        ax (matplotlib.axes.Axes): axes to draw on.
-        energy ([float]): energy mesh (E - EF) of the DOS.
-        ewidth_go (float, None): ewidth of the go run. Nothing is drawn if None.
-
-    Returns:
-        bool: True if the line is drawn.
+    AkaiKKR integrates the charge over [EF - ewidth, EF] in the go run, so the line shows the
+    bottom of the SCF energy contour; the ewidth of the go run, not of the dos run, must be given.
+    Returns True if the line is drawn.
     """
-    if ewidth_go is None:
-        return False
-    ebtm = -abs(float(ewidth_go))
-    ax.axvline(ebtm, label=_EWIDTH_LINE_LABEL, **_EWIDTH_LINE_STYLE)
-    energy = np.asarray(energy, dtype=float)
-    lo, hi = float(energy.min()), float(energy.max())
-    if ebtm < lo:
-        margin = 0.02 * (hi - ebtm)
-        ax.set_xlim(ebtm - margin, hi + margin)
-    return True
+    return mark_ewidth_go(ax, energy, ewidth_go)
 
 
 def resolve_ewidth_go(directory, ewidth_go=None, go_outfile=_DEFAULT_GO_OUTFILE,
@@ -87,46 +67,23 @@ def resolve_ewidth_go(directory, ewidth_go=None, go_outfile=_DEFAULT_GO_OUTFILE,
 
 def _plot_dos(energy, dos_block, output_direcotry=None,
               yscale="log", figsize=(5, 3), ewidth_go=None):
-    if len(dos_block) > 1:  # mag
-        dos_up, dos_dn = dos_block[0], dos_block[1]
-        _figsize = (figsize[0]*2, figsize[1])
-        fig, axes = plt.subplots(1, 2, figsize=_figsize)
-        ax = axes[0]
-        ax.plot(energy, dos_up)
-        ax.set_title("up")
-        ax.set_yscale(yscale)
+    """total DOS figure (dos.png): one panel per spin, drawn by pyakaikkr.plot.plot_dos."""
+    nspin = len(dos_block)
+    fig, axes = plt.subplots(1, nspin, figsize=(figsize[0] * nspin, figsize[1]), squeeze=False)
+    for ispin, ax in enumerate(axes[0]):
+        _draw_dos(ax, energy, [dos_block[ispin]], yscale=yscale, efermi=False)
+        if nspin > 1:
+            ax.set_title("up" if ispin == 0 else "dn")
         ax.set_xlabel("E(Ry)-EF")
         ax.set_ylabel("DOS")
         if _mark_ewidth_go(ax, energy, ewidth_go):
             ax.legend(frameon=False, fontsize=8)
-        ax = axes[1]
-        ax.plot(energy, dos_dn)
-        ax.set_title("dn")
-        ax.set_yscale(yscale)
-        ax.set_xlabel("E(Ry)-EF")
-        ax.set_ylabel("DOS")
-        if _mark_ewidth_go(ax, energy, ewidth_go):
-            ax.legend(frameon=False, fontsize=8)
-
-    else:  # monmag
-        dos_up = dos_block[0]
-        _figsize = figsize
-        fig, ax = plt.subplots(figsize=_figsize)
-        ax.plot(energy, dos_up)
-        ax.set_yscale(yscale)
-        ax.set_xlabel("E(Ry)-EF")
-        ax.set_ylabel("DOS")
-        if _mark_ewidth_go(ax, energy, ewidth_go):
-            ax.legend(frameon=False, fontsize=8)
-
     if output_direcotry is None:
         output_direcotry = "."
     fig.tight_layout()
-    imgfile = "dos.png"
-    imgfilepath = os.path.join(output_direcotry, imgfile)
+    imgfilepath = os.path.join(output_direcotry, "dos.png")
     fig.savefig(imgfilepath)
     print("  saved to", imgfilepath)
-    # fig.show()
     fig.clf()
     plt.close(fig)
     return imgfilepath
@@ -144,84 +101,36 @@ def _EX_plot_dos(directory, outfile, output_direcotry=None,
 
 def _plot_pdos_all(energy, pdos_block, typeofsite, output_direcotry=None,
                    yscale="log", figsize=(5, 3), ewidth_go=None):
-    l_label = ["s", "p", "d", "f", "g", "h", "i", "j", "k", "l", "m"]
-
-    serial_site = []
-    for site in typeofsite:
-        for shortname in site["comp_shortname"]:
-            serial_site.append(shortname)
-
+    """PDOS figures (pdos_<icmp>.png): one figure per component, one panel per spin, one curve per l,
+    drawn by pyakaikkr.plot.plot_pdos."""
+    serial_site = [shortname for site in typeofsite for shortname in site["comp_shortname"]]
     energy = np.array(energy)
-
+    nspin = len(pdos_block)
     if output_direcotry is None:
         output_direcotry = "."
-
     imgfilepaths = []
-    if len(pdos_block) > 1:  # up and down
-        pdos_up, pdos_dn = pdos_block[0], pdos_block[1]
-
-        _figsize = (figsize[0]*2, figsize[1])
-        for icmp, (up_atom, dn_atom, title) in enumerate(zip(pdos_up, pdos_dn, serial_site)):
-            fig, axes = plt.subplots(1, 2, figsize=_figsize)
-
-            up_atom = np.array(up_atom)
-            dn_atom = np.array(dn_atom)
-            ax = axes[0]
-            for l in range(up_atom.shape[1]):
-                ax.plot(energy, up_atom[:, l], label=l_label[l])
+    for icmp, title in enumerate(serial_site):
+        fig, axes = plt.subplots(1, nspin, figsize=(figsize[0] * nspin, figsize[1]), squeeze=False)
+        for ispin, ax in enumerate(axes[0]):
+            _draw_pdos(ax, energy, np.array(pdos_block[ispin][icmp]), yscale=yscale, efermi=False)
             _mark_ewidth_go(ax, energy, ewidth_go)
             ax.legend()
-            ax.set_title("up")
-            ax.set_yscale(yscale)
+            if nspin > 1:
+                ax.set_title("up" if ispin == 0 else "dn")
             ax.set_xlabel("E(Ry)-EF")
             ax.set_ylabel("PDOS")
-            ax = axes[1]
-            for l in range(dn_atom.shape[1]):
-                ax.plot(energy, dn_atom[:, l], label=l_label[l])
-            _mark_ewidth_go(ax, energy, ewidth_go)
-            ax.legend()
-            ax.set_title("dn")
-            ax.set_yscale(yscale)
-            ax.set_xlabel("E(Ry)-EF")
-            ax.set_ylabel("PDOS")
+        if nspin > 1:
             fig.suptitle(title)
-            fig.tight_layout()
-            imgfile = "pdos_{}.png".format(icmp)
-            imgfilepath = os.path.join(output_direcotry, imgfile)
-            fig.savefig(imgfilepath)
-            print("  saved to", imgfilepath)
-            imgfilepaths.append(imgfilepath)
-            # fig.show()
-            fig.clf()
-            plt.close(fig)
-        print()
-
-    else:  # up only
-        pdos_up = pdos_block[0]
-
-        _figsize = (figsize[0], figsize[1])
-        for icmp, (up_atom, title) in enumerate(zip(pdos_up, serial_site)):
-            fig, ax = plt.subplots(1, 1, figsize=_figsize)
-
-            up_atom = np.array(up_atom)
-            for l in range(up_atom.shape[1]):
-                ax.plot(energy, up_atom[:, l], label=l_label[l])
-            _mark_ewidth_go(ax, energy, ewidth_go)
-            ax.legend()
-            ax.set_yscale(yscale)
-            ax.set_xlabel("E(Ry)-EF")
-            ax.set_ylabel("PDOS")
-            ax.set_title(title)
-            fig.tight_layout()
-            imgfile = "pdos_{}.png".format(icmp)
-            imgfilepath = os.path.join(output_direcotry, imgfile)
-            fig.savefig(imgfilepath)
-            print("  saved to", imgfilepath)
-            imgfilepaths.append(imgfilepath)
-            # fig.show()
-            fig.clf()
-            plt.close(fig)
-        print()
+        else:
+            axes[0][0].set_title(title)
+        fig.tight_layout()
+        imgfilepath = os.path.join(output_direcotry, "pdos_{}.png".format(icmp))
+        fig.savefig(imgfilepath)
+        print("  saved to", imgfilepath)
+        imgfilepaths.append(imgfilepath)
+        fig.clf()
+        plt.close(fig)
+    print()
     return imgfilepaths
 
 

@@ -23,3 +23,7 @@
 - aiida-akaikkr の `aiida_akaikkr.plot` は provenance（`inputs.potential.creator`）から go の ewidth を取る同じ規則です。
 
 テスト: `tests/plot/test_dos_ewidth_line.py`（`tests/akaikkr/Cu/` の出力があれば go=1.0 / dos=2.0 の取り違えが無いことも確認）。
+
+## 2026-09-26: 描画の共通化
+
+線を引く関数は `pyakaikkr.plot.mark_ewidth_go` に移した（`DosPlotter._mark_ewidth_go` はその薄い皮）。`DosPlotter` / `PDosPlotter` は配列を `pyakaikkr.plot.plot_dos` / `plot_pdos` に渡して描き、aiida-akaikkr の `plot_dos` / `plot_pdos` も同じ関数を使う（`contour_bottom` で go の ewidth を求めて `ewidth_go` に渡す）。規則（go の ewidth、fallback 無し）は変わらない。

@@ -56,22 +56,30 @@ kkr-gaes site --exe ... --comp BiMnFeCo --polytyp fcc --orbital Bi6s=occupied --
 kkr-gaes check --dos RUN/.../out_dos.log --go RUN/.../out_go.log --ewidth 1.2 --orbital Rb4p=core   # 範囲と準位を表示
 ```
 
-## DOS 図の共通部品（`pyakaikkr.gaes.plot`）
+## 図の共通部品（`pyakaikkr.plot`、配列を受ける「plot 関数 A」）
 
-GAES の DOS 図はどれも同じ要素（緑 = 粗いギャップ区間、青 = 細かい部分区間、斜線 = [min_ewidth, max_ewidth] の帯、赤 = −ewidth_go、青線 = 注目する core 準位（破線 `*`）、灰線 = 他の準位）を描くので、`draw_gaes_dos` に集約した。
+DOS / PDOS / A(w,k) / J_ij / GAES の描画は `pyakaikkr.plot` に集約した。どの関数も **numpy 配列と dict と matplotlib の Axes** だけを受け取り、ファイルも AiiDA のノードも知らない。pyakaikkr の `DosPlotter` / `PDosPlotter`（および `gaes.plot`）は out_*.log を `AkaikkrJob.get_*` で配列に直してからこれを呼び、aiida-akaikkr の `plot.py` は ArrayData / Dict の配列をそのまま渡す（配色は `style` dict で aiida 側のものを使う）。保存は呼び手が行う。
+
+| 関数 | 入力 | 描くもの |
+|---|---|---|
+| `plot_dos(ax, energy, dos[nspin, ne], ewidth_go=, mirror_down=, fill=, yscale=)` | total DOS | スピンごとの曲線（down は負側に鏡映、log では鏡映しない）、E_F 線、−ewidth_go 線 |
+| `plot_pdos(ax, energy, pdos[nspin, ne, nl], nl=, spin=)` | 1 成分の PDOS | l ごとの曲線（NaN で詰めた l は飛ばす） |
+| `plot_awk(ax, kdist, energy, awk[nk, ne], kcrt, klabel)` | A(w,k) | pcolormesh、k 点の格子線、E_F 線。QuadMesh を返す（colorbar 用） |
+| `plot_jij(ax, distance, jij, xlim=, ylim=)` / `jij_limits` | 1 対の J_ij(R) | 距離順の折れ線と 0 線 |
+| `plot_gaes_dos(ax, energy, dos, ewidth=, final=, coarse=, fine=, bounds=, levels=, natm=, dosth=, dosth2=)` | GAES の 1 面 | 曲線、緑 / 青の区間、斜線の範囲、赤の −ewidth、final、準位線、閾値線（natm 倍） |
+| `mark_ewidth_go`, `mark_efermi`, `style_axes`, `component_names`, `shade_regions`, `shade_ewidth_bounds`, `draw_levels`, `draw_thresholds` | 部品 | |
 
 ```python
-from pyakaikkr.gaes import dos_curves_from_outputs, levels_from_go
-from pyakaikkr.gaes.ewidth import choose_ewidth2
-from pyakaikkr.gaes.plot import draw_gaes_dos, legend_text
-e, c, _ = dos_curves_from_outputs([(AkaikkrJob(d), "out_dos.log")])
-dec = choose_ewidth2(e, c, 1.2, dosth=2e-2, dosth2=1e-3, min_ewidth=1.0, max_ewidth=2.0)
-draw_gaes_dos(ax, e, c[0], ewidth=1.2, decision=dec, bounds=(1.0, 2.0), levels=levels_from_go(d + "/out_go.log"),
-              highlight=["Bi6s"], xlim=(-2.4, 0.8))
-fig.suptitle(legend_text())
+from pyakaikkr import AkaikkrJob
+from pyakaikkr.plot import plot_dos, plot_gaes_dos, gaes_legend_text
+job = AkaikkrJob(d)
+energy, dos_block = job.get_dos_as_list("out_dos.log")           # ファイル → 配列
+plot_dos(ax, energy, dos_block, ewidth_go=job.get_ewidth("out_go.log"))
+plot_gaes_dos(ax, energy, dos_block, ewidth=1.2, decision=dec, bounds=(1.0, 2.0),
+              levels=levels_from_go(d + "/out_go.log"), highlight=["Bi6s"], natm=5, dosth=2e-2, dosth2=1e-3)
 ```
 
-`tests/gaes/tools/plot_hea_XMnFeCo.py`, `plot_orbital_rules.py`, `plot_conv_pairs.py` がこれを使う（docs/data の図）。aiida-akaikkr の `plot --gaes-pk` は自前の配色で同じ要素を描く。
+`pyakaikkr.gaes.plot`（`draw_gaes_dos`、`legend_text`）は互換のための再輸出。テストは `tests/plot/test_plot_arrays.py`（specx 不要）。`tests/gaes/tools/plot_hea_XMnFeCo.py`, `plot_orbital_rules.py`, `plot_conv_pairs.py` と aiida-akaikkr の `plot --dos-pk / --spc-pk / --jij-pk / --gaes-pk` が同じ関数で描く。
 
 ## 軌道の valence / core 指定（`--orbital`、`Gaes(orbitals=[...])`）
 
