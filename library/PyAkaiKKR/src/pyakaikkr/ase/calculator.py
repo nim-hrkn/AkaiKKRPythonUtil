@@ -13,6 +13,8 @@ from ase.calculators.calculator import (FileIOCalculator, InputError, Calculatio
                                         SCFError, ReadError, all_changes)
 
 from ..AkaiKkr import AkaikkrJob
+from ..Error import KKRUnknownOptionError, KKROptionValueError
+from ..option import normalize_option
 from .occupancy import same_occupancy
 from .structure import atoms_to_kkr_param, check_kkr_output_structure
 
@@ -37,6 +39,10 @@ class AkaiKKR(FileIOCalculator):
     The command is given by ``command=``, the environment variable ASE_AKAIKKR_COMMAND
     or the [akaikkr] section of the ASE config. PREFIX is replaced by the label.
     Example: command="/path/to/specx < PREFIX.in > PREFIX.out".
+
+    ``option=`` is the begin_option dict (see pyakaikkr.option); it is validated when
+    the input is written. ``code=`` ("akaikkr", "akaikkr_cnd", "cpa2021v01") only
+    selects which option keys are warned about as having no effect.
     """
     implemented_properties = ["energy", "magmom", "magmoms"]
     _legacy_default_command = "specx < PREFIX.in > PREFIX.out"
@@ -44,7 +50,7 @@ class AkaiKKR(FileIOCalculator):
         go="go", potentialfile="pot.dat",
         edelt=1e-3, ewidth=1.0, reltyp="sra", sdftyp="mjw", magtyp="mag",
         record=None, outtyp="update", bzqlty=6, maxitr=200, pmix=0.02,
-        option=None,
+        option=None, code="akaikkr",
         type_mode="symmetry", symprec=1e-5, type_params=None, Vc="Og",
         type_order="electronegativity",
         reuse_potential=True, allow_unconverged=False,
@@ -108,7 +114,11 @@ class AkaiKKR(FileIOCalculator):
         for key in _INPUT_KEYS:
             dic[key] = p[key]
         if p["option"]:
-            dic["option"] = p["option"]
+            # canonical names, "T"/"F" for logicals; unknown keys raise before specx runs
+            try:
+                dic["option"] = normalize_option(p["option"], code=p["code"], strict=True)
+            except (KKRUnknownOptionError, KKROptionValueError) as e:
+                raise InputError(str(e)) from e
         if p["go"] == "fsm":
             if "fspin" not in p:
                 raise InputError("go=fsm needs the parameter fspin.")
@@ -133,6 +143,9 @@ class AkaiKKR(FileIOCalculator):
         job = AkaikkrJob(self.directory)
         if job.check_stopped_by_errtrp(self.outfile):
             raise CalculationFailed("specx stopped by errtrp: " + job._read(self.outfile)[-1])
+        opterr = job.check_option_error(self.outfile)
+        if opterr is not None:
+            raise CalculationFailed("specx stopped on the begin_option block: " + opterr)
         converged = job.get_convergence(self.outfile)
         if not converged and not p["allow_unconverged"]:
             raise SCFError("AkaiKKR did not converge (set allow_unconverged=True to accept).")
@@ -167,3 +180,25 @@ class AkaiKKR(FileIOCalculator):
         self.results["converged"] = converged
         self.results["type_of_site"] = typeofsite
         self.job = job
+
+    def _output_job(self):
+        outpath = os.path.join(self.directory, self.outfile)
+        if not os.path.isfile(outpath):
+            raise ReadError(f"{outpath} not found.")
+        return AkaikkrJob(self.directory)
+
+    def get_option(self):
+        """begin_option values that specx used in the last run (from its optnwrt: echo lines).
+
+        Returns:
+            dict: canonical option name -> value (int/float/bool); {} if none was given/used.
+        """
+        return self._output_job().get_option(self.outfile)
+
+    def get_emesh_param(self):
+        """meshr, mse, ng and mxl actually used in the last run.
+
+        Returns:
+            dict: {"meshr": int, "mse": int, "ng": int, "mxl": int}
+        """
+        return self._output_job().get_emesh_param(self.outfile)

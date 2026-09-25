@@ -1,0 +1,23 @@
+#--- go potentialfile
+dos pot.dat
+#--- brvtyp a c/a b/a alpha beta gamma
+fcc 6.8313626631542945 1.0 1.0 90.0 90.0 90.0
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 2.0 sra mjw nmag 2nd
+#--- outtyp bzqlty maxitr pmix
+update 6 200 0.02
+#--- ntyp
+1
+#--- type ncmp
+  Cu 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+0 0 0 29 100.0
+#--- natm
+1
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Cu
+begin_option
+ cemesr_ref= 0.75
+end_option

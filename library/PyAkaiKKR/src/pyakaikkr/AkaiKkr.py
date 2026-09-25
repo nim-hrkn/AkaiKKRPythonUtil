@@ -15,6 +15,9 @@ from pymatgen.core.periodic_table import Element
 from .AwkReader import AwkReader
 from .Cif2Kkr import ak_cif2kkrparam
 from .Error import KKRValueAquisitionError, KKRFailedExecutionError
+from .option import (normalize_option, format_option_card, parse_option_echo,
+                     find_option_error, read_inputcard_option as _read_inputcard_option,
+                     OPTION_KEYS)
 from .Unit import Unit
 import io
 
@@ -431,31 +434,21 @@ class AkaikkrJob:
             return result
 
         def make_option_card(dic):
-            """make option section from dict.
-                The option section starts with begin_option and ends with end_option
+            """make option section from dict (see pyakaikkr.option).
+                The option section starts with begin_option and ends with end_option.
+                Keys are validated and aliases replaced by canonical names.
             Args:
                 dic (dict): kkr parameters
+
+            Raises:
+                KKRUnknownOptionError, KKROptionValueError: invalid dic["option"]
 
             Returns:
                 [str]: lines in the kkr input format
             """
-            result = []
-            if "option" in dic:
-                options = dic["option"]
-                result.append("")
-                result.append("begin_option")
-                for key, value in options.items():
-                    if isinstance(value, list):
-                        value = list(map(str, value))
-                        result.append(" begin_{}".format(key))
-                        result.append(" "+" ".join(value))
-                        result.append(" end_{}".format(key))
-                    else:
-                        value = str(value)
-                        result.append(" "+" ".join([key+"=", value]))
-                result.append("end_option")
-                result.append("")
-            return result
+            if "option" not in dic:
+                return []
+            return format_option_card(normalize_option(dic["option"], strict=True))
 
         card = []
         card += from_keylist(dic, ["go", "potentialfile"])
@@ -506,7 +499,14 @@ class AkaikkrJob:
             self.path_dir, akaikkr_exe, infile, outfile)
         ret = subprocess.call(cmd, shell=True)
         if ret != 0:
-            raise KKRFailedExecutionError("return_code={}".format(ret))
+            msg = "return_code={}".format(ret)
+            try:
+                opterr = self.check_option_error(outfile)
+            except OSError:
+                opterr = None
+            if opterr is not None:
+                msg += ", " + opterr
+            raise KKRFailedExecutionError(msg)
 
         stoppped_by_errtrp = self.check_stopped_by_errtrp(outfile)
         if stoppped_by_errtrp:
@@ -578,6 +578,88 @@ class AkaikkrJob:
             return True
         else:
             return False
+
+    def check_option_error(self, outfile):
+        """the line where specx reports an error of the begin_option block, or None.
+
+        specx stops with 'unknown token: <token>' (stop 100) on an unknown key or on
+        'key=value' without a space, and with 'failed to read "end_option"' on EOF.
+
+        Args:
+            outfile (str): output filename
+
+        Returns:
+            str or None: the error line
+        """
+        return find_option_error(self._read(outfile))
+
+    def get_option(self, outfile):
+        """option values that specx echoed (``optnwrt:<name> <value>``) in the output.
+
+        specx echoes a begin_option value only when it is used, so the result is the
+        set of given options that took effect in this run (cemesr_ref appears only in
+        dos/spc runs; klabel is never echoed). {} if no option was
+        given. Values are converted to int/float/bool.
+
+        Args:
+            outfile (str): output filename
+
+        Returns:
+            dict: canonical option name -> value
+        """
+        return parse_option_echo(self._read(outfile))
+
+    def get_emesh_param(self, outfile):
+        """meshr, mse, ng and mxl actually used, from the header table of the output.
+
+        These are the effective values whether or not begin_option was given.
+
+        Args:
+            outfile (str): output filename
+
+        Raises:
+            KKRValueAquisitionError: table not found
+
+        Returns:
+            dict: {"meshr": int, "mse": int, "ng": int, "mxl": int}
+        """
+        data = self._read(outfile)
+        for i, line in enumerate(data):
+            head = line.split()
+            if head[:4] == ["meshr", "mse", "ng", "mxl"] and i + 1 < len(data):
+                values = data[i + 1].split()
+                if len(values) >= 4:
+                    return {k: int(v) for k, v in zip(head[:4], values[:4])}
+        raise KKRValueAquisitionError("failed to get meshr/mse/ng/mxl")
+
+    def read_inputcard_option(self, inputcard, typed=True, strict=True):
+        """begin_option block of an inputcard in self.path_dir as a dict (see pyakaikkr.option).
+
+        Args:
+            inputcard (str): inputcard filename (relative to self.path_dir)
+
+        Returns:
+            dict: canonical option name -> value; {} if there is no block
+        """
+        return _read_inputcard_option(os.path.join(self.path_dir, inputcard),
+                                      typed=typed, strict=strict)
+
+    def unused_option(self, inputcard, outfile):
+        """keys given in the inputcard's begin_option that specx did not echo in the output,
+        i.e. that were not used by this run (e.g. cemesr_ref in a go run).
+        Keys that specx never echoes (klabel) and unknown keys are not reported.
+
+        Args:
+            inputcard (str): inputcard filename
+            outfile (str): output filename
+
+        Returns:
+            set: canonical option names
+        """
+        given = self.read_inputcard_option(inputcard, typed=False, strict=False)
+        used = self.get_option(outfile)
+        return {k for k in given
+                if k in OPTION_KEYS and OPTION_KEYS[k].echo and k not in used}
 
     def get_convergence(self, outfile):
         """check convergence for go calculation.

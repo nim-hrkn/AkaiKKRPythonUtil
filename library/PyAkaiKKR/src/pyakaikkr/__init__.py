@@ -4,6 +4,7 @@
 
 __version__ = '2023.2.1'
 from .Error import *
+from .option import *
 from .AkaiKkr import *
 from .Fmg import *
 from .AwkReader import *

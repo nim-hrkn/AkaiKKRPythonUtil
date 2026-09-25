@@ -1,0 +1,36 @@
+#--- go potentialfile
+go pot.dat
+#--- brvtyp
+aux
+0.0 0.7071067811865476 0.7071067811865476
+0.7071067811865476 0.0 0.7071067811865476
+0.7071067811865476 0.7071067811865476 0.0
+4.830502863860995
+#--- edelt ewidth reltyp sdftyp magtyp record
+0.001 1.0 sra mjw nmag init
+#--- outtyp bzqlty maxitr pmix
+update 4 3 0.02
+#--- ntyp
+1
+#--- type ncmp
+  Cu 1
+#- rmt field mxl
+0.0 0.0 2
+#- anclr conc
+29 100.0
+#--- natm
+1
+#--- atmicx atmtyp
+0.00000000a 0.00000000b 0.00000000c Cu
+begin_option
+ mse= 5
+ tol= 1e-5
+ critic= -2.0
+ cemesr_ref= 0.6
+ begin_klabel
+  G X W
+ end_klabel
+ begin_foo
+  1 2
+ end_foo
+end_option

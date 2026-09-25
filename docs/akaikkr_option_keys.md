@@ -35,6 +35,8 @@ pyakaikkr から渡すときは入力 dict に `"option"` キーを入れる。`
 param["option"] = {"mse": 3, "cpaitr_show": True, "klabel": ["G", "X", "W"]}
 ```
 
+Python からの参照（2026-09-25 実装、[option_access_usage.md](option_access_usage.md)）: `pyakaikkr.OPTION_KEYS` にこの表の内容（正式名、別名、型、既定値、効くコード）があり、`AkaikkrJob.make_inputcard` は書く前に `normalize_option` で検証する（未知キーは実行前に `KKRUnknownOptionError`、別名は正式名に、論理値は `T`/`F` に）。既存 inputcard は `read_inputcard_option`、出力は `AkaikkrJob.get_option`（specx が値を使った時点で出す ` optnwrt:<name> <value>` 行。`cemesr_ref` は `ref` の名前で、dos/spc でしか出ない）と `get_emesh_param`（ヘッダの `meshr mse ng mxl`）で読める。
+
 ## 2. キーの一覧
 
 値は文字列として保持され、使う側で `read(...,*)` により数値化される。「使用箇所」は値が実際に効く場所。

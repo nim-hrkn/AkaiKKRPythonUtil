@@ -62,3 +62,13 @@ class KKRValueAquisitionError(Exception):
 class KKRStructureMismatchError(Exception):
     """the structure in the akaikkr output differs from the input"""
     pass
+
+
+class KKRUnknownOptionError(ValueError):
+    """unknown key or malformed token in the begin_option block"""
+    pass
+
+
+class KKROptionValueError(ValueError):
+    """value of a begin_option key cannot be written or converted"""
+    pass
