@@ -226,15 +226,16 @@ def check_rules(rules: Sequence[OrbitalRule], levels: Dict[str, Level]) -> List[
 
 
 def initial_ewidth(ewidth_init, bounds: Bounds, ediff=0.2):
-    """ewidth_init if inside the bounds, else the middle of the range (or bound +- ediff)."""
+    """first ewidth: ewidth_init raised to min_ewidth + ediff (or the middle of a closed range) when
+    a valence rule puts the lower bound above it.  It is never lowered for a core rule: a first go
+    with a contour cutting into the valence band (Tl 5d core: 0.39 Ry) diverges or gives no gap,
+    while a go at ewidth_init yields the DOS from which the next candidate inside the range is taken."""
     lo, hi = bounds.min_ewidth, bounds.max_ewidth
-    if (lo is None or ewidth_init >= lo - 1e-9) and (hi is None or ewidth_init <= hi + 1e-9):
+    if lo is None or ewidth_init >= lo - 1e-9:
         return ewidth_init
-    if lo is not None and hi is not None:
+    if hi is not None and hi < lo + ediff:
         return round(0.5 * (lo + hi), 4)
-    if lo is not None:
-        return round(lo + ediff, 4)
-    return round(max(hi - ediff, 0.3), 4)
+    return round(lo + ediff, 4)
 
 
 def levels_as_dict(levels: Dict[str, Level]) -> Dict[str, list]:

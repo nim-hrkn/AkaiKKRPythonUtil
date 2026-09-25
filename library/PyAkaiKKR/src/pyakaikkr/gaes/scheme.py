@@ -199,6 +199,17 @@ class Gaes:
                     seen.e_min, seen.e_max = min(seen.e_min, v.e_min), max(seen.e_max, v.e_max)
                     seen.e, seen.star = 0.5 * (seen.e_min + seen.e_max), v.star
         bounds = self._bounds(self._levels_seen if self.orbitals else {})
+        if bounds.min_ewidth is not None and bounds.min_ewidth > ewidth:
+            # a valence rule asks for a deeper contour than this go used: the dos window must reach
+            # E_F - min_ewidth - eth - ediff to see the gap there (Rb 4s valence: min 2.3 Ry)
+            need = round(min((bounds.min_ewidth + self.eth + self.ediff) / self.ref + 1e-9, self.ewidth_dos_max), 4)
+            for r in runners.values():
+                if (r.ewidth_dos_used or r.ewidth_dos) < need - 1e-6:
+                    self.logger.info("orbital bounds %s: widening ewidth_dos %.3f -> %.3f", bounds.as_list(), r.ewidth_dos_used or r.ewidth_dos, need)
+                    try:
+                        r.run_dos(ewidth_dos=need, force=True)
+                    except KKRFailedExecutionError as e:
+                        self.logger.warning("wider dos window %.3f failed (%s)", need, e)
         while True:
             pairs = []
             for p, r in runners.items():

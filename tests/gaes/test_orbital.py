@@ -75,12 +75,15 @@ def test_levels_from_tables_prefers_the_converged_table():
     assert lv["Rb4p"].source == "table_atomic" and lv["Rb4p"].e == pytest.approx(-0.862 - 0.6, abs=1e-3)
 
 
-def test_initial_ewidth_moves_into_the_range():
+def test_initial_ewidth_is_only_raised():
     b = bounds_from_rules(parse_orbital_rules(["Rb4p=core"]), levels_from_go(RB_GO), 0.2)
-    assert initial_ewidth(1.2, b) == pytest.approx(0.536, abs=2e-3)      # max - ediff
+    assert initial_ewidth(1.2, b) == 1.2            # a core rule never lowers the first ewidth (the first go's DOS does)
     assert initial_ewidth(0.6, b) == 0.6
     b = bounds_from_rules(parse_orbital_rules(["Rb4p=valence", "Rb4s=core"]), levels_from_go(RB_GO), 0.2)
-    assert initial_ewidth(0.8, b) == pytest.approx(0.5 * (1.138 + 1.899), abs=2e-3)
+    assert initial_ewidth(0.8, b) == pytest.approx(1.138 + 0.2, abs=2e-3)   # raised to min + ediff
+    assert initial_ewidth(1.5, b) == 1.5
+    b = bounds_from_rules(parse_orbital_rules(["Rb4s=valence"]), levels_from_go(RB_GO), 0.2)
+    assert initial_ewidth(1.2, b) == pytest.approx(2.30 + 0.2, abs=2e-3)
 
 
 def test_old_is_refused_outside_the_bounds():
