@@ -47,19 +47,20 @@ def draw_ewidth(ax, ewidth, label=None, **kw):
     ax.axvline(-ewidth, **kw)
 
 
-def draw_levels(ax, levels, highlight=(), e_min=None, y_text=100.0, fontsize=8):
+def draw_levels(ax, levels, highlight=(), e_min=None, y_text=100.0, fontsize=8, label_all=True):
     """core levels E - E_F from levels_from_go (dict key -> Level with .e / .star) or a dict key -> [e, star]:
-    solid = core, dashed = '*' (valence). Keys in `highlight` are blue and labelled; others gray."""
+    solid = core, dashed = '*' (valence). Keys in `highlight` are blue; the others gray. Every level inside
+    the window is labelled (element, orbital, '*', E - E_F) unless label_all=False."""
     for key, v in (levels or {}).items():
         e, star = (v.e, v.star) if hasattr(v, "e") else (v[0], v[1])
         if e_min is not None and e <= e_min:
             continue
-        if key in highlight:
-            ax.axvline(e, color=LEVEL_COLOR, lw=1.5, ls="--" if star else "-")
-            ax.text(e, y_text, "%s%s %.2f" % (key, "*" if star else "", e), rotation=90, fontsize=fontsize,
-                    color=LEVEL_COLOR, ha="right", va="top")
-        else:
-            ax.axvline(e, color=LEVEL_COLOR_OTHER, lw=0.8, ls="--" if star else "-", alpha=0.8)
+        hi = key in highlight
+        color = LEVEL_COLOR if hi else LEVEL_COLOR_OTHER
+        ax.axvline(e, color=color, lw=1.5 if hi else 0.9, ls="--" if star else "-", alpha=1.0 if hi else 0.9)
+        if hi or label_all:
+            ax.text(e, y_text, "%s%s %.2f" % (key, "*" if star else "", e), rotation=90, fontsize=fontsize if hi else fontsize - 1,
+                    color=color, ha="right", va="top")
 
 
 def draw_gaes_dos(ax, energy, dos, ewidth=None, decision=None, coarse=(), fine=(), bounds=None, levels=None,
