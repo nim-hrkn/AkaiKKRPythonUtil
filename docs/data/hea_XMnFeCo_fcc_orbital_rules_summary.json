@@ -807,5 +807,103 @@
   },
   "message": "",
   "seconds": 12
+ },
+ "SeMnFeCo_Se4s-valence": {
+  "status": "finished",
+  "ewidth": 1.4175,
+  "tried": [
+   1.2,
+   1.4175
+  ],
+  "gap": [
+   -2.2425,
+   -1.2525
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    1.245002,
+    null
+   ],
+   [
+    1.245002,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -1.0444,
+    true
+   ],
+   [
+    -1.042,
+    true
+   ]
+  ],
+  "mismatch": [
+   [],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 22
+ },
+ "BiMnFeCo_Bi6s-valence": {
+  "status": "finished",
+  "ewidth": 1.3725,
+  "tried": [
+   1.2,
+   1.3725
+  ],
+  "gap": [
+   -1.4175,
+   -1.2225
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    1.1589458,
+    null
+   ],
+   [
+    1.1589458,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -0.9562,
+    true
+   ],
+   [
+    -0.9562,
+    true
+   ]
+  ],
+  "mismatch": [
+   [],
+   []
+  ],
+  "step0": [
+   1.145,
+   null
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 26
  }
 }

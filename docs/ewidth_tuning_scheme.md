@@ -727,6 +727,10 @@ aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 g
   | Tl 5d valence | −0.94 `*` | [1.15, —] | 1.2 → 1.2925 | `finished`（5d 帯の下 [−2.24, −1.25]） |
   | Ga 3d valence | 表 A −1.17 → go −1.04 `*` | [1.24, —] | 1.565（表 A から） | `finished`（3d 帯の下 [−2.24, −1.37]） |
   | Rb 4s core | −2.10（core） | [—, 1.90] | 1.2 | `finished`（1.2 は範囲内、ギャップ [−1.93, −1.18]） |
+  | Se 4s valence | −1.04 `*` | [1.25, —] | 1.2 → 1.4175 | `finished`（4s 帯の下 [−2.24, −1.25]） |
+  | Bi 6s valence | −0.96 `*` | [1.16, —] | 1.2 → 1.3725 | `finished`（5d と 6s の間 [−1.42, −1.22]。指定無しの結果と同じ） |
+
+  同じ軌道を valence / core にした対の図: `docs/data/hea_XMnFeCo_fcc_orbital_pairs_dos.png`（Rb 4p、Se 4s、Bi 6s の 3 組。左 valence、右 core。Rb 4p core は SCF 発散で `ewidth_fail`、Bi 6s core は eth 0.2 の走行）。
 
   図 `docs/data/hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 面、最終判定の DOS、青線 = 指定した準位（破線 `*`）、斜線 = その判定の範囲、赤 = −ewidth）、結果 `docs/data/hea_XMnFeCo_fcc_orbital_rules_summary.json`、スクリプト `tests/gaes/tools/plot_orbital_rules.py`。Rb 4s valence の面（窓 3.73）では −2.3 Ry より下の DOS に窓を広げたことによる偽のピークが並ぶ（§13、ewidth_dos_max の理由）。
 
