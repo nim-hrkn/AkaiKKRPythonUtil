@@ -55,6 +55,23 @@ kkr-gaes site --exe ... --comp BiMnFeCo --polytyp fcc --orbital Bi6s=occupied --
 kkr-gaes check --dos RUN/.../out_dos.log --go RUN/.../out_go.log --ewidth 1.2 --orbital Rb4p=core   # 範囲と準位を表示
 ```
 
+## DOS 図の共通部品（`pyakaikkr.gaes.plot`）
+
+GAES の DOS 図はどれも同じ要素（緑 = 粗いギャップ区間、青 = 細かい部分区間、斜線 = [min_ewidth, max_ewidth] の帯、赤 = −ewidth_go、青線 = 注目する core 準位（破線 `*`）、灰線 = 他の準位）を描くので、`draw_gaes_dos` に集約した。
+
+```python
+from pyakaikkr.gaes import dos_curves_from_outputs, levels_from_go
+from pyakaikkr.gaes.ewidth import choose_ewidth2
+from pyakaikkr.gaes.plot import draw_gaes_dos, legend_text
+e, c, _ = dos_curves_from_outputs([(AkaikkrJob(d), "out_dos.log")])
+dec = choose_ewidth2(e, c, 1.2, dosth=2e-2, dosth2=1e-3, min_ewidth=1.0, max_ewidth=2.0)
+draw_gaes_dos(ax, e, c[0], ewidth=1.2, decision=dec, bounds=(1.0, 2.0), levels=levels_from_go(d + "/out_go.log"),
+              highlight=["Bi6s"], xlim=(-2.4, 0.8))
+fig.suptitle(legend_text())
+```
+
+`tests/gaes/tools/plot_hea_XMnFeCo.py`, `plot_orbital_rules.py`, `plot_conv_pairs.py` がこれを使う（docs/data の図）。aiida-akaikkr の `plot --gaes-pk` は自前の配色で同じ要素を描く。
+
 ## 軌道の valence / core 指定（`--orbital`、`Gaes(orbitals=[...])`）
 
 `Rb4p=valence`（別名 `occupied`: 積分路に入れる）、`Rb4p=core`（別名 `unoccupied`: 積分路から外す）のように、元素・軌道ごとに指定できる（仕様: ewidth_tuning_scheme.md §15）。
