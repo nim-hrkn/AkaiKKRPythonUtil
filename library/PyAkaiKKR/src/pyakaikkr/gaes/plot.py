@@ -43,7 +43,7 @@ def draw_ewidth(ax, ewidth, label=None, **kw):
     """the contour bottom E_F - ewidth_go (red dash-dot); ewidth may be None."""
     if ewidth is None:
         return
-    kw = dict(color=EWIDTH_COLOR, ls="-.", lw=1.3, label=label) | kw
+    kw = dict(color=EWIDTH_COLOR, ls="-.", lw=1.6, label=label, zorder=6) | kw   # on top of level lines at the same energy
     ax.axvline(-ewidth, **kw)
 
 
