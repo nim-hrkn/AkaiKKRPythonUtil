@@ -476,3 +476,51 @@ Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore
   | AlScNiBi fcc | 1.6 → 1.2525 | 2e-2 | 1e-3 | [−1.312, −1.103] | 136 反復、err −6.11 | −12028.6194 |
 
   ewidth 1.6 の解と比べて全エネルギーは 0.012〜0.036 Ry 低い（Bi 5d の裾を積分路が跨がなくなった分）。新 ewidth の DOS では細かい区間の位置が 0.01〜0.03 Ry ずれるだけで、候補は変わらない（`old`）。
+
+## 14. 実行中に原子準位から ewidth を予測する方法（提案、2026-09-25）
+
+### 14.1 使える事実
+
+- out_go.log の成分ごとの core 準位（`core level` 行）は、その準位が dos の窓に入っていれば total DOS の semicore ピークと数 mRy 以内で一致する（[core_levels_vs_dos.md](core_levels_vs_dos.md) §2、fcc 7,505 系）。つまり **semicore の位置は DOS を計算しなくても go の出力から分かる**。
+- core 準位は SCF の各反復で更新されるが、出力には最後の 1 回しか出ない。E_F（`ef=`）も同じ。ただし反復ごとの `neu`（電荷中性のずれ）と `te` は出るので、SCF が「ある程度」進んだかは判定できる。
+- `*` 付きの準位（ebtm より上で valence に切替）は ewidth に応じて 0.05〜0.1 Ry 動く（In 4d: ewidth 1.2 → 1.46 → 1.53 で −1.10 → −1.17 → −1.13 Ry）。core のままの準位（Ge 3d、Sn 4d、Bi 5d …）は系や ewidth によらず ±0.03 Ry しか動かない。
+- valence 帯の底は DOS でしか分からない。ただし 4 元 HEA では −0.75〜−1.0 Ry の範囲に収まっていた（valence 帯の幅は成分の s, p 帯で決まる）。
+
+### 14.2 「DOS がある程度収束したら E_F と semicore 位置が分かるか」
+
+分かる。手順は次のとおり。
+
+1. go を `maxitr` を小さく（50〜100）して回す。収束していなくても、`ef=` と core 準位は出る。`neu` の絶対値が 0.1 未満まで下がっていれば、E_F は最終値から ±0.05 Ry 以内、core 準位（core のもの）は ±0.03 Ry 以内にある（今日の In / Sn / Bi の実行での最終値との比較から。数値は実装時に検証する）。
+2. 成分ごとの core 準位 E_c − E_F を集め、dos の窓に入る範囲（−2.3 Ry 以上）にあるものを **semicore の候補位置** とする。`*` の有無も記録する。
+3. semicore の位置が分かれば、ギャップの**下端**はその準位から上に 0.1〜0.2 Ry（ピークの裾、DOS < 1e-3 になる位置。d 状態は幅 0.1、p 状態は 0.2 程度）で予測できる。ギャップの**上端**（valence 帯の底）は DOS が要る。
+
+### 14.3 提案: core 準位を使った 3 段の予測
+
+**A. 予測（dos 無し、go の短い実行 1 回）**
+
+- `maxitr_probe`（100）で go を 1 回回し、`neu` が閾値を切ったら止める（AkaiKKR には反復途中で止める入力が無いので、`maxitr` を小さくして走らせ、`neu` が大きければもう 1 回続ける）。
+- core 準位から semicore 候補 {E_c} を作る。**禁止区間**を E_c ± w（w = 0.15 Ry、`*` 付きは 0.25 Ry）とする。
+- ewidth の候補は、E_F から下へ見て、禁止区間に入らず、かつ上の禁止区間（または E_F − ewidth_min）から ediff 以上離れた位置。具体的には、E_F 基準で最も浅い禁止区間の上端 e_top を取り、`ewidth_pred = −(e_top + ediff + margin)` … ただし e_top より上に valence 帯の底があることは DOS で確かめないと分からないので、A の段階では「semicore に当たらない範囲」だけを決める。
+- 禁止区間が無い（−2.3 Ry より上に core 準位が無い: Al と 3d 遷移金属だけの系、Pt / Au / Hg など）なら、ewidth は valence 帯の底だけで決まる。この場合 A は「制約無し」を返す。
+
+**B. 確認（dos 1 回）**
+
+- A の候補で go（通常の maxitr）→ dos を回し、Method 2 で判定する。A で禁止区間を避けているので、Bi 系の「5d の裾に乗る」や In 系の「4d を切る」ような初期値の失敗が無くなり、`new` は valence 帯の底の位置調整だけになる。
+- dos で得た valence 帯の底 e_v と、A の禁止区間の上端 e_top の間がギャップ。幅 e_v − e_top < eth なら `fail`（AlGaSnPb のような semicore の階段）を DOS を待たずに A の段階で予告できる（e_v は −0.75〜−1.0 Ry と仮定して警告する）。
+
+**C. Committee への組み込み**
+
+- GAES-Committee（§7.1）のメンバー ewidth は、A の禁止区間を避けた値だけにする。メンバー数を減らせる。
+- vote には DOS 由来のギャップ区間に加え、core 準位由来の禁止区間の補集合を 1 票として入れる（threshold に依存しない票）。
+
+### 14.4 実装の場所
+
+- `pyakaikkr`: `AkaikkrJob.get_core_levels_by_component(outfile)`（成分・軌道・値・`*`）、`gaes.corelevels.forbidden_regions(job, outfile, w, w_star)`、`gaes.ewidth.decide` に `forbidden` を渡して候補と `old` 判定から除外する。
+- `Gaes` / `AkaikkrGaesWorkChain`: STEP1 の前に probe go（`maxitr_probe`）を入れ、`ewidth_init` を A で置き換える（`predict_from_core_levels=True`）。
+- 検証: 今日の 4 系（AlSiRhBi、AlSiScPb、AlMnFeIn、AlCoNiSn）と Bi / Pb / Tl の 2019 年 RUN で、A の予測が Method 2 の最終 ewidth と一致するか、go の回数が減るかを見る。
+
+### 14.5 限界
+
+- valence 帯の底は core 準位からは出ないので、DOS を完全に省くことはできない。A は「どこに置いてはいけないか」を決める段。
+- `*` 付きの準位は ewidth で動くので、A の予測は ±0.1 Ry の不確かさを持つ。禁止区間の幅で吸収する。
+- 2022.0721 の akaikkr ビルドでは Hf 4f のように準位そのものが 2019 年版と 0.6 Ry 違う場合がある。予測は同じビルドの go 出力から行う。
