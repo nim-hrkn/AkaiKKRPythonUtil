@@ -9,9 +9,12 @@ from pyakaikkr.gaes.plot import draw_gaes_dos, legend_text
 RUNS = [("bzqlty 10", "lmx2_ew_1.15"), ("bzqlty 14", "lmx2_ew_1.15_bz14"), ("bzqlty 18", "lmx2_ew_1.15_bz18")]
 def info(d):
     txt = open(d + "/out_go.log").read()
-    itr = re.findall(r"itr=\s*(\d+)", txt); err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
+    itr = re.findall(r"itr=\s*(\d+)", txt)
+    # per-iteration lines: "itr=  1  rms error = -0.051" (first ones) and "itr=190 neu= ... err= 0.766"
+    hist = [float(x) for x in re.findall(r"itr=\s*\d+.*?err(?:or)?\s*=\s*(-?\d+\.\d+)", txt)]
+    err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
     core = re.search(r"\*\*\* type-\S+\s+Hf.*?core charge in the muffin-tin sphere =\s*(-?\d+\.\d+)", txt, re.S)
-    return (int(itr[-1]) if itr else None), (float(err[-1]) if err else None), (float(core.group(1)) if core else None), [float(x) for x in err]
+    return (int(itr[-1]) if itr else None), (float(err[-1]) if err else None), (float(core.group(1)) if core else None), hist
 fig, axes = plt.subplots(len(RUNS), 2, figsize=(16, 4.4 * len(RUNS)))
 for row, (label, d) in enumerate(RUNS):
     ax, axh = axes[row]
