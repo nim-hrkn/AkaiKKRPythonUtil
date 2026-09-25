@@ -19,9 +19,13 @@ def bounds_of(run_dir, ew):
 PAIRS = [
     # the Hf runs had no orbital rule: the default range [1.0, 2.0] applies
     ("AlSiSnHf bcc (cpa2021v01), Hf 4f", ["Hf4f", "Hf5p"], [(H + "/ew_0.9", 0.9, (1.0, 2.0)), (T + "/key_13145072,ew_000-1.2000,ed_000-1e-04,polytyp_bcc,pm_000-5e-03", 1.2, (1.0, 2.0))]),
+    # the 0.641 / 0.386 starts came from the level table (step-0 rule of the first version, since replaced:
+    # the first go now always uses ewidth_init); they were never chosen from a DOS
     ("InMnFeCo fcc, In4d=core", ["In4d"], [(d, ew, bounds_of(d, ew)) for d, ew in ((glob.glob("RUN_orb4/InMnFeCo_In4d-core/key_*ew_000-0.6410*")[0], 0.641), (glob.glob("RUN_orb5/InMnFeCo_In4d-core/key_*ew_000-1.2000*")[0], 1.2))]),
     ("TlMnFeCo fcc, Tl5d=core", ["Tl5d"], [(d, ew, bounds_of(d, ew)) for d, ew in ((glob.glob("RUN_orb4/TlMnFeCo_Tl5d-core/key_*ew_000-0.3860*")[0], 0.386), (glob.glob("RUN_orb5/TlMnFeCo_Tl5d-core/key_*ew_000-1.2000*")[0], 1.2))]),
 ]
+START_NOTE = {0.9: "manual ewidth scan, not chosen by GAES", 0.641: "step-0 start from the level table (old rule), not chosen from a DOS",
+              0.386: "step-0 start from the level table (old rule), not chosen from a DOS", 1.2: "ewidth_init"}
 def info(d):
     txt = open(d + "/out_go.log").read()
     itr = re.findall(r"itr=\s*(\d+)", txt); err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
@@ -33,14 +37,16 @@ for row, (name, keys, runs) in enumerate(PAIRS):
         e, c, _ = dos_curves_from_outputs([(AkaikkrJob(d), "out_dos.log")]); lv = levels_from_go(d + "/out_go.log")
         n, err, _ = info(d); conv = err is not None and err < -5.9
         # gap regions by the Method 2 rules (dosth 2e-2 / dosth2 1e-3, eth 0.3, ediff 0.2), no ewidth bounds
-        dec = choose_ewidth2(e, c, ew, dosth=2e-2, dosth2=1e-3, eth=0.3, ediff=0.2)
+        dec = choose_ewidth2(e, c, ew, dosth=2e-2, dosth2=1e-3, eth=0.3, ediff=0.2,
+                             min_ewidth=bounds[0] if bounds else None, max_ewidth=bounds[1] if bounds else None)
         flag = dec.flag
         draw_gaes_dos(ax, e, c[0], ewidth=ew, decision=dec, bounds=bounds, levels=lv, highlight=keys, xlim=(-2.9, 0.9))
         # how specx treated the orbital concerned in this go: '*' = valence (inside the contour), else core
         roles = ", ".join("%s: %s (%.2f Ry)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in keys if k in lv)
         bl = "[%s, %s]" % tuple(None if b is None else round(b, 3) for b in bounds) if bounds else "none"
-        ax.set_title("%s: ewidth %.4f, %s (itr %s, log10 rms %s), gap judgement: %s, [min, max] ewidth %s\n%s" % (
-            name, ew, "converged" if conv else "NOT converged", n, err, flag, bl, roles), fontsize=8, loc="left",
+        ax.set_title("%s: ewidth %.4f (%s), %s (itr %s, log10 rms %s)\n%s; gap judgement with [min, max] ewidth %s: %s%s" % (
+            name, ew, START_NOTE.get(ew, ""), "converged" if conv else "NOT converged", n, err, roles, bl, flag,
+            " -> %.4f" % dec.ewidth if flag == "new" else ""), fontsize=8, loc="left",
             color="k" if conv else "darkred")
 for ax in axes[-1]: ax.set_xlabel("E - EF (Ry)")
 fig.suptitle("SCF convergence flips with ewidth. Second title line: how specx treated the orbital in that go (CORE, or VALENCE *).\n" + legend_text(), fontsize=9)
