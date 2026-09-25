@@ -52,40 +52,88 @@ $ make specx fmg
 
 # test script
 
-- It tests AkaiKKR package.
-- It generates AkaiKKR input file from cif files.
+The test scripts run AkaiKKR on a fixed set of materials (pure metals, CPA alloys, a semiconductor, SmCo5 with and
+without open-core 4f) in every mode (go, fsm, dos, spc31, j3.0, tc, gofmg; cnd for the conductivity build) and compare
+the results with reference values. Each material's parameters are defined once in
+`akaikkr_testscript.testrun_class` (`_<material>_common_param`) and the structures are generated from CIF files.
 
- 
-For example, if you use CPA2021V01, (Note that the directory name specified by {PREFIX} must be .../akaikkr_cpa2021v01.)
+| directory | build of AkaiKKR (`<program_path>/<build>/specx`) | reference |
+|---|---|---|
+| `tests/akaikkr` | `akaikkr` (standard) | `reference/ifort.json` (62 checks, 13 materials); `reference/ifort_ase.json` for the ASE backend |
+| `tests/akaikkr_cnd` | `akaikkr_cnd` (conductivity: cnd, displc lines) | `reference/ifort.json` (61 checks, 11 materials) |
+| `tests/akaikkr_cpa2021v01` | patched CPA2021V01 (see above) | `reference/ifort.json` (a copy of the `akaikkr` reference; needs regeneration, see the BUG section) |
+
 ```
-$ cd {PREFIX}/tests/akaikkr_cpa2021v01
+$ conda activate akaikkr          # pyakaikkr, akaikkr_testscript, pymatgen, ase installed
+$ cd {PREFIX}/tests/akaikkr
+$ export OMP_NUM_THREADS=24
 $ python testrun.py <program_path> [--set <name>] [--create_ref] [--compiler ifort]
+$ python testrun_ase.py <program_path> [--set <name>] [--create_ref]        # ASE backend, reference/ifort_ase.json
 ```
-`<program_path>` is the directory that contains `akaikkr/specx`, `akaikkr_cnd/specx`, ...
-See [docs/testscript_usage.md](docs/testscript_usage.md) for the options, the reference files and the known last-digit differences.
 
-The following display appears at the end of the execution.
+- `<program_path>` is the directory that contains `akaikkr/specx`, `akaikkr_cnd/specx`, `akaikkr_cpa2021v01/specx`.
+- `--set` selects a subset defined in `testsets.py` (`all`, `Cu`, `Fe`, `Co`, `Ni`, `NiFe`, `AlMnFeCo`, ...).
+- `--create_ref` writes `reference/<compiler>[_ase].json` instead of comparing.
+- The outputs of each material stay in `<material>/` (inputcard, `out_*.log`, `dos.png`, `pdos_*.png`, `Awk_*.png`);
+  the values of this run are written to `result.json` (`result_ase.json`). The red dash-dotted line in the DOS figures is
+  E − E<sub>F</sub> = −ewidth of the go run (the bottom of the SCF energy contour).
+- Details (backends, environment, the known last-digit differences between machines, the fixes of 2026-09):
+  [docs/testscript_usage.md](docs/testscript_usage.md).
+
+The following display appears at the end of the execution (here `tests/akaikkr_cnd`; the `akaikkr` set has no `cnd`
+column and includes FeB195 and SmCo5_noc).
 ```
+ALL TESTS PASSED.
+
 SHORT SUMMARY
-             dos fsm go gofmg spc31
-AlMnFeCo_bcc   O   O  O     O     -
-Co             O   O  O           -
-Co2MnSi        O   O  O           -
-Cu             O      O           -
-Fe             O   O  O           -
-FeB195         O      O           -
-FeRh05Pt05     O   O  O           -
-Fe_lmd         O      O           -
-GaAs           O      O           -
-Ni             O   O  O           -
-NiFe           O   O  O           -
-SmCo5_noc             O            
-SmCo5_oc       O   O  O           -
+             cnd dos fsm go gofmg j3.0 spc31 tc
+AlMnFeCo_bcc   O   O   O  O     O    O     O  O
+Co             -   O   O  O     -    O     O  O
+Co2MnSi        -   O   O  O     -    O     O  O
+Cu             -   O   -  O     -    -     O  -
+Fe             -   O   O  O     -    O     O  O
+FeRh05Pt05     O   O   O  O     -    O     O  O
+Fe_lmd         -   O   -  O     -    -     O  -
+GaAs           -   O   -  O     -    -     O  -
+Ni             -   O   O  O     -    O     O  O
+NiFe           O   O   O  O     -    O     O  O
+SmCo5_oc       -   O   O  O     -    O     O  O
 O: passed. X: failed, -: no reference
 ```
+If a check fails, `TEST FAILED.` and the failed keys are printed before the summary. A few checks are known to fail by
+the last digit when the machine differs from the one that made the reference (Fe_lmd, SmCo5_oc go moment, AlMnFeCo_bcc
+cnd / spc31; docs/testscript_usage.md §4). The thresholds are left as they are.
 
-As an example, the block spectra $A(w,k)$ of NiFe (FCC $\mathrm{Ni}_{0.9}\mathrm{Fe}_{0.1}$) is generated under the NiFe directory as follows.
+As an example, the Bloch spectral function $A(w,k)$ of NiFe (FCC $\mathrm{Ni}_{0.9}\mathrm{Fe}_{0.1}$) is generated under the NiFe directory as follows.
 ![](https://github.com/nim-hrkn/AkaiKKRPythonUtil/blob/cpa2021v01_supported/fig/NiFe_Awk_all.png?raw=true)
+
+## GAES examples in tests/akaikkr
+
+Two stand-alone examples decide the ewidth of go with GAES (Gap-Anchored Ewidth Search, [docs/gaes_usage.md](docs/gaes_usage.md),
+specification [docs/ewidth_tuning_scheme.md](docs/ewidth_tuning_scheme.md)) on a single-site CPA alloy:
+```
+$ cd {PREFIX}/tests/akaikkr
+$ python gaes_ewidth_example.py <program_path> --comp AlScNiBi --polytyp fcc --min-ewidth 1.0 --max-ewidth 1.5
+$ python gaes_orbital_example.py <program_path>            # SeMnFeCo fcc, Se 4s as valence and as core
+```
+The runs go to `<comp>_<polytyp>_ewidth/`, `SeMnFeCo_fcc_Se4s-valence/`, `SeMnFeCo_fcc_Se4s-core/` and the figures to
+`gaes_ewidth_<comp>_<polytyp>.png`, `gaes_orbital_SeMnFeCo_fcc_Se4s.png`.
+
+## pytest
+
+Unit tests of the library live next to the test sets. Tests that run specx are skipped unless
+`AKAIKKR_PROGRAM_PATH` (the same `<program_path>`) is set.
+```
+$ export AKAIKKR_PROGRAM_PATH=/path/to/AkaiKKRprogram.2022.0721.ifort
+$ pytest tests/ase tests/gaes tests/option tests/plot
+```
+| directory | what is tested |
+|---|---|
+| `tests/ase` | the ASE calculator, inputcard generation, occupancies, agreement between the CIF and ASE backends |
+| `tests/gaes` | gap detection, Method 2 judgement, orbital rules, compositions, a GAES run with specx; `tests/gaes/tools/` holds the survey scripts behind `docs/data/` |
+| `tests/option` | `begin_option` writing / validation / reading back from the outputs |
+| `tests/plot` | the array-based drawing functions of `pyakaikkr.plot`, the ewidth line of the DOS plotter, the HTML report (`kkr-report`) |
+| `tests/structure` | small primitive structures (CIF) used by the GAES survey |
 
 # ASE interface
 
@@ -124,5 +172,7 @@ in `tests/akaikkr` to make `reference/ifort_ase.json`, then `python testrun_ase.
 [aiida-akaikkr](../aiida-akaikkr) wraps specx as AiiDA CalcJobs (go / fsm / dos / j3.0 / tc / spc31 / cnd). Its `example/run_examples.py` uses the same `_<material>_common_param` definitions as the test script and reproduces `tests/*/reference/ifort.json`; see `aiida-akaikkr/docs/`.
 
 # BUG
-- TEST FAILED is always shown at the end of testrun.py.
-- Awk\_both.png is generated at the top directory of testrun.py.
+- `Awk_both.png` is generated at the top directory of testrun.py.
+- `tests/akaikkr_cpa2021v01/reference/ifort.json` is a copy of the `akaikkr` reference and does not match the CPA2021V01
+  values (e.g. Cu go te −3304.747251823); it has to be regenerated with `--create_ref`.
+- `tests/akaikkr` Co2MnSi dos / spc31 differ from the reference in te by 1e-5 while go agrees; cause unknown.
