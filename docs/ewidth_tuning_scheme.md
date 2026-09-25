@@ -722,6 +722,12 @@ aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 g
   | Tl 5d core | −0.94 `*` | [—, 0.74] | 1.2 | `ewidth_fail`（同上） |
   | Ga 3d core | −1.08 `*` | [—, 0.88] | 1.2 | `ewidth_fail`（同上） |
   | Rb 4s valence | −2.10（core） | [2.30, —] | 1.2 | `ewidth_fail`（窓を 3.73 に広げても [−2.8, −2.3] に DOS < 2e-2 の幅 0.3 の区間が無い） |
+  | In 4d valence | 表 A −1.17 → go −1.07 `*` | [1.27, —] | 1.565（表 A から 1.365 + 0.2） | `finished`（4d 帯の下 [−2.24, −1.40]） |
+  | Tl 5d valence | −0.94 `*` | [1.15, —] | 1.2 → 1.2925 | `finished`（5d 帯の下 [−2.24, −1.25]） |
+  | Ga 3d valence | 表 A −1.17 → go −1.04 `*` | [1.24, —] | 1.565（表 A から） | `finished`（3d 帯の下 [−2.24, −1.37]） |
+  | Rb 4s core | −2.10（core） | [—, 1.90] | 1.2 | `finished`（1.2 は範囲内、ギャップ [−1.93, −1.18]） |
+
+  図 `docs/data/hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 面、最終判定の DOS、青線 = 指定した準位（破線 `*`）、斜線 = その判定の範囲、赤 = −ewidth）、結果 `docs/data/hea_XMnFeCo_fcc_orbital_rules_summary.json`、スクリプト `tests/gaes/tools/plot_orbital_rules.py`。Rb 4s valence の面（窓 3.73）では −2.3 Ry より下の DOS に窓を広げたことによる偽のピークが並ぶ（§13、ewidth_dos_max の理由）。
 
   `core` 指定が通るのは、その準位と valence 帯の間に幅 eth のギャップがある系（La、Ba、Se、Bi は eth 0.2）だけで、In / Tl / Ga のように準位が valence 帯に近い系では `fail` になる。`valence` 指定は準位の下にギャップがあれば通る（Pr、Ce）。
 

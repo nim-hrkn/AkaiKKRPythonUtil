@@ -1,0 +1,811 @@
+{
+ "RbMnFeCo_Rb4p-core": {
+  "status": "ewidth_fail",
+  "ewidth": 0.5875,
+  "tried": [
+   1.2,
+   0.5875
+  ],
+  "gap": null,
+  "flags": [
+   "new",
+   "fail"
+  ],
+  "bounds": [
+   [
+    null,
+    0.7359228
+   ],
+   [
+    null,
+    0.7359228
+   ]
+  ],
+  "levels": [
+   [
+    -0.9371,
+    true
+   ],
+   [
+    -1.6793,
+    false
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Rb4p=core",
+     "star": true,
+     "level": -0.93712515
+    }
+   ],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": false
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [None, 0.7359228] (orbital rules ['Rb4p=core'])",
+  "seconds": 66
+ },
+ "SeMnFeCo_Se4s-core": {
+  "status": "finished",
+  "ewidth": 0.7725,
+  "tried": [
+   1.2,
+   0.7725
+  ],
+  "gap": [
+   -0.8925,
+   -0.6675
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    null,
+    0.843877
+   ],
+   [
+    null,
+    0.843877
+   ]
+  ],
+  "levels": [
+   [
+    -1.0444,
+    true
+   ],
+   [
+    -1.0466,
+    false
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Se4s=core",
+     "star": true,
+     "level": -1.0444395
+    }
+   ],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 36
+ },
+ "BiMnFeCo_Bi6s-core": {
+  "status": "ewidth_fail",
+  "ewidth": 1.4024999999999999,
+  "tried": [
+   0.4,
+   1.4024999999999999
+  ],
+  "gap": null,
+  "flags": [
+   "new",
+   "fail"
+  ],
+  "bounds": [
+   [
+    null,
+    1.6320252
+   ],
+   [
+    null,
+    0.7543747000000001
+   ]
+  ],
+  "levels": [
+   [
+    -1.8333,
+    false
+   ],
+   [
+    -0.9568,
+    true
+   ]
+  ],
+  "mismatch": [
+   [],
+   [
+    {
+     "rule": "Bi6s=core",
+     "star": true,
+     "level": -0.9568176
+    }
+   ]
+  ],
+  "step0": [
+   null,
+   0.6000000000000001
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [None, 0.7543747000000001] (orbital rules ['Bi6s=core'])",
+  "seconds": 21
+ },
+ "BiMnFeCo_Bi6s-core_eth0.2": {
+  "status": "finished",
+  "ewidth": 0.7275,
+  "tried": [
+   1.2,
+   0.7275
+  ],
+  "gap": [
+   -0.7575,
+   -0.6375
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    null,
+    0.7533761999999999
+   ],
+   [
+    null,
+    0.7533761999999999
+   ]
+  ],
+  "levels": [
+   [
+    -0.9562,
+    true
+   ],
+   [
+    -0.9599,
+    false
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Bi6s=core",
+     "star": true,
+     "level": -0.9561609999999999
+    }
+   ],
+   []
+  ],
+  "step0": [
+   null,
+   0.6000000000000001
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 38
+ },
+ "RbMnFeCo_Rb4p-valence": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.9275,
+   -1.1775
+  ],
+  "flags": [
+   "old"
+  ],
+  "bounds": [
+   [
+    1.1383275,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -0.9371,
+    true
+   ]
+  ],
+  "mismatch": [
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 12
+ },
+ "PrMnFeCo_Pr5p-valence": {
+  "status": "finished",
+  "ewidth": 1.7774999999999999,
+  "tried": [
+   1.2,
+   1.7774999999999999
+  ],
+  "gap": [
+   -2.2699333,
+   -1.6625933
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    1.6450392999999999,
+    null
+   ],
+   [
+    1.6450392999999999,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -1.4145,
+    false
+   ],
+   [
+    -1.4047,
+    true
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Pr5p=valence",
+     "star": false,
+     "level": -1.4144562999999999
+    }
+   ],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 21
+ },
+ "CeMnFeCo_Ce5p-valence": {
+  "status": "finished",
+  "ewidth": 1.9124999999999999,
+  "tried": [
+   1.2,
+   1.9124999999999999
+  ],
+  "gap": [
+   -2.4044832,
+   -1.8093937
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    1.7645216999999997,
+    null
+   ],
+   [
+    1.7645216999999997,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -1.5597,
+    false
+   ],
+   [
+    -1.5522,
+    true
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Ce5p=valence",
+     "star": false,
+     "level": -1.5597327499999998
+    }
+   ],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 23
+ },
+ "LaMnFeCo_La5p-core": {
+  "status": "finished",
+  "ewidth": 0.8125,
+  "tried": [
+   1.2,
+   0.8125
+  ],
+  "gap": [
+   -0.9825,
+   -0.8025
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    null,
+    1.1145292
+   ],
+   [
+    null,
+    1.1145292
+   ]
+  ],
+  "levels": [
+   [
+    -1.3183,
+    true
+   ],
+   [
+    -1.3316,
+    false
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "La5p=core",
+     "star": true,
+     "level": -1.3183303
+    }
+   ],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 58
+ },
+ "BaMnFeCo_Ba5p-core": {
+  "status": "finished",
+  "ewidth": 0.6375,
+  "tried": [
+   1.2,
+   0.6375
+  ],
+  "gap": [
+   -0.8625,
+   -0.5775
+  ],
+  "flags": [
+   "new",
+   "old",
+   "old"
+  ],
+  "bounds": [
+   [
+    null,
+    0.8596895
+   ],
+   [
+    null,
+    0.8596895
+   ],
+   [
+    null,
+    0.8596895
+   ]
+  ],
+  "levels": [
+   [
+    -1.0646,
+    true
+   ],
+   [
+    -1.0877,
+    false
+   ],
+   [
+    -1.0834,
+    false
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Ba5p=core",
+     "star": true,
+     "level": -1.0645619000000002
+    }
+   ],
+   [],
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 43
+ },
+ "InMnFeCo_In4d-core": {
+  "status": "ewidth_fail",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": null,
+  "flags": [
+   "fail"
+  ],
+  "bounds": [
+   [
+    null,
+    0.9060705
+   ]
+  ],
+  "levels": [
+   [
+    -1.107,
+    true
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "In4d=core",
+     "star": true,
+     "level": -1.10701155
+    }
+   ]
+  ],
+  "step0": [
+   null,
+   0.841
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [None, 0.9060705] (orbital rules ['In4d=core'])",
+  "seconds": 8
+ },
+ "TlMnFeCo_Tl5d-core": {
+  "status": "ewidth_fail",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": null,
+  "flags": [
+   "fail"
+  ],
+  "bounds": [
+   [
+    null,
+    0.7430384999999999
+   ]
+  ],
+  "levels": [
+   [
+    -0.9438,
+    true
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Tl5d=core",
+     "star": true,
+     "level": -0.94380745
+    }
+   ]
+  ],
+  "step0": [
+   null,
+   0.5860000000000001
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [None, 0.7430384999999999] (orbital rules ['Tl5d=core'])",
+  "seconds": 12
+ },
+ "GaMnFeCo_Ga3d-core": {
+  "status": "ewidth_fail",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": null,
+  "flags": [
+   "fail"
+  ],
+  "bounds": [
+   [
+    null,
+    0.8838314
+   ]
+  ],
+  "levels": [
+   [
+    -1.0848,
+    true
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Ga3d=core",
+     "star": true,
+     "level": -1.08482695
+    }
+   ]
+  ],
+  "step0": [
+   null,
+   0.806
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [None, 0.8838314] (orbital rules ['Ga3d=core'])",
+  "seconds": 6
+ },
+ "RbMnFeCo_Rb4s-valence": {
+  "status": "ewidth_fail",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": null,
+  "flags": [
+   "fail"
+  ],
+  "bounds": [
+   [
+    2.3000244000000003,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -2.0995,
+    false
+   ]
+  ],
+  "mismatch": [
+   [
+    {
+     "rule": "Rb4s=valence",
+     "star": false,
+     "level": -2.0994584
+    }
+   ]
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "no gap candidate inside [min_ewidth, max_ewidth] = [2.3000244000000003, None] (orbital rules ['Rb4s=valence'])",
+  "seconds": 12
+ },
+ "InMnFeCo_In4d-valence": {
+  "status": "finished",
+  "ewidth": 1.565,
+  "tried": [
+   1.565
+  ],
+  "gap": [
+   -2.2425,
+   -1.4025
+  ],
+  "flags": [
+   "old"
+  ],
+  "bounds": [
+   [
+    1.2709403,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -1.0701,
+    true
+   ]
+  ],
+  "mismatch": [
+   []
+  ],
+  "step0": [
+   1.365,
+   null
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 9
+ },
+ "TlMnFeCo_Tl5d-valence": {
+  "status": "finished",
+  "ewidth": 1.2925,
+  "tried": [
+   1.2,
+   1.2925
+  ],
+  "gap": [
+   -2.2425,
+   -1.2525
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "bounds": [
+   [
+    1.1445764,
+    null
+   ],
+   [
+    1.1445764,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -0.9438,
+    true
+   ],
+   [
+    -0.9059,
+    true
+   ]
+  ],
+  "mismatch": [
+   [],
+   []
+  ],
+  "step0": [
+   1.15,
+   null
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 22
+ },
+ "GaMnFeCo_Ga3d-valence": {
+  "status": "finished",
+  "ewidth": 1.565,
+  "tried": [
+   1.565
+  ],
+  "gap": [
+   -2.2425,
+   -1.3725
+  ],
+  "flags": [
+   "old"
+  ],
+  "bounds": [
+   [
+    1.2403661,
+    null
+   ]
+  ],
+  "levels": [
+   [
+    -1.0395,
+    true
+   ]
+  ],
+  "mismatch": [
+   []
+  ],
+  "step0": [
+   1.365,
+   null
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 7
+ },
+ "RbMnFeCo_Rb4s-core": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.9275,
+   -1.1775
+  ],
+  "flags": [
+   "old"
+  ],
+  "bounds": [
+   [
+    null,
+    1.8988924
+   ]
+  ],
+  "levels": [
+   [
+    -2.0995,
+    false
+   ]
+  ],
+  "mismatch": [
+   []
+  ],
+  "step0": [
+   1.0,
+   2.0
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 12
+ }
+}
