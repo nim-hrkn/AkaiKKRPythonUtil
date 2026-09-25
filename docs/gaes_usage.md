@@ -83,7 +83,7 @@ plot_gaes_dos(ax, energy, dos_block, ewidth=1.2, decision=dec, bounds=(1.0, 2.0)
 
 ## 例（tests/akaikkr/）
 
-`testrun.py` と同じく `<program_path>`（`akaikkr/specx` を含むディレクトリ）を渡す。出力は tests/akaikkr の下（`RUN_gaes_ewidth/`、`RUN_gaes_orbital/`、`gaes_*.png`、.gitignore 済み）。
+`testrun.py` と同じく `<program_path>`（`akaikkr/specx` を含むディレクトリ）を渡す。出力は tests/akaikkr の直下（`SeMnFeCo_fcc_ewidth/`、`SeMnFeCo_fcc_Se4s-valence/`、`SeMnFeCo_fcc_Se4s-core/`、`gaes_*.png`。testrun の `Cu/` などと同じ扱いで .gitignore 済み）。
 
 ```
 cd tests/akaikkr

@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 tests/gaes/RUN/
-tests/akaikkr/RUN_gaes_ewidth/
-tests/akaikkr/RUN_gaes_orbital/
+tests/akaikkr/*_ewidth/
+tests/akaikkr/*-valence/
+tests/akaikkr/*-core/
 tests/akaikkr/gaes_*.png

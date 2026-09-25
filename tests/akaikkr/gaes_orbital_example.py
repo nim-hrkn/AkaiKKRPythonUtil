@@ -8,8 +8,8 @@ usage: python gaes_orbital_example.py <program_path> [--comp SeMnFeCo] [--orbita
 Runs GAES twice on the same system: "<orbital>=valence" (alias occupied) and "<orbital>=core"
 (alias unoccupied). The rule turns the core level of that orbital, read from every go output, into
 the ewidth range: valence -> min_ewidth = |E - E_F| + ediff, core -> max_ewidth = |E - E_F| - ediff
-(docs/ewidth_tuning_scheme.md section 15). Runs go to RUN_gaes_orbital/<comp>_<polytyp>_<rule>/,
-the figure to gaes_orbital_<comp>_<polytyp>_<orbital>.png (left valence, right core).
+(docs/ewidth_tuning_scheme.md section 15). Runs go to <comp>_<polytyp>_<orbital>-valence/ and
+<comp>_<polytyp>_<orbital>-core/, the figure to gaes_orbital_<comp>_<polytyp>_<orbital>.png (left valence, right core).
 """
 import argparse
 import os
@@ -40,7 +40,7 @@ def main():
     results = {}
     for role in ("valence", "core"):
         rule = "{}={}".format(args.orbital, role)
-        g = Gaes(exe, Layout(os.path.join("RUN_gaes_orbital", "{}_{}".format(key, rule.replace("=", "-"))), version=2),
+        g = Gaes(exe, Layout("{}_{}".format(key, rule.replace("=", "-")), version=2),
                  ewidth_init=args.ewidth_init, ref=ref, method=2, dosth=2e-2, dosth2=1e-3, eth=args.eth,
                  orbitals=[rule],                     # the range [min_ewidth, max_ewidth] comes from the rule
                  edelt_init=1e-4, edelt_dos=1e-4, with_j=False)

@@ -7,7 +7,7 @@ usage: python gaes_ewidth_example.py <program_path> [--comp SeMnFeCo] [--polytyp
                                      [--min-ewidth 1.0] [--max-ewidth 2.0] [--threads 20]
 
 <program_path> is the directory that contains akaikkr/specx (as for testrun.py). The run goes to
-RUN_gaes_ewidth/<comp>_<polytyp>/ (key_<comp>.json + one directory per go), the figure to
+<comp>_<polytyp>_ewidth/ (key_<comp>_<polytyp>.json + one directory per go), the figure to
 gaes_ewidth_<comp>_<polytyp>.png. See docs/gaes_usage.md and docs/ewidth_tuning_scheme.md.
 """
 import argparse
@@ -36,7 +36,7 @@ def main():
     comp = SiteComposition.from_type_name(args.comp)
     key = "{}_{}".format(args.comp, args.polytyp)
     params = {args.polytyp: make_single_site_param(comp, args.polytyp, type_name="HEA")}
-    g = Gaes(exe, Layout(os.path.join("RUN_gaes_ewidth", key), version=2),
+    g = Gaes(exe, Layout(key + "_ewidth", version=2),
              ewidth_init=args.ewidth_init, ref=ref, method=2, dosth=2e-2, dosth2=1e-3,
              min_ewidth=args.min_ewidth, max_ewidth=args.max_ewidth,
              edelt_init=1e-4, edelt_dos=1e-4,        # go and judgement dos both at 1e-4 (2019 setting)
