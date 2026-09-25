@@ -17,7 +17,7 @@ def info(d):
     txt = open(d + "/out_go.log").read()
     itr = re.findall(r"itr=\s*(\d+)", txt); err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
     return (int(itr[-1]) if itr else None), (float(err[-1]) if err else None), ("cpu time" in txt or "sbrtime" in txt)
-fig, axes = plt.subplots(len(PAIRS), 2, figsize=(16, 3.4 * len(PAIRS)), sharex=True)
+fig, axes = plt.subplots(len(PAIRS), 2, figsize=(16, 3.8 * len(PAIRS)), sharex=True)
 for row, (name, keys, runs) in enumerate(PAIRS):
     for col, (d, ew) in enumerate(runs):
         ax = axes[row, col]
@@ -27,9 +27,11 @@ for row, (name, keys, runs) in enumerate(PAIRS):
         dec = choose_ewidth2(e, c, ew, dosth=2e-2, dosth2=1e-3, eth=0.3, ediff=0.2)
         flag = dec.flag
         draw_gaes_dos(ax, e, c[0], ewidth=ew, decision=dec, levels=lv, highlight=keys, xlim=(-2.9, 0.9))
-        ax.set_title("%s: ewidth %.4f, %s (itr %s, log10 rms %s), gap judgement: %s" % (
-            name, ew, "converged" if conv else "NOT converged", n, err, flag), fontsize=8, loc="left",
+        # how specx treated the orbital concerned in this go: '*' = valence (inside the contour), else core
+        roles = ", ".join("%s: %s (%.2f Ry)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in keys if k in lv)
+        ax.set_title("%s: ewidth %.4f, %s (itr %s, log10 rms %s), gap judgement: %s\n%s" % (
+            name, ew, "converged" if conv else "NOT converged", n, err, flag, roles), fontsize=8, loc="left",
             color="k" if conv else "darkred")
 for ax in axes[-1]: ax.set_xlabel("E - EF (Ry)")
-fig.suptitle("SCF convergence flips with ewidth. " + legend_text(), fontsize=9)
+fig.suptitle("SCF convergence flips with ewidth (second title line: how specx treated the orbital in that go, CORE or VALENCE *). " + legend_text(), fontsize=9)
 fig.tight_layout(rect=(0, 0, 1, 0.98)); fig.savefig("conv_pairs_dos.png", dpi=120); print("saved conv_pairs_dos.png")
