@@ -11,6 +11,7 @@
 | [testscript_ase_spec.md](testscript_ase_spec.md) | 仕様書 | テストスクリプトの ASE backend の設計仕様（同上） |
 | [option_access_spec.md](option_access_spec.md) | 仕様書 | `begin_option` を pyakaikkr から参照する設計仕様（2026-09-25 実装、末尾に実装メモ）: キー辞書 `OPTION_KEYS`、inputcard の option ブロックの読み取り、出力の `optnwrt:` echo と `meshr mse ng mxl` の実効値の読み取り、書く前の検証 |
 | [gaes_usage.md](gaes_usage.md) | 使い方 | GAES（`pyakaikkr.gaes`, CLI `kkr-gaes`）: 既存 dos への判定、スキームの実行、互換モード、2022.0721 の各ビルドの注意 |
+| [data/atomic_core_levels_dsp.csv](data/atomic_core_levels_dsp.csv) | データ | H〜Bi の単体 fcc（a=実験原子体積、nmag、pbe、sra）に specx `go=dsp` を新規（pot.dat 無し）で掛けた初期原子ポテンシャルの core 準位 646 本（Ry / eV、core 電子数、`*`）。図 [data/atomic_core_levels_dsp.png](data/atomic_core_levels_dsp.png)、スクリプト `tests/gaes/tools/atomic_levels_dsp.py`, `plot_atomic_levels.py` |
 | [core_levels_vs_dos.md](core_levels_vs_dos.md) | 解析記録 | out_go.log の E_F（`ef=` 行）と成分ごとの core 準位（`*` = valence に切替）の読み方、2019 年 RUN 7,505 系での core 準位と total DOS の semicore ピークの一致（Ge 3d, Sn 4d, Bi 5d, Pb 5d, Sc 3p, Y 4p, Zr 4p, In 4d ...）、GAES への含意 |
 | [ewidth_tuning_scheme.md](ewidth_tuning_scheme.md) | 仕様書 | ewidth 自動調整スキーム GAES（Gap-Anchored Ewidth Search: DOS < threshold の連続 mesh 区間 = バンドギャップに E_F − ewidth_go が入るまで go/dos を回す。2019 年の HEA 網羅計算 run_scheme2 を一般化。微分は使わない）と GAES-Committee（複数 ewidth_go の投機的並列実行と vote）の pyakaikkr.gaes 移植仕様。移植元の誤り 12 件、PDOS 拡張、SiteComposition、type 名 40 文字制限 |
 
