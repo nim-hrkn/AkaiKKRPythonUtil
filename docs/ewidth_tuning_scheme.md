@@ -1,0 +1,376 @@
+# ewidth 自動調整スキーム: GAES（Gap-Anchored Ewidth Search）と GAES-Committee の pyakaikkr 移植仕様
+
+作成日: 2026-09-25（旧 `hea_scheme2_spec.md` を、HEA に限らない一般のアルゴリズムとして書き直し、名前を GAES に定めたもの）
+移植元: `fukushima_HEA_run_exprlattice/production_run/run0/`（2019-11、`1306.run_scheme2.py`, `HEARun.py`, `HEAPathSearch.py`, `hea_util.py`, `kkrinput_brvtyp.py`, `akaikkrio2.py`）
+移植先: AkaiKKRPythonUtil（pyakaikkr 2023.2.1）、AkaiKKR 2022.0721（`akaikkr/specx`）
+
+## 0. 背景と目的
+
+全電子計算の電子状態には valence、semicore、core の領域がある。AkaiKKR の go は [E_F − ewidth, E_F] の複素エネルギー経路で電荷を積分するので、`ewidth` は valence 帯と、その下の core または semicore 帯との間の、DOS が小さいエネルギー領域（以下**バンドギャップ**と呼ぶ）の中を指すように選ばなければならない。ewidth が valence 帯の中にあれば電荷を取りこぼし、semicore 帯の中にあれば semicore の一部だけを valence として数えるので、どちらも自己無撞着な解にならない。
+
+- バンドギャップは「連続した energy mesh の区間で DOS(E) < threshold」と定義する。threshold の既定は 1e-3（states/Ry、後述の単位）で、変更できる。DOS = 0 で定義しないのは、AkaiKKR は小さな `edelt`（虚部）を入れて計算するため、原理的に DOS = 0 のエネルギー領域が存在しないからである（VASP 等の実軸の計算では存在する）。
+- 手順は「ewidth を仮に決めて go を回し、dos で DOS を出し、E_F − ewidth_go がバンドギャップの中にあるか見る。無ければ ewidth を直して go からやり直す」である。これまでは人間がこれを行っていた。AkaiKKR 本体にも、pyakaikkr にも、これを検知するアルゴリズムは入っていない。
+- 2019 年の `fukushima_HEA_run_exprlattice/` は、この ewidth 調整を自動化したアルゴリズムで HEA（4 元等比、bcc/fcc、単一サイト CPA）の網羅計算を行ったものである。アルゴリズム自体は HEA に限らない一般のものなので、本仕様では HEA 固有の部分（2 桁原子番号の連結キー、等比濃度、`a=1000000`）を切り離し、任意の inputcard 辞書に対する **ewidth tuning scheme** として `pyakaikkr` に実装する。単一サイト CPA の入力は、等比に限らず任意の比の組成（`Rh0.5Pt0.5`、`B0.975Vc0.025` のような AkaiKKR の type 名と同じ書き方）を受ける `SiteComposition` から作る（§3.1）。
+- `run0/RUN/` にはその結果が置かれているが、残っているのは**最終的に採用された ewidth の計算だけ**であり、途中の試行は無い（§2 の誤り #1 のため、ディレクトリ名の `ew_000` は試行番号として信用できない）。
+
+### 0.1 名前
+
+- **GAES（Gap-Anchored Ewidth Search）**: DOS のバンドギャップ区間に E_F − ewidth_go を固定（anchor）するまで ewidth_go を置き直して go / dos を繰り返す探索。族の名前であり、同時に移植元の逐次方式（ewidth を 1 本置き、DOS を見て直す、を繰り返す。日本語ではギャップ追従法）を指す。
+- **GAES-Committee**: ewidth_go を投機的に複数置いて並列に go + dos を走らせ（ewidth_dos は固定）、各 DOS から得たギャップ区間の投票（vote）でギャップを推定し、その推定から GAES で仕上げる方式（§7.1）。複数の ewidth_go の計算を committee（委員会）、集約段を vote と呼ぶ。
+- パッケージ名 `pyakaikkr.gaes`、CLI 名 `kkr-gaes`、例外 `GaesError`。文書はこのファイル（`ewidth_tuning_scheme.md`）にまとめる。
+
+### 0.2 判定は DOS の値で行い、微分は使わない
+
+バンドギャップの端を DOS の微分（勾配の急変）で見つける方式は採らない。AkaiKKR の DOS は mesh 点ごとにギザギザしていることがあり（CPA の共鳴、粗い k 点、小さな edelt）、微分はその凹凸に敏感で一般的なアルゴリズムにならない。判定は §4 のとおり「連続した mesh 区間で DOS(E) < threshold」という値の比較だけで行う。平滑化してから微分する案も、平滑化幅という新たなパラメータを増やすだけなので採らない。
+
+目的は次の 4 つ。
+
+1. DOS（将来は PDOS）からバンドギャップ区間を検出し、与えた ewidth_go がその中にあるか判定し、無ければ次の ewidth 候補を返す関数群（§4、§5）。人間が手で行っていた判定をそのまま関数にしたもので、単独でも使える。
+2. 上の判定と、edelt・pmix を段階的に落として SCF を追い込む手順を組み合わせた状態機械 GAES（§7）。移植元の scheme2。
+3. 投機的並列実行と投票で初期 ewidth を決める GAES-Committee（§7.1）。
+4. 2019 年の RUN を読み直す互換モード（§8）。
+
+対象は akaikkr/specx。akaikkr_cnd は `displc` 必須で、dos の窓が ref=0.5 なので、§3.3 の ref を差し替えれば動くが本仕様の検証対象には入れない。
+
+### 0.3 将来の拡張（PDOS）— 設計で先に確保しておくこと
+
+いまは total DOS だけで判定する。HEA のように各元素が等しい濃度で入っていれば、どの元素の semicore も total DOS に同じ重みで現れるので、total DOS で正しいバンドギャップを検知できた。しかし希薄な成分では成り立たない。例えば La0.999Ge0.001 では Ge の total DOS への寄与は濃度分（0.001 程度）しかなく、threshold 1e-3 と同程度なので、total DOS からは Ge の semicore を認識できない。この場合は Ge の **PDOS（成分ごとの DOS）**で semicore を検知しなければならない。
+
+- したがって §4 の区間検出は「energy mesh と、任意本数の DOS 曲線の列」を入力に取り、全曲線の AND でバンドギャップを決める形にする。曲線が polytyp ごとの total DOS でも、成分ごとの PDOS でも同じ関数が使える。
+- AkaiKKR の `DOS of component i` は成分 i の on-site Green 関数から出る成分あたりの DOS（`spmain.f`: `-Im wkc(l,i,k)/π`）で、濃度は掛かっていないと読める（実装時に希薄系で確認する）。掛かっていなければ、希薄成分の semicore は PDOS では本来の高さで見え、threshold をそのまま使える。
+- PDOS 用の threshold は total DOS 用と別に持てるようにする（`dosth_pdos`）。PDOS は l 成分に分かれて出るので、成分ごとに l を足した値を曲線にする（`get_pdos_as_list` の `output_format="spin_separation"` の l 和）。
+
+## 1. 用語と記号
+
+| 記号 | 意味 |
+|---|---|
+| ewidth_go | go（と j, tc）の ewidth。SCF の積分路は [E_F − ewidth_go, E_F] |
+| ewidth_dos | dos の ewidth。窓は [E_F − ref·ewidth_dos, E_F + (1 − ref)·ewidth_dos]、ref は akaikkr で 0.75、akaikkr_cnd で 0.5、`begin_option` の `cemesr_ref=` で変更（[akaikkr_option_keys.md](akaikkr_option_keys.md)、[option_access_usage.md](option_access_usage.md)） |
+| E | dos 出力の横軸 E − E_F（Ry） |
+| dosth | バンドギャップ判定の threshold。既定 1e-3、変更可 |
+| バンドギャップ区間 | mesh 上で連続して DOS(E) < dosth となる区間 [e1, e2] |
+| eth | 区間を採用する最小幅（Ry）。移植元 0.30 |
+| ediff | 区間上端からの余裕（Ry）。移植元 0.20。新 ewidth は −(e2 − ediff − margin)、margin 0.01 |
+
+DOS の単位: pyakaikkr の `get_dos` が返す total DOS はスピンごと（states/Ry/cell/spin）。判定は**スピン和**（up + dn、nmag なら up の 1 本）に対して行う。移植元は平均 (up+dn)/2 に 1e-2 を掛けていた（= スピン和に 2e-2）。ユーザー指定の既定 1e-3 はスピン和に対する値とし、互換モードは 2e-2 を使う。
+
+## 2. 移植元の誤りと修正方針
+
+| # | 箇所 | 内容 | 修正 |
+|---|---|---|---|
+| 1 | `1306.run_scheme2.py` STEP1 | 新しい ewidth（`nextplan=="new"`）が返っても `iew` を進めないため、同じディレクトリ `ew_000` の既存 out_go.log を再利用して再計算しない。str.out で `('new', ...)` は 2053 回出ているが、そのすべてが ewidth=1.2 の結果を「新 ewidth の結果」として再判定している（2 回目は必ず `old` になる構造）。 | 実行ディレクトリ名に実際の ewidth 値を含め、inputcard の ewidth と一致しなければ再計算する（§6）。互換モードでも既存結果の再利用は inputcard の内容が一致する場合に限る。 |
+| 2 | `HEARun.analyzeDOS.__init__` | 低 DOS 領域が上端まで続くとき、未定義名 `smalldos` を参照して NameError。 | `len(mask)` を使う（§4）。 |
+| 3 | `akaikkrio2.OutputGo.converging` | `falg = True` のタイポ。当該分岐（`r2moment>0.8 and r2err>0.8`）は直前の `r2err>0.8` に含まれるので削除する。 | §5 の判定式に置き換える。 |
+| 4 | `akaikkrio2.OutputDOS.get` | スピン和ではなく平均 `(up+dn)/2` を返しているので、`dosth=1e-2` は平均 DOS への閾値になっている。 | スピン和で判定する（§1）。 |
+| 5 | `HEArun.make_heainput` | `self.dic` を破壊的に更新するため、go → dos → j と呼ぶうちに `go`, `ewidth`, `record` が前の呼び出しの値を引きずる。 | 入力辞書は毎回 `deepcopy` して作る。 |
+| 6 | `HEArun.run_all` | go が未収束でも dos と j を実行する（`stopifnotconverged=False` 固定）。 | 既定では収束した go の後だけ dos / j を実行する。互換モードでは移植元どおり常に実行する。 |
+| 7 | `1306.run_scheme2.py` | `nextplan=="fail"`（新 ewidth を作れない）を `keyconverged=True` にして「収束」と同じ扱いで終了する。 | 状態を `ewidth_fail` として記録し、収束とは区別する（§7）。 |
+| 8 | `calculate_pm` | `ipm` をローカルで進めるので、呼び出し元の `ipm` と実際に使ったディレクトリ番号がずれる。 | 使った pm 段の番号を戻り値で返す。 |
+| 9 | `analyzeDOS`, `make_new_ewidth` | 裸の `raise`（RuntimeError）。 | 専用例外 `GaesError` を送出する。 |
+| 10 | `HEADos` | 未定義の `OutFirstDOS` を使う。 | 削除し、プロットは `pyakaikkr.DosPlotter`（go の ewidth の線付き、[dos_plot_ewidth_line.md](dos_plot_ewidth_line.md)）に任せる。 |
+| 11 | `hea_util` | `from pymatgen import Element` は pymatgen 2022 以降で動かない。 | `pymatgen.core.periodic_table.Element` を使う。 |
+| 12 | `OutputGo.__init__` | 履歴が空だと `h_err[-1]` で IndexError。 | `AkaikkrJob.get_convergence`（`*** no convergence` の有無）で判定する。specx は `tol=1e-6`（log10 err ≤ -6）で収束、`maxitr` 到達で `*** no convergence` を出すので、移植元の `err <= -6` 判定と等価。 |
+
+移植元で仕様どおりだったもの（誤りではない）:
+
+- inputcard の `a=1000000` は標準 specx の機能で、`chklat.f` が `a > 0.99e6` のとき `qvolum(anclr,1)`（純物質の実験原子体積、cc/mol）を濃度平均して格子定数を決める。`a ≈ 0` なら MJW 値の表（`qvolum(anclr,2)`）を使う。合金化による体積変化は入らない。
+- `record=2nd` は pm_000 でも指定されるが、pot.dat が無いときは specx が `eof detected; data generated` と警告して初期化から始めるので害はない。
+
+## 3. ファイル構成
+
+| 区分 | パス | 内容 |
+|---|---|---|
+| 追加 | `library/PyAkaiKKR/src/pyakaikkr/gaes/__init__.py` | 公開 API（`gap_regions`, `check_ewidth`, `choose_ewidth`, `is_converging`, `KkrRunner`, `Layout`, `Gaes`, `GaesCommittee`, `SiteComposition`） |
+| 追加 | `pyakaikkr/gaes/gap.py` | バンドギャップ区間の検出（§4） |
+| 追加 | `pyakaikkr/gaes/ewidth.py` | ewidth の判定と候補生成（§4.2） |
+| 追加 | `pyakaikkr/gaes/convergence.py` | SCF 履歴の「まだ落ちている」判定（§5） |
+| 追加 | `pyakaikkr/gaes/runner.py` | 1 ディレクトリで go / dos / j を実行する `KkrRunner`（§6） |
+| 追加 | `pyakaikkr/gaes/layout.py` | ディレクトリ命名と検索（§6.1） |
+| 追加 | `pyakaikkr/gaes/scheme.py` | 状態機械 `Gaes` と結果集計（§7, §9） |
+| 追加 | `pyakaikkr/gaes/committee.py` | `GaesCommittee`: 投機的並列実行と vote（§7.1） |
+| 追加 | `pyakaikkr/gaes/cli.py` | `kkr-gaes` コマンド（§10） |
+| 追加 | `pyakaikkr/gaes/composition.py` | `SiteComposition`（任意の元素と比の単一サイト組成、AkaiKKR の type 名との相互変換、type 名の長さ検査）、`make_single_site_param`（§3.1） |
+| 追加 | `pyakaikkr/gaes/legacy_hea.py` | 2019 年の 2 桁原子番号キー（`13142122`）⇄ `SiteComposition`、`heakeylist0.csv` の読み込み。互換モード専用 |
+| 修正 | `pyakaikkr/Error.py` | `GaesError(Exception)` を追加 |
+| 修正 | `library/PyAkaiKKR/setup.cfg` | `console_scripts: kkr-gaes = pyakaikkr.gaes.cli:main` |
+| 追加 | `tests/gaes/` | pytest（§11） |
+| 追加 | `docs/gaes_usage.md` | 使い方（実装後） |
+
+`pyakaikkr.gaes` は `import pyakaikkr` からは読み込まない（明示 import）。
+
+### 3.1 単一サイト組成と入力（`composition.py`, `legacy_hea.py`）
+
+```python
+@dataclass(frozen=True)
+class SiteComposition:
+    elements: tuple[str, ...]        # 元素記号（"Vc" = 空孔、Z=0 も可）、入力順を保つ
+    fractions: tuple[float, ...]     # 合計 1（1e-6 以内）。等比なら 1/n
+    @classmethod
+    def from_elements(cls, elements: Sequence[str] | str) -> "SiteComposition"   # 等比。["Al","Si","Sc","Ti"] または "AlSiScTi"
+    @classmethod
+    def from_dict(cls, comp: Mapping[str, float]) -> "SiteComposition"           # {"Rh": 0.5, "Pt": 0.5}
+    @classmethod
+    def from_type_name(cls, name: str) -> "SiteComposition"                      # "Rh0.5Pt0.5"（末尾の "_1" は捨てる）、"Fe"、"B0.975Vc0.025"
+    @property
+    def z(self) -> tuple[int, ...]                                               # 原子番号（Vc は 0）
+    @property
+    def conc(self) -> tuple[float, ...]                                          # 百分率（AkaiKKR の conc）
+    def type_name(self, suffix: str = "", ndigits: int = 3, max_len: int = 40) -> str
+    def key(self) -> str                                                         # ディレクトリ名に使う安全な文字列（type_name から "." を "p" に）
+```
+
+- 組成は**任意の元素数と比**。HEA の 4 元等比は `from_elements("AlSiScTi")` の特殊な場合にすぎない。テストセットの `Rh0.5Pt0.5_1`（FeRh05Pt05）や `B0.975Vc0.025_1`（FeB195）と同じ書き方を `from_type_name` で読み、`type_name()` で書く。
+- `type_name` は pyakaikkr の Cif2Kkr と同じ書式（元素記号 + 分率、分率 1 なら省略、`_<site>` の接尾辞は `suffix` で付ける）。`ndigits` は分率の桁数。**長さが `max_len`（既定 40）を超えれば `ValueError`**（§3.1.1）。空白とカンマを含めば `ValueError`。
+- 2019 年のキーは `legacy_hea.py` の `heakey_to_composition("13142122") -> SiteComposition`（2 桁ずつ原子番号、等比。桁数が奇数なら `ValueError`）と `composition_to_heakey(comp)`（等比でなければ `ValueError`）、`load_heakeylist(path)`（列 `heakey, elements`、`heakey` は文字列で読む。先頭ゼロ保護）で扱う。
+
+```python
+def make_single_site_param(comp: SiteComposition, brvtyp: str, *, lattice: str | float = "expr",
+                           go="go", ewidth=1.2, edelt=1e-4, pmix=0.005, maxitr=500, bzqlty=10,
+                           sdftyp="pbe", reltyp="sra", magtyp="mag", record="2nd", outtyp="update",
+                           rmt=1.0, mxl=2, field=0.0, type_name: str | None = None,
+                           potentialfile="pot.dat", option: dict | None = None) -> dict
+```
+
+- `AkaikkrJob.default` を `deepcopy` して更新した辞書を返す。`ntyp=1, type=[type_name], ncmp=[len(comp.z)], anclr=[list(comp.z)], conc=[comp.conc]`, `natm=1, atmicx=[["0.0a","0.0b","0.0c",type_name]]`。`type_name` 省略時は `comp.type_name()`。移植元と同じ inputcard を出したいとき（互換モード）は `type_name="HEA"` と整数の conc（等比 4 元で `25`）を使う。
+- `lattice`: `"expr"`（既定、`a=1000000`、実験原子体積の濃度平均）、`"mjw"`（`a=0`）、`float`（bohr）。
+- `option` は `normalize_option` を通して `dic["option"]` に入れる。
+
+#### 3.1.1 AkaiKKR の type 名・atmtyp の制限（ソース確認、2026-09-25）
+
+`AkaiKKRprogram.2022.0721` のソースと、Cu で 40 / 41 / 45 文字の type 名を実際に走らせて確かめた。
+
+| 項目 | 値 | 根拠 |
+|---|---|---|
+| type 名と atmtyp の最大長 | **40 文字** | `akaikkr_common/source/m_param.f`: `len_type = 40`。`akaikkr/source/specx.f` と `akaikkr_cnd/source/specx.f` は `type(:)*(len_type), atmtyp(:)*(len_type)`。`akaikkr_cpa2021v01/source/specx.f` は `*40` の直書き。3 ビルドとも 40 |
+| 超えたとき | **エラーにならず、41 文字目以降を黙って捨てる** | `readin.f` の `type(i)=token`, `atmtyp(i)=token` は Fortran の文字代入なので切り詰め。type と atmtyp が同じ長さで切られるので `ty2ity.f` の照合は通る。出力（`type=` 行、`*** type-... ***` 行、反復開始行）には 40 文字だけ出る。41 文字と 45 文字で確認 |
+| 落とし穴 | 40 文字目までが同じ 2 つの type は同一とみなされ、`ty2ity` は先に定義した方に結び付ける | 上と同じ理由。pyakaikkr 側で検査して弾く（`SiteComposition.type_name` と、将来 `make_inputcard` にも） |
+| 使える文字 | 空白とカンマ以外 | トークンの区切りは空白または単一のカンマ（`akaikkr_common/source/xtoken.f`）。`.`、`_`、数字は可（`Rh0.5Pt0.5_1`, `B0.975Vc0.025_1` が実例） |
+| 1 行の長さ | 1024 文字 | `m_param.f`: `len_token = 1024`（`xtoken.f` の行バッファ） |
+| 反復開始行の表示 | 型名の後ろの `_2` 等は同じ type の原子数 | `spmain.f` 707 行: `write(cwtyp,'(a,i3)')'_',iwtyp(i)`。FeB195 の `B0.975Vc0.025_1_2` は名前ではなく「2 原子」の意味。title は 2000 文字 |
+
+pyakaikkr の `get_type_of_site` と `get_component_moment` は空白区切りで型名を取るので 40 文字までなら影響しない。ASE calculator の `check_kkr_output_structure` は入力の型名と出力の型名を比べるので、41 文字以上を渡すと不一致になる。Cif2Kkr が付ける名前（元素 + 分率 + `_<site>`）は 8 元・3 桁分率で 40 文字を超え得る（例 `Al0.125Si0.125Sc0.125Ti0.125V0.125Cr0.125Mn0.125Fe0.125_1` は 57 文字）ので、`SiteComposition.type_name(ndigits=2)` や短縮名を使う。
+
+scheme 側は「inputcard 辞書（`AkaikkrJob.make_inputcard` に渡せるもの）」だけを受けるので、HEA 以外は CIF（`AkaikkrJob.read_structure`）や ASE（`pyakaikkr.ase.atoms_to_kkr_param`）から作った辞書をそのまま渡せる。
+
+### 3.2 ewidth_dos と dos の窓
+
+- go と j は同じ ewidth_go を使う。dos は ewidth_dos（既定 3.0、移植元と同じ）で、窓は [E_F − 0.75·3.0, E_F + 0.25·3.0] = [−2.25, 0.75] Ry、201 点、刻み 0.015 Ry。§4 の判定はこの mesh 上で行う。
+- 窓の下端が −ewidth_go − eth より上にあると、ewidth_go の下側に幅 eth の区間があっても検出できない。`Gaes` は各 dos の前に `ref·ewidth_dos ≥ ewidth_go + eth + ediff` を確かめ、満たさなければ ewidth_dos を `(ewidth_go + eth + ediff)/ref` に広げる（`ewidth_dos_auto=True`、既定）。ref は `dosth` と同じくパラメータ（既定 0.75。akaikkr_cnd なら 0.5、`option={"cemesr_ref": ...}` を渡すならその値）。
+- mesh 点数は固定なので ewidth_dos を広げると刻みが粗くなる。eth より刻みが十分小さいこと（刻み ≤ eth/10）を確かめ、満たさなければ警告する。
+
+## 4. バンドギャップ区間の検出と ewidth の判定（`gap.py`, `ewidth.py`）
+
+判定は DOS の値の threshold 比較だけで行う（§0.2。微分は使わない）。
+
+### 4.1 区間検出
+
+```python
+@dataclass(frozen=True)
+class GapRegion:
+    e1: float; e2: float                 # Ry, E - EF
+    i1: int; i2: int                     # mesh index（両端を含む）
+    @property
+    def width(self) -> float
+
+def gap_regions(energy: np.ndarray, curves: Sequence[np.ndarray], dosth: float = 1e-3,
+                *, labels: Sequence[str] | None = None) -> list[GapRegion]
+def dos_curves_from_outputs(jobs_and_files: Sequence[tuple[AkaikkrJob, str]], *,
+                            spin_sum: bool = True) -> tuple[np.ndarray, list[np.ndarray], list[str]]
+def pdos_curves_from_output(job: AkaikkrJob, outfile: str, *, l_sum: bool = True,
+                            spin_sum: bool = True) -> tuple[np.ndarray, list[np.ndarray], list[str]]
+```
+
+- `energy` は E − E_F（Ry）の mesh、`curves` は同じ mesh 上の DOS 曲線の列（polytyp ごとの total DOS、成分ごとの PDOS、あるいはその両方を連結したもの）。全曲線の mesh が一致しなければ `GaesError`。
+- 各 mesh 点で「すべての曲線が dosth 未満」を取り（AND）、連続して真である mesh 区間を `GapRegion` にする。区間の上端 e2 は**最後に条件を満たした点の次の点**（移植元と同じ。`i2` はその index）。末尾まで続く場合は最後の点（移植元の NameError 箇所）。
+- `dos_curves_from_outputs` は `get_dos_as_list` のスピン和を曲線にする。`pdos_curves_from_output` は `get_pdos_as_list(output_format="spin_separation")` を成分ごとに l 和・スピン和して曲線にする（§0.3 の PDOS 拡張の入口。いまは用意だけして `Gaes` からは使わない）。
+
+### 4.2 ewidth の判定と候補
+
+```python
+def check_ewidth(regions: Sequence[GapRegion], ewidth: float, *, eth: float = 0.30,
+                 ediff: float = 0.20) -> GapRegion | None
+def choose_ewidth(regions: Sequence[GapRegion], ewidth: float, *, eth: float = 0.30,
+                  ediff: float = 0.20, margin: float = 0.01) -> tuple[str, float | None, list[float]]
+```
+
+- `check_ewidth`: 区間を高エネルギー側から見て、幅 `e2 − e1 > eth` かつ `e1 < −ewidth < e2` かつ `−ewidth < e2 − ediff` を満たす最初の区間を返す（無ければ None）。「E_F − ewidth_go がバンドギャップの中にあり、上端から ediff 以上離れている」の判定そのもの。
+- `choose_ewidth` は移植元の `calc_new_ewidth`:
+  1. `check_ewidth` が区間を返せば `("old", ewidth, candidates)`。
+  2. 無ければ幅 `> eth` の各区間から `−(e2 − ediff − margin)` を候補にして高エネルギー側から並べ、`("new", candidates[0], candidates)`。候補が無ければ `("fail", None, [])`。
+- 候補は「区間の上端の少し下」なので、valence 帯の直下のギャップがまず選ばれる。semicore を valence に含めたいときは `min_ewidth` で下限を与えて候補を絞る（新規、既定 None）。
+
+## 5. 「まだ収束に向かっている」判定（`convergence.py`）
+
+```python
+def is_converging(err_history: Sequence[float], moment_history: Sequence[float], *,
+                  last: int = 100, r2_th: float = 0.80, mae_err_th: float = 5e-4,
+                  mae_moment_th: float = 5e-5, mae_err_loose_th: float = 6e-3) -> bool
+```
+
+- 直近 `last` 点の err（log10 rms）と moment に、反復番号を説明変数にした最小二乗直線を引き、標準化した値で r² を、生の値で MAE を求める。
+- 判定は移植元の生きている条件だけ: `r2_err > r2_th`、または `mae_err < mae_err_th`、または `mae_moment < mae_moment_th and mae_err < mae_err_loose_th`。タイポで死んでいた条件は入れない。
+- scikit-learn は使わず `numpy.polyfit` で書く（定数列は r² = 0）。点数が 3 未満なら `False`。
+
+## 6. 1 ディレクトリの実行（`runner.py`）
+
+```python
+class KkrRunner:
+    def __init__(self, akaikkr_exe: str, directory: str, param_go: dict, *,
+                 ewidth_dos: float = 3.0, files: dict | None = None, compat: bool = False)
+    def run_go(self, copy_potential_from: str | None = None, force: bool = False) -> bool  # converged
+    def run_dos(self, force: bool = False) -> None
+    def run_j(self, force: bool = False) -> None
+    def run_all(self, copy_potential_from=None, with_j: bool = True) -> bool
+    def result(self) -> dict     # §9 の 1 行分
+```
+
+- `files` の既定は `{"inputcard_go": "inputcard_go", "out_go": "out_go.log", "inputcard_dos": "inputcard_dos", "out_dos": "out_dos.log", "inputcard_j": "inputcard_j", "out_j": "out_j.log", "potential": "pot.dat"}`（移植元と同名）。
+- `copy_potential_from` が与えられれば `AkaikkrJob.copy_potential` で pot.dat をコピーしてから実行する。
+- 再利用の判定（誤り #1 の修正）: 既存の inputcard を読んで、これから書く内容と文字列として一致し、かつ出力が正常終了（`sbtime report` あり、`***err` 無し、`check_option_error` が None）していれば実行しない。inputcard が異なるときは既存出力を `out_go.log.bak-<n>` に退避して再実行する。`force=True` なら無条件に実行する。
+- 実行は `AkaikkrJob.run`。`KKRFailedExecutionError` はそのまま上げる。収束は `AkaikkrJob.get_convergence`。
+- `run_all` は go の後、`compat=False`（既定）なら収束したときだけ dos と j を、`compat=True` なら常に実行する。`with_j=False` で j を省く（磁性でない系の一括処理用）。
+- dos と j の inputcard は `param_go` を `deepcopy` し `go` と（dos なら）`ewidth` だけ差し替える。`option` は `normalize_option` を通す。
+- `result()` は `AkaikkrJob` の `get_total_energy, get_total_moment, get_component_moment, get_lattice_constant, get_unitcell_volume, get_rms_error, get_convergence, get_ewidth, get_option, get_emesh_param, get_curie_temperature(out_j), get_jij_as_dataframe(out_j), get_dos(out_dos)` で §9 の項目を返す。
+
+### 6.1 ディレクトリ命名（`layout.py`）
+
+```python
+@dataclass
+class RunPoint:
+    key: str; iew: int; ewidth: float; ied: int; edelt: float; polytyp: str; ipm: int; pmix: float
+
+class Layout:
+    def __init__(self, prefix: str = "RUN", version: int = 2, sep: str = ",")
+    def dirname(self, p: RunPoint) -> str
+    def parse(self, dirname: str) -> RunPoint
+    def find(self, **fixed) -> list[RunPoint]
+```
+
+- `key` は系を識別する文字列（既定は `SiteComposition.key()`、一般には呼び出し側が与えるラベル。2019 年の RUN では heakey）。`polytyp` は同じ系の構造バリアント（bcc/fcc など、1 つでもよい）。
+- `version=1`（互換）: `key_{key},ew_{iew:03},ed_{ied:03},polytyp_{polytyp},pm_{ipm:03}`。移植元と同じ。2019 年の RUN を読むときに使う。
+- `version=2`（既定）: `key_{key},ew_{iew:03}-{ewidth:.4f},ed_{ied:03}-{edelt:.0e},polytyp_{polytyp},pm_{ipm:03}-{pmix:.0e}`。ewidth / edelt / pmix の実値を含むので、同じ `iew` で ewidth が変わっても別ディレクトリになる。
+- `find` は `os.scandir` で列挙して `parse` で戻す。区切りのカンマは移植元の資産と互換のため既定にし、`sep=";"` 等も許す。
+
+## 7. GAES（`scheme.py`）
+
+```python
+class Gaes:
+    def __init__(self, akaikkr_exe: str, layout: Layout, *,
+                 ewidth_init=1.2, ewidth_dos=3.0, ewidth_dos_auto=True, ref=0.75,
+                 dosth=1e-3, eth=0.30, ediff=0.20, margin=0.01, min_ewidth=None,
+                 edelt_steps=(1e-4, 1e-3, 1e-2), pmix_steps=(1e-2, 5e-3, 1e-3, 5e-4, 1e-4),
+                 pmix_init=0.005, maxitr_init=500, maxitr_2nd=200, maxitr_pm=300,
+                 max_pm_iter=20, max_ew=10, with_j=True, compat=False, logger=None)
+    def run(self, key: str, params: dict[str, dict]) -> KeyResult   # polytyp -> param_go 辞書
+    def run_many(self, items: Iterable[tuple[str, dict[str, dict]]]) -> list[KeyResult]
+```
+
+`params` は polytyp 名 → go の inputcard 辞書（`ewidth`, `edelt`, `pmix`, `maxitr` は scheme が上書きする）。単一サイト CPA なら `{"bcc": make_single_site_param(comp, "bcc"), "fcc": make_single_site_param(comp, "fcc")}`。1 キーの処理:
+
+1. **STEP1（ewidth の粗い決定）**: `iew=0, ewidth=ewidth_init, edelt=edelt_steps[0], pmix=pmix_init, maxitr=maxitr_init` で各 polytyp を 1 回だけ go → dos（→ j）。全 polytyp の total DOS（スピン和）を `gap_regions` に渡し `choose_ewidth`。
+   - `old` かつ全 polytyp 収束 → **finished**。
+   - `old` だが未収束 → STEP2 へ。
+   - `new` → `iew += 1`、ewidth を候補に置き換えて STEP1 をやり直す（誤り #1 の修正。`version=2` の layout なら別ディレクトリになる）。同じ ewidth を二度試さない。`iew >= max_ew` で **ewidth_exhausted**。
+   - `fail` → **ewidth_fail**（収束扱いにしない）。go が全 polytyp 収束していれば結果は残す。
+2. **STEP2（SCF の追い込み）**: `maxitr=maxitr_2nd`。`edelt_steps` を順に、各 edelt で `pmix_steps` を順に試す。各 pmix では前段の pot.dat をコピーして `maxitr=maxitr_pm` で最大 `max_pm_iter` 回まで継続し、収束したら次の polytyp、`is_converging` が偽なら次の pmix。全 pmix を使い切ったら次の edelt。
+   - 各 edelt の後に DOS を見て `choose_ewidth`。`old` かつ全 polytyp 収束 → **finished**。`new` → 新 ewidth で STEP1 からやり直し。`fail` → **ewidth_fail**。
+3. `iew` が `max_ew` に達する、または候補が尽きたら **not_converged**。
+
+- `KeyResult` は `status`（`finished | ewidth_fail | ewidth_exhausted | not_converged | error`）、最終 `RunPoint`（polytyp ごと）、試した ewidth の列、採用したバンドギャップ区間、§9 の結果行、例外メッセージを持ち、`RUN/key_<key>.json` に書く。1 キーの例外は捕まえて `error` にし、次のキーへ進む。
+- 判定に使う曲線は既定で polytyp ごとの total DOS。`curves="pdos"` にすると各 polytyp の全成分 PDOS を連結して渡す（§0.3。`dosth_pdos` を使う。実装は第 2 段階）。
+- `compat=True` のときの差: `Layout(version=1)`、dos / j を常に実行、`dosth=2e-2`、STEP1 の `new` で `iew` を進めずに既存結果を再利用（移植元の挙動の再現。2019 年の RUN の検証用で、新規計算には使わない）。
+
+### 7.1 GAES-Committee（`committee.py`）
+
+```python
+class GaesCommittee:
+    def __init__(self, gaes: Gaes, *, ewidth_members=(0.8, 1.0, 1.2, 1.5, 2.0), ewidth_dos=None,
+                 quorum="majority", n_parallel=4, threads_per_member=None,
+                 maxitr_member=None, reuse_member=True)
+    def run(self, key: str, params: dict[str, dict]) -> KeyResult
+    def vote(self, energy: np.ndarray, member_regions: Sequence[Sequence[GapRegion]]) -> list[GapRegion]
+```
+
+1 キーの処理:
+
+1. **Committee（投機的並列実行）**: `ewidth_members` の各 ewidth_go について、各 polytyp を go → dos で 1 回ずつ走らせる（`maxitr_member`、既定は `maxitr_init`。収束は要求しない。DOS のギャップは未収束でもおおむね出るため）。**ewidth_dos は全メンバーで固定**し、`ewidth_dos=None` なら `(max(ewidth_members) + eth + ediff) / ref` を使う（§3.2 の条件を全メンバーで満たすため。窓が届かないメンバーの DOS は投票に参加できない）。`n_parallel` 個の specx を同時に走らせ、`OMP_NUM_THREADS` を `threads_per_member`（既定は総スレッド数 / n_parallel）に分ける。ディレクトリは `Layout` の `iew` にメンバー番号を使い、ewidth の実値が名前に入る（§6.1 version 2）。
+2. **Vote（投票）**: メンバーごと・polytyp ごとに `gap_regions` を求め、mesh 点ごとに「その点がギャップ区間に入っている」票を数える。票数が quorum（`"majority"`: メンバー数の過半、整数: その数、`"all"`: 全員）以上の連続 mesh 区間を **consensus gap** とする。polytyp は AND（GAES と同じ）。ewidth_dos と mse が固定なので E − E_F の mesh は全メンバーで同一で、EF の差は軸に吸収される。投票の単位は mesh 点（区間の重なりではない）。
+3. **仕上げ**: consensus gap に `choose_ewidth` の候補生成（区間上端 − ediff − margin）を当てて初期 ewidth を決め、それを `ewidth_init` として `Gaes.run` を呼ぶ。`reuse_member=True` で、採った ewidth がメンバーの ewidth と一致すればそのディレクトリの pot.dat と結果を STEP1 の出発点として再利用する（inputcard 一致の規則 §6）。
+4. consensus gap が空なら **committee_fail** を記録し、`Gaes.run` を既定の `ewidth_init` で走らせる（GAES 単独に退避）。
+
+- `KeyResult` に `committee` を加える: メンバーごとの ewidth、収束、ギャップ区間、mesh 点ごとの得票数、consensus gap、採用した初期 ewidth。票の割れ（メンバー間でギャップ区間が一致しない度合い）はギャップ推定の不確かさとして残す。
+- 使い分け: GAES は 1 本ずつ直すので specx の実行回数は少ないが逐次。GAES-Committee はメンバー数だけ余分に走らせる代わりに初期 ewidth の当たりがよく、valence 帯の中や semicore の中から始めて何度もやり直す事態を避けられる。並列資源があるときは Committee、無いときは GAES。
+- PDOS 拡張（§0.3）は vote の前段の `gap_regions` に PDOS 曲線を渡すだけで、Committee 側は変わらない。
+
+## 8. 2019 年の RUN の読み直し（互換モード）
+
+- `collect_legacy(prefix) -> pd.DataFrame`: `Layout(version=1)` で列挙し、各ディレクトリの inputcard_go から ewidth / edelt / pmix を読み直して（ディレクトリ名の `iew` は信用しない）、`KkrRunner.result()` で §9 の行を作る。
+- 残っているのは最終 ewidth の計算だけなので、「ewidth の試行履歴」は復元できない。str.out があれば `('old'|'new'|'fail', ...)` 行から試行を読む `parse_str_out(path)` を補助として用意する。
+- 検証: 例 `key_13487580,ew_000,ed_000,polytyp_fcc,pm_000`（AlCdReHg fcc）で `total_energy=-21075.683771993`、`a=8.01512`、`Tc=0.0`。key 13142122 の DOS に `gap_regions(dosth=2e-2)` を当てて str.out の `[-2.2425,-2.1075],[-2.0025,-0.7275]` が再現し、`choose_ewidth(1.2)` が `("old", 1.2, [0.9375])` になること。
+
+## 9. 出力（結果行）
+
+`KkrRunner.result()` と `KeyResult` の 1 polytyp 分:
+
+| 列 | 取得元 |
+|---|---|
+| key, polytyp, ewidth, edelt, pmix, iew, ied, ipm, directory | `RunPoint` |
+| ewidth_dos, ref, dosth, gap_regions, gap_used | scheme のパラメータと §4 の結果（`gap_used` は `check_ewidth` が返した区間） |
+| a_bohr, volume_bohr3 | `get_lattice_constant`, `get_unitcell_volume`（out_go） |
+| converged, n_iter, last_err | `get_convergence`, `len(get_rms_error)`, `get_rms_error()[-1]` |
+| total_energy_Ry, total_moment, component_moment[] | out_go |
+| option, emesh | `get_option`, `get_emesh_param`（out_go） |
+| Tc_K, jij_csv | out_j（`with_j` のとき） |
+| dos_csv | `get_dos(out_dos, "dataframe")` を保存したパス |
+
+集計は `Gaes.collect(prefix) -> pd.DataFrame`（全 `key_*.json` を読む）。
+
+## 10. CLI
+
+```
+kkr-gaes run   --exe /path/to/specx --input params.json [--prefix RUN] [--dosth 1e-3]
+                      [--ewidth-init 1.2] [--ewidth-dos 3.0] [--ref 0.75] [--no-j] [--compat] [--threads 24]
+                      [--committee 0.8,1.0,1.2,1.5,2.0 [--quorum majority] [--n-parallel 4]]   # GAES-Committee で初期 ewidth を決める
+kkr-gaes site  --exe /path/to/specx --comp Rh0.5Pt0.5 [--comp AlSiScTi ...] [--polytyp bcc fcc]
+                      [--lattice expr|mjw|<bohr>] ...（run と同じオプション）   # 単一サイト CPA を組成から
+kkr-gaes hea   --exe /path/to/specx --keys heakeylist0.csv [--polytyp bcc fcc] [--start N --stop M] ...
+                      # 2019 年の heakey リストから（互換用）
+kkr-gaes check --dos out_dos.log [--dos out_dos_fcc.log ...] --ewidth 1.2 [--dosth 1e-3]
+                      # 実行せず、既存の dos 出力に対して §4 の判定だけを出す
+kkr-gaes collect --prefix RUN [--legacy] -o result.csv
+kkr-gaes comp  Rh0.5Pt0.5 | AlSiScTi | 13142122   # 組成・type 名・heakey の相互変換と type 名の長さ検査
+```
+
+- `params.json` は `{key: {polytyp: param_go}}`。`site` と `hea` サブコマンドは組成（または heakey リスト）からこれを作って `run` と同じ処理をする。
+- `check` は人間が手でやっていた判定の代替で、scheme を回さずに使える。
+- `--threads` は `OMP_NUM_THREADS` を子プロセスにだけ設定する。ログは `prefix/kkr-gaes.log`。`--committee` を付けると `GaesCommittee`、無ければ `Gaes` を使う。
+
+## 11. テスト（`tests/gaes/`）
+
+specx 不要:
+
+- `test_gap.py`: 合成 DOS（ガウス 2 山 + 定数 5e-4）で区間が 1 本、`dosth` を変えると幅が変わる、末尾まで低 DOS が続くケース（旧 NameError）、mesh 不一致で例外、2 曲線の AND。
+- `test_ewidth.py`: `check_ewidth` / `choose_ewidth` の `old` / `new` / `fail`、`min_ewidth`。
+- `test_legacy_dos.py`: `run0/RUN/key_13487580,...,polytyp_fcc,pm_000/out_dos.log` と str.out の値の再現（§8。ディレクトリがあるときだけ）。
+- `test_convergence.py`: 単調減少列で `True`、雑音のみで `False`、`last` 未満の長さ。
+- `test_layout.py`: v1 / v2 の往復、旧ディレクトリ名の `parse`。
+- `test_composition.py`: `from_type_name("Rh0.5Pt0.5_1")` → `{Rh: 0.5, Pt: 0.5}`、`"B0.975Vc0.025"` → Z (5, 0)、`from_elements("AlSiScTi")` が等比、`type_name()` の往復、41 文字以上・空白・カンマで `ValueError`、`heakey_to_composition("13142122")` ⇄ `("Al","Si","Sc","Ti")`、奇数桁で `ValueError`、5 元。`make_single_site_param(..., type_name="HEA")` の inputcard が例の `inputcard_go`（AlCdReHg fcc）と `#` 行と空白の正規化を除いて一致。
+- `test_result_legacy.py`: 例ディレクトリの out_go / out_dos / out_j を `KkrRunner.result()` で読む。
+- `test_committee_vote.py`: 合成 DOS 5 本（ギャップ区間を少しずつずらしたもの、1 本は窓が届かず区間無し）で `vote` が過半の区間を返す、`quorum="all"` で共通部分だけになる、全員不一致で空、`ewidth_dos=None` の自動決定が §3.2 の条件を満たす。
+- `test_gap.py` にギザギザした合成 DOS（ギャップ内に幅 1 mesh の 5e-4 の凹凸、valence 帯に 1 mesh の落ち込み）を加え、threshold 比較だけで区間が正しく出ること（微分を使えば誤る形）。
+
+specx が必要（`AKAIKKR_PROGRAM_PATH`）:
+
+- `test_run.py`: Cu fcc（`lattice=6.82`、`tests/akaikkr/reference/ifort.json` の Cu_go と同じ ewidth / bzqlty）で `KkrRunner.run_all(with_j=False)` が収束し te が一致。`gap_regions` が E_F − 1.0 を含む区間を返し `check_ewidth(1.0)` が None でないこと（Cu の 3d 価電子帯の下に semicore は無い）。
+- `test_gaes_small.py`: 1 系（bcc のみ、`max_pm_iter=2`, `maxitr_init=50`）で `Gaes.run` が例外なく `status` を返すこと。ewidth_init を意図的に valence 帯の中（例 0.3）にして `new` が出て別ディレクトリで再計算されること（誤り #1 の修正の確認）。
+
+## 12. 実装時の注意
+
+- `AkaikkrJob.make_inputcard` は `atmicx` を `["0.0a","0.0b","0.0c","HEA"]` の形で受ける。移植元の `0 0 0 HEA` と等価。
+- `record=2nd` で pot.dat が無いときの `***wrn in spmain...eof detected` は正常。
+- specx は `a=1000000` をヘッダで `a=*********` と印字する。`get_lattice_constant` は `bravais=` の行から読むので影響しない。
+- DOS の閾値判定は E − E_F の軸で行う。`get_dos` が返すエネルギーは out_dos.log の 1 列目そのもの（E_F 基準）。
+- 移植元の `pot.dat.info` は読まない。
+- DOS 図を出すときは go の ewidth の線を入れる（`DosEXPlotter(..., go_outfile="out_go.log")`、[dos_plot_ewidth_line.md](dos_plot_ewidth_line.md)）。
+- 2019 年の RUN を読むときは、誤り #1 のため `ew_000` に「ewidth=1.2 で計算した結果」しか無い。ewidth は必ず inputcard_go から読み直す。
+- `test_committee_small.py`: 同じ系で `GaesCommittee(ewidth_members=(0.5, 1.0, 1.5), n_parallel=3, maxitr_member=30).run` が `committee` の票と consensus gap を返し、採用した初期 ewidth がその区間に入ること。

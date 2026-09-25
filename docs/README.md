@@ -10,7 +10,7 @@
 | [ase_calculator_spec.md](ase_calculator_spec.md) | 仕様書 | ASE calculator の設計仕様（2026-09-24 実装、末尾に実装メモと後日談） |
 | [testscript_ase_spec.md](testscript_ase_spec.md) | 仕様書 | テストスクリプトの ASE backend の設計仕様（同上） |
 | [option_access_spec.md](option_access_spec.md) | 仕様書 | `begin_option` を pyakaikkr から参照する設計仕様（2026-09-25 実装、末尾に実装メモ）: キー辞書 `OPTION_KEYS`、inputcard の option ブロックの読み取り、出力の `optnwrt:` echo と `meshr mse ng mxl` の実効値の読み取り、書く前の検証 |
-| [hea_scheme2_spec.md](hea_scheme2_spec.md) | 仕様書 | 2019 年の HEA 単一サイト CPA スクリーニング（run_scheme2: ewidth 自動選定 + edelt/pmix 追い込み）を pyakaikkr.hea に移植する設計仕様。移植元の誤り 12 件と修正方針、a=1000000 の意味 |
+| [ewidth_tuning_scheme.md](ewidth_tuning_scheme.md) | 仕様書 | ewidth 自動調整スキーム GAES（Gap-Anchored Ewidth Search: DOS < threshold の連続 mesh 区間 = バンドギャップに E_F − ewidth_go が入るまで go/dos を回す。2019 年の HEA 網羅計算 run_scheme2 を一般化。微分は使わない）と GAES-Committee（複数 ewidth_go の投機的並列実行と vote）の pyakaikkr.gaes 移植仕様。移植元の誤り 12 件、PDOS 拡張、SiteComposition、type 名 40 文字制限 |
 
 ## 関連プロジェクト
 

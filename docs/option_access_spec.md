@@ -115,7 +115,7 @@ def parse_option_echo(lines: Iterable[str], *, typed: bool = True) -> dict
 ## 7. 他プロジェクトとの接続（実装はここではしない）
 
 - aiida-akaikkr: parser で `AkaikkrJob.get_option(out)` と `get_emesh_param(out)` を `results["option"]`, `results["emesh"]` に入れると、`contour_bottom` 等が `cemesr_ref` を provenance から取れる（いまは 0.75/0.5 をビルドで決め打ち）。dos 出力には `optnwrt:cemesr_ref` が出る。
-- HEA scheme2 移植（`docs/hea_scheme2_spec.md` §3.2 の `option`）は `normalize_option` を通すだけ。
+- ewidth 自動調整スキーム（`docs/ewidth_tuning_scheme.md` §3.1 の `option`）は `normalize_option` を通すだけ。
 
 ## 8. テスト（`tests/option/`）
 
