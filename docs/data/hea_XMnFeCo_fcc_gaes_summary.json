@@ -1,0 +1,374 @@
+{
+ "GaMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.41625,
+  "tried": [
+   1.2,
+   1.41625
+  ],
+  "gap": [
+   -3.16125,
+   -1.31625
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 14
+ },
+ "AsMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.32375,
+  "tried": [
+   1.2,
+   1.32375
+  ],
+  "gap": [
+   -2.35125,
+   -1.13625
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 18
+ },
+ "SeMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.41375,
+  "tried": [
+   1.2,
+   1.41375
+  ],
+  "gap": [
+   -3.02625,
+   -1.24875
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 24
+ },
+ "RbMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.9275,
+   -1.1775
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 12
+ },
+ "InMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.50625,
+  "tried": [
+   1.2,
+   1.43875,
+   1.50625
+  ],
+  "gap": [
+   -3.16125,
+   -1.45125
+  ],
+  "flags": [
+   "new",
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 26
+ },
+ "SbMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.2825,
+  "tried": [
+   1.2,
+   1.2825
+  ],
+  "gap": [
+   -1.8975,
+   -1.1025
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 19
+ },
+ "TeMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.4024999999999999,
+  "tried": [
+   1.2,
+   1.4024999999999999
+  ],
+  "gap": [
+   -2.2425,
+   -1.2225
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 22
+ },
+ "BaMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.3875,
+  "tried": [
+   1.2,
+   1.3725,
+   1.3875
+  ],
+  "gap": [
+   -1.9875,
+   -1.3425
+  ],
+  "flags": [
+   "new",
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 33
+ },
+ "LaMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.6724999999999999,
+  "tried": [
+   1.2,
+   1.6724999999999999
+  ],
+  "gap": [
+   -2.2425,
+   -1.5825
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 62
+ },
+ "CeMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.2525,
+   -0.7875
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 9
+ },
+ "PrMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.0,
+  "tried": [
+   1.2,
+   1.0
+  ],
+  "gap": [
+   -1.0875,
+   -0.7875
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 18
+ },
+ "NdMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.0,
+  "tried": [
+   1.2,
+   1.0
+  ],
+  "gap": [
+   -1.1325,
+   -0.7725
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 19
+ },
+ "PmMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.0,
+  "tried": [
+   1.2,
+   1.0
+  ],
+  "gap": [
+   -1.1775,
+   -0.7725
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 19
+ },
+ "SmMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.2225,
+   -0.7575
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 10
+ },
+ "YbMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.3575,
+   -0.7425
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 8
+ },
+ "LuMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.2,
+  "tried": [
+   1.2
+  ],
+  "gap": [
+   -1.7025,
+   -0.7425
+  ],
+  "flags": [
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 9
+ },
+ "TlMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.30375,
+  "tried": [
+   1.2,
+   1.30375
+  ],
+  "gap": [
+   -3.16125,
+   -1.27125
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 23
+ },
+ "BiMnFeCo": {
+  "status": "finished",
+  "ewidth": 1.3725,
+  "tried": [
+   1.2,
+   1.3725
+  ],
+  "gap": [
+   -1.4175,
+   -1.2225
+  ],
+  "flags": [
+   "new",
+   "old"
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "seconds": 26
+ }
+}
