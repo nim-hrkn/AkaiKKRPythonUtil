@@ -539,6 +539,24 @@ Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore
 - Pr / Nd / Pm は 5p 帯の上のギャップ [−1.1〜−1.2, −0.77] の候補 0.78〜0.79 が `min_ewidth` 1.0 に寄せられた解。5p 帯の下（1.78〜1.87）に置きたければ `min_ewidth` を 1.2 にする。
 - Te / In / As / Bi の −0.7 Ry 付近（X の浅い s / d 帯と valence 帯の底の間）の低 DOS 区間は、DOS < 2e-2 の幅が 0.16〜0.29 Ry で eth = 0.30 に届かず、DOS < 1e-3 の点も無いので、ギャップ区間にならない。`min_ewidth` 0.5 で再実行しても同じ解になる（Te 1.4025、In 1.5025、As 1.3125、Bi 1.3725）。In は幅 0.29 で境界にあり、eth 0.25 なら In 4d を core 側に置く解（≈ 0.8）が候補になる。
 
+### 13.4 tests/structure/small_primitive_structures の 7 構造（2026-09-25、ユーザー指定）
+
+CIF（原始胞、`ak_cif2kkrparam` で変換）から akaikkr ビルド、nmag、pbe、sra、bzqlty 8、Method 2、ewidth_init 1.2、[min, max] = [1.0, 2.0] で GAES を走らせた。スクリプト `tests/gaes/tools/run_small_primitive_structures.py`、結果 `docs/data/small_primitive_structures_gaes_summary.json`、図 `docs/data/small_primitive_structures_gaes_dos.png`（`GLOB="RUN/*/key_*.json" plot_orbital_rules.py` で描画）。
+
+| 構造 | 格子 | ewidth の経過 | 使ったギャップ (Ry) | 窓の中の準位 (E − E_F) | 結果 |
+|---|---|---|---|---|---|
+| RbCl | fcc（岩塩） | 1.2 → 1.2625 | [−1.49, −1.25] | Rb 4s −1.76、Cl 3s* −0.96、Rb 4p* −0.61 | finished |
+| ZnSe | fcc（閃亜鉛鉱） | 1.2 → 1.2775 | [−2.24, −1.25] | Se 4s* −0.94 | finished |
+| InP | fcc | 1.2 → 1.6975 | [−2.24, −1.57] | In 4d* −1.10 | finished（4d 帯の下） |
+| InAs | fcc | 1.2 → 1.7275 | [−2.15, −1.60] | In 4d* −1.11、As 4s* −0.77 | finished |
+| InSb | fcc | 1.2 → 1.6225 | [−1.78, −1.52] | Sb 4d −2.16、In 4d* −1.17、Sb 5s* −0.68 | finished |
+| SnSe2 | hcp（3 原子） | 1.2 → 1.2375 → 1.2525 | [−1.36, −1.21] | Sn 4d −1.74、Se 4s* −0.89 | finished |
+| Bi2Se3 | rhb（5 原子） | 1.2 | — | Bi 5d −1.73、Se 4s* −0.92、Bi 6s* −0.81 | ewidth_fail |
+
+- In 化合物は 1.2 が In 4d*（−1.10〜−1.17）の直上の裾（幅 0.26〜0.29 < eth）にあり、4d 帯の下のギャップへ移る。RbCl は Rb 4s（−1.76）と Cl 3s*（−0.96）の間、ZnSe は Se 4s* の下、SnSe2 は Sn 4d（−1.74）と Se 4s*（−0.89）の間に置かれる。すべて SCF 収束。
+- Bi2Se3 の fail: 粗い区間 [−1.56, −1.07]（Bi 5d と Se 4s* の間）と [−2.37, −1.81] はあるが、DOS の最小値が 5.4e-3 / 6.1e-3 で細かい閾値（1e-3、緩和 2e-3）を切らない。5 原子の菱面体胞を bzqlty 8 で解いた DOS はギャップの底が浮いており、valence 帯の中の DOS もぎざぎざ（InP、InSb でも同様）。bzqlty を上げた再計算を §13.4.1 に記す。
+- 図の −2.5〜−2.7 Ry（Bi2Se3）の 2 本のピークはどの成分の core 準位とも一致せず、窓を 4.5 まで広げたことによる偽の構造（§13、ewidth_dos_max の理由）。
+
 ## 14. 実行中に原子準位から ewidth を予測する方法（提案、2026-09-25）
 
 ### 14.1 使える事実
