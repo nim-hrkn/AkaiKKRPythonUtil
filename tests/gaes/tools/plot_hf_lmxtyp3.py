@@ -8,8 +8,8 @@ from pyakaikkr.gaes.ewidth import choose_ewidth2
 from pyakaikkr.gaes.plot import draw_gaes_dos, legend_text
 C = "/tmp/claude-1000/-home-kino-kino-Claude-Project-AKAIKKR/cf1c7f21-9c6c-416d-bd70-1577df1e05cf/scratchpad/ewscan_AlSiSnHf"
 T = "/home/kino/kino/Claude/Project/AKAIKKR/AkaiKKRPythonUtil/tests/gaes/RUN_Hf_stopped/Al0p25Si0p25Sn0p25Hf0p25_bcc/key_13145072,ew_000-1.2000,ed_000-1e-04,polytyp_bcc,pm_000-5e-03"
-LMX2 = {0.9: C + "/ew_0.9", 1.2: T}
-EWS = [0.9, 1.2, 1.5]
+LMX2 = {0.9: C + "/ew_0.9", 1.15: "lmx2_ew_1.15", 1.2: T}
+EWS = [0.9, 1.15, 1.2, 1.5]
 def info(d):
     txt = open(d + "/out_go.log").read()
     itr = re.findall(r"itr=\s*(\d+)", txt); err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
@@ -19,8 +19,9 @@ fig, axes = plt.subplots(len(EWS), 2, figsize=(16, 4.6 * len(EWS)), sharex=True)
 for row, ew in enumerate(EWS):
     for col, (label, d) in enumerate((("lmxtyp=2", LMX2.get(ew)), ("lmxtyp=3", "ew_%s" % ew))):
         ax = axes[row, col]
+        if ew == 1.15 and label == "lmxtyp=3": d = "lmx3_ew_1.15"
         if d is None or not os.path.isfile(d + "/out_dos.log"):
-            ax.set_title("%s ewidth %.1f: no dos output" % (label, ew), fontsize=9, loc="left"); continue
+            ax.set_title("%s ewidth %.2f: no dos output" % (label, ew), fontsize=9, loc="left"); continue
         e, c, _ = dos_curves_from_outputs([(AkaikkrJob(d), "out_dos.log")]); lv = levels_from_go(d + "/out_go.log")
         n, err, tot = info(d); conv = err is not None and err < -5.9
         dec = choose_ewidth2(e, c, ew, dosth=2e-2, dosth2=1e-3, eth=0.3, ediff=0.2, min_ewidth=1.0, max_ewidth=2.0)
@@ -37,7 +38,7 @@ for row, ew in enumerate(EWS):
         except Exception as ex:
             ax.text(0.02, 0.05, "pdos: %s" % ex, transform=ax.transAxes, fontsize=7)
         roles = ", ".join("%s: %s (%.2f)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in ("Hf4f",) if k in lv)
-        ax.set_title("AlSiSnHf bcc (cpa2021v01) %s, ewidth %.1f: %s, itr %s, log10 rms %s\nHf total charge %s (Z=72); %s; gap judgement: %s%s" % (
+        ax.set_title("AlSiSnHf bcc (cpa2021v01) %s, ewidth %.2f: %s, itr %s, log10 rms %s\nHf total charge %s (Z=72); %s; gap judgement: %s%s" % (
             label, ew, "CONVERGED" if conv else "NOT CONVERGED", n, err, tot, roles, dec.flag,
             " -> %.4f" % dec.ewidth if dec.flag == "new" else ""), fontsize=8, loc="left", color="k" if conv else "darkred")
         if ax.get_legend_handles_labels()[0]: ax.legend(fontsize=7, loc="lower right")
