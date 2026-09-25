@@ -353,7 +353,7 @@ def plot_gaes_dos(ax, energy, dos, *, ewidth=None, ewidth_label=None, final=None
         ax.axvline(-final, color=s["final"], lw=1.0, ls="--", label="$-$ewidth final (%.4f)" % final)
     if efermi:
         mark_efermi(ax, s)
-    draw_levels(ax, levels, highlight=highlight, e_min=e_min, y_text=None if style is not None else ylim[1] / 3, style=s)
+    draw_levels(ax, levels, highlight=highlight, e_min=e_min, y_text=None if (style is not None or ylim is None) else ylim[1] / 3, style=s)
     draw_thresholds(ax, dosth, dosth2, natm, s)
     if log:
         ax.set_yscale("log")
@@ -364,6 +364,61 @@ def plot_gaes_dos(ax, energy, dos, *, ewidth=None, ewidth_label=None, final=None
     return lines
 
 
+# ---------------------------------------------------------------- figure export (PNG + SVG)
+def _rasterize_meshes(fig):
+    """rasterize colour meshes / images (A(w,k)) so that an SVG stays small: the mesh becomes an embedded
+    PNG while axes, text and lines remain vector."""
+    from matplotlib.collections import QuadMesh
+    from matplotlib.image import AxesImage
+    n = 0
+    for ax in fig.axes:
+        for art in list(ax.collections) + list(ax.images):
+            if isinstance(art, (QuadMesh, AxesImage)):
+                art.set_rasterized(True)
+                n += 1
+    return n
+
+
+def figure_to_svg(fig, rasterize_meshes=True, dpi=150):
+    """the figure as an SVG string (XML declaration and DOCTYPE removed, ready to inline in HTML)."""
+    import io
+    if rasterize_meshes:
+        _rasterize_meshes(fig)
+    buf = io.StringIO()
+    fig.savefig(buf, format="svg", dpi=dpi, bbox_inches="tight", metadata={"Date": None})
+    text = buf.getvalue()
+    i = text.find("<svg")
+    return text[i:] if i >= 0 else text
+
+
+def figure_to_png(fig, dpi=150):
+    """the figure as PNG bytes."""
+    import io
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png", dpi=dpi, bbox_inches="tight")
+    return buf.getvalue()
+
+
+def data_uri(png_bytes):
+    """PNG bytes as a data URI for an <img> tag."""
+    import base64
+    return "data:image/png;base64," + base64.b64encode(png_bytes).decode("ascii")
+
+
+def save_figure(fig, path_noext, formats=("png", "svg"), rasterize_meshes=True, dpi=150):
+    """save the figure as <path_noext>.png and .svg (meshes rasterized inside the SVG); returns {fmt: path}."""
+    out = {}
+    for fmt in formats:
+        path = "{}.{}".format(path_noext, fmt)
+        if fmt == "svg":
+            with open(path, "w") as f:
+                f.write(figure_to_svg(fig, rasterize_meshes=rasterize_meshes, dpi=dpi))
+        else:
+            fig.savefig(path, dpi=dpi)
+        out[fmt] = path
+    return out
+
+
 def gaes_legend_text():
     return ("black = DOS, green / blue = coarse / fine gap regions, hatched = [min, max] ewidth, "
             "red = -ewidth_go, blue lines = core levels (dashed = * valence), gray = other levels")
@@ -372,4 +427,4 @@ def gaes_legend_text():
 __all__ = ["DEFAULT_STYLE", "L_NAMES", "EWIDTH_LINE_LABEL", "mark_ewidth_go", "mark_efermi", "style_axes",
            "plot_dos", "plot_pdos", "component_names", "plot_awk", "jij_limits", "plot_jij",
            "shade_regions", "shade_ewidth_bounds", "draw_ewidth", "draw_levels", "draw_thresholds",
-           "plot_gaes_dos", "gaes_legend_text"]
+           "plot_gaes_dos", "gaes_legend_text", "figure_to_svg", "figure_to_png", "data_uri", "save_figure"]
