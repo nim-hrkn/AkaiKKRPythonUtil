@@ -10,8 +10,10 @@ RUNS = [("bzqlty 10", "lmx2_ew_1.15"), ("bzqlty 14", "lmx2_ew_1.15_bz14"), ("bzq
 def info(d):
     txt = open(d + "/out_go.log").read()
     itr = re.findall(r"itr=\s*(\d+)", txt)
-    # per-iteration lines: "itr=  1  rms error = -0.051" (first ones) and "itr=190 neu= ... err= 0.766"
-    hist = [float(x) for x in re.findall(r"itr=\s*\d+.*?err(?:or)?\s*=\s*(-?\d+\.\d+)", txt)]
+    # crystal SCF lines only: "itr=190 neu= -0.0271 moment= ... te= ... err= 0.766" (the earlier
+    # "itr= 1  rms error = ..." blocks are the atomic-potential generation of each component)
+    rows = re.findall(r"itr=\s*\d+\s+neu=\s*(-?\d+\.\d+)\s+moment=\s*(-?\d+\.\d+)\s+te=\s*(-?\d+\.\d+)\s+err=\s*(-?\d+\.\d+)", txt)
+    hist = [(float(a), float(b), float(c), float(d)) for a, b, c, d in rows]
     err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
     core = re.search(r"\*\*\* type-\S+\s+Hf.*?core charge in the muffin-tin sphere =\s*(-?\d+\.\d+)", txt, re.S)
     return (int(itr[-1]) if itr else None), (float(err[-1]) if err else None), (float(core.group(1)) if core else None), hist
@@ -27,8 +29,12 @@ for row, (label, d) in enumerate(RUNS):
     roles = ", ".join("%s: %s (%.2f)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in ("Hf4f",) if k in lv)
     ax.set_title("AlSiSnHf bcc (cpa2021v01) lmxtyp=2, ewidth 1.15, %s: %s, itr %s, log10 rms %s\nHf core charge in MT %s; %s; gap judgement: %s" % (
         label, "CONVERGED" if conv else "NOT CONVERGED", n, err, core, roles, dec.flag), fontsize=8, loc="left", color="k" if conv else "darkred")
-    axh.plot(range(1, len(hist) + 1), hist, color="k", lw=1.0); axh.set_xlabel("iteration"); axh.set_ylabel("log10 rms err")
-    axh.set_title("%s: SCF history" % label, fontsize=8, loc="left"); axh.axhline(-6, color="gray", lw=0.6, ls="--")
+    it = range(1, len(hist) + 1)
+    axh.plot(it, [h[3] for h in hist], color="k", lw=1.0, label="log10 rms err"); axh.set_xlabel("iteration"); axh.set_ylabel("log10 rms err")
+    axh.axhline(-4, color="gray", lw=0.6, ls="--")
+    ax2 = axh.twinx(); ax2.plot(it, [h[0] for h in hist], color="tab:red", lw=0.8, label="neu (electron count error)"); ax2.set_ylabel("neu", color="tab:red")
+    axh.set_xlim(0, 120)
+    axh.set_title("%s: crystal SCF history (first 120 of %d iterations); red = neu" % (label, len(hist)), fontsize=8, loc="left")
 axes[-1][0].set_xlabel("E - EF (Ry)")
 fig.suptitle("AlSiSnHf bcc, ewidth 1.15, lmxtyp=2: k-point density (bzqlty). " + legend_text(), fontsize=9)
 fig.tight_layout(rect=(0, 0, 1, 0.975)); fig.savefig("hf_bz_dos.png", dpi=120); print("saved hf_bz_dos.png")
