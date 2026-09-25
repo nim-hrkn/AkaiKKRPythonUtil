@@ -81,6 +81,20 @@ plot_gaes_dos(ax, energy, dos_block, ewidth=1.2, decision=dec, bounds=(1.0, 2.0)
 
 `pyakaikkr.gaes.plot`（`draw_gaes_dos`、`legend_text`）は互換のための再輸出。テストは `tests/plot/test_plot_arrays.py`（specx 不要）。`tests/gaes/tools/plot_hea_XMnFeCo.py`, `plot_orbital_rules.py`, `plot_conv_pairs.py` と aiida-akaikkr の `plot --dos-pk / --spc-pk / --jij-pk / --gaes-pk` が同じ関数で描く。
 
+## 例（tests/akaikkr/）
+
+`testrun.py` と同じく `<program_path>`（`akaikkr/specx` を含むディレクトリ）を渡す。出力は tests/akaikkr の下（`RUN_gaes_ewidth/`、`RUN_gaes_orbital/`、`gaes_*.png`、.gitignore 済み）。
+
+```
+cd tests/akaikkr
+python gaes_ewidth_example.py  <program_path> [--comp SeMnFeCo] [--polytyp fcc] [--ewidth-init 1.2] [--min-ewidth 1.0] [--max-ewidth 2.0]
+python gaes_orbital_example.py <program_path> [--comp SeMnFeCo] [--orbital Se4s] [--eth 0.3]
+```
+
+1. `gaes_ewidth_example.py`: ewidth だけを GAES に決めさせる。単一サイト CPA（等比、`--comp Rh0.5Pt0.5` のような比も可）を Method 2、[1.0, 2.0] で走らせ、経過（各 go の判定、区間、候補、fail の理由）を印字し、最終判定の DOS を `gaes_ewidth_<comp>_<polytyp>.png` に描く。
+2. `gaes_orbital_example.py`: 同じ系で `<orbital>=valence` と `<orbital>=core` の 2 通りを続けて走らせ、段階 0 の範囲、各 go で読んだ準位（`*` = valence）と範囲、指定との食い違い、結果を印字し、左右 2 面の図 `gaes_orbital_<comp>_<polytyp>_<orbital>.png` に描く。SeMnFeCo の Se 4s では valence が 4s 帯の下（≈ 1.42）、core が 4s と valence 帯の間（≈ 0.77）に落ち着く（§15.5.1）。
+3. 図は `gaes_example_plot.py`（`pyakaikkr.plot.plot_gaes_dos` を呼ぶ）。
+
 ## 軌道の valence / core 指定（`--orbital`、`Gaes(orbitals=[...])`）
 
 `Rb4p=valence`（別名 `occupied`: 積分路に入れる）、`Rb4p=core`（別名 `unoccupied`: 積分路から外す）のように、元素・軌道ごとに指定できる（仕様: ewidth_tuning_scheme.md §15）。
