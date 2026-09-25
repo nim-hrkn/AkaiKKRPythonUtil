@@ -31,8 +31,8 @@ for ax, tag in zip(axes, order):
     conv = ",".join("%s" % v for v in d["converged"].values()) if d["converged"] else None
     unit = " (judged per atom, natm %d)" % natm if natm else ""
     ax.set_title("%s: %s, ewidth %.4f, conv=%s, bounds [%s, %s], tried %s%s%s" % (
-        tag, d["status"], jf["ewidth"], conv, lo and round(lo, 3), hi and round(hi, 3), unit,
-        [round(t, 3) for t in d["ewidth_tried"]], why), fontsize=8, loc="left")
+        tag, d["status"], jf["ewidth"], conv, lo and round(lo, 3), hi and round(hi, 3),
+        [round(t, 3) for t in d["ewidth_tried"]], unit, why), fontsize=8, loc="left")
     for th, ls in ((pr.get("dosth", 2e-2), "--"), (pr.get("dosth2", 1e-3), ":")):   # thresholds in the displayed unit
         ax.axhline(th * (natm or 1), color="0.4", lw=0.6, ls=ls)
 for ax in axes[len(order):]: ax.axis("off")
