@@ -24,13 +24,13 @@ PAIRS = [
     ("InMnFeCo fcc, In4d=core", ["In4d"], [(d, ew, bounds_of(d, ew)) for d, ew in ((glob.glob("RUN_orb4/InMnFeCo_In4d-core/key_*ew_000-0.6410*")[0], 0.641), (glob.glob("RUN_orb5/InMnFeCo_In4d-core/key_*ew_000-1.2000*")[0], 1.2))]),
     ("TlMnFeCo fcc, Tl5d=core", ["Tl5d"], [(d, ew, bounds_of(d, ew)) for d, ew in ((glob.glob("RUN_orb4/TlMnFeCo_Tl5d-core/key_*ew_000-0.3860*")[0], 0.386), (glob.glob("RUN_orb5/TlMnFeCo_Tl5d-core/key_*ew_000-1.2000*")[0], 1.2))]),
 ]
-START_NOTE = {0.9: "manual ewidth scan, not chosen by GAES", 0.641: "step-0 start from the level table (old rule), not chosen from a DOS",
-              0.386: "step-0 start from the level table (old rule), not chosen from a DOS", 1.2: "ewidth_init"}
+START_NOTE = {0.9: "manual scan, not chosen by GAES", 0.641: "old step-0 start from the table, not from a DOS",
+              0.386: "old step-0 start from the table, not from a DOS", 1.2: "ewidth_init"}
 def info(d):
     txt = open(d + "/out_go.log").read()
     itr = re.findall(r"itr=\s*(\d+)", txt); err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
     return (int(itr[-1]) if itr else None), (float(err[-1]) if err else None), ("cpu time" in txt or "sbrtime" in txt)
-fig, axes = plt.subplots(len(PAIRS), 2, figsize=(16, 3.8 * len(PAIRS)), sharex=True)
+fig, axes = plt.subplots(len(PAIRS), 2, figsize=(16, 4.3 * len(PAIRS)), sharex=True)
 for row, (name, keys, runs) in enumerate(PAIRS):
     for col, (d, ew, bounds) in enumerate(runs):
         ax = axes[row, col]
@@ -44,8 +44,8 @@ for row, (name, keys, runs) in enumerate(PAIRS):
         # how specx treated the orbital concerned in this go: '*' = valence (inside the contour), else core
         roles = ", ".join("%s: %s (%.2f Ry)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in keys if k in lv)
         bl = "[%s, %s]" % tuple(None if b is None else round(b, 3) for b in bounds) if bounds else "none"
-        ax.set_title("%s: ewidth %.4f (%s), %s (itr %s, log10 rms %s)\n%s; gap judgement with [min, max] ewidth %s: %s%s" % (
-            name, ew, START_NOTE.get(ew, ""), "converged" if conv else "NOT converged", n, err, roles, bl, flag,
+        ax.set_title("%s: ewidth %.4f (%s)\n%s, itr %s, log10 rms %s\n%s\ngap judgement with [min, max] ewidth %s: %s%s" % (
+            name, ew, START_NOTE.get(ew, ""), "CONVERGED" if conv else "NOT CONVERGED", n, err, roles, bl, flag,
             " -> %.4f" % dec.ewidth if flag == "new" else ""), fontsize=8, loc="left",
             color="k" if conv else "darkred")
 for ax in axes[-1]: ax.set_xlabel("E - EF (Ry)")
