@@ -1,6 +1,7 @@
 # ewidth 自動調整スキーム: GAES（Gap-Anchored Ewidth Search）と GAES-Committee の pyakaikkr 移植仕様
 
 作成日: 2026-09-25（旧 `hea_scheme2_spec.md` を、HEA に限らない一般のアルゴリズムとして書き直し、名前を GAES に定めたもの）
+使われた論文: T. Fukushima, H. Akai, T. Chikyow, H. Kino, Phys. Rev. Materials 6, 023802 (2022), doi:10.1103/PhysRevMaterials.6.023802（手法自体は未発表）
 移植元: `fukushima_HEA_run_exprlattice/production_run/run0/`（2019-11、`1306.run_scheme2.py`, `HEARun.py`, `HEAPathSearch.py`, `hea_util.py`, `kkrinput_brvtyp.py`, `akaikkrio2.py`）
 移植先: AkaiKKRPythonUtil（pyakaikkr 2023.2.1）、AkaiKKR 2022.0721（`akaikkr/specx`）
 
@@ -15,7 +16,7 @@
 
 ### 0.1 名前
 
-- **GAES（Gap-Anchored Ewidth Search）**: DOS のバンドギャップ区間に E_F − ewidth_go を固定（anchor）するまで ewidth_go を置き直して go / dos を繰り返す探索。族の名前であり、同時に移植元の逐次方式（ewidth を 1 本置き、DOS を見て直す、を繰り返す。日本語ではギャップ追従法）を指す。
+- **GAES（Gap-Anchored Ewidth Search）**: DOS のバンドギャップ区間に E_F − ewidth_go を固定（anchor）するまで ewidth_go を置き直して go / dos を繰り返す探索。族の名前であり、同時に移植元の逐次方式（ewidth を 1 本置き、DOS を見て直す、を繰り返す。日本語ではギャップ追従法）を指す。この手法は T. Fukushima, H. Akai, T. Chikyow, H. Kino, *Phys. Rev. Materials* **6**, 023802 (2022), [doi:10.1103/PhysRevMaterials.6.023802](https://doi.org/10.1103/PhysRevMaterials.6.023802) の HEA 網羅計算で使われたものだが、**手法そのものは未発表**（同論文には記述が無い）。移植元 `fukushima_HEA_run_exprlattice/production_run/run0/` はその計算のスクリプトであり、本仕様書が手法の最初の記述になる。
 - **GAES-Committee**: ewidth_go を投機的に複数置いて並列に go + dos を走らせ（ewidth_dos は固定）、各 DOS から得たギャップ区間の投票（vote）でギャップを推定し、その推定から GAES で仕上げる方式（§7.1）。複数の ewidth_go の計算を committee（委員会）、集約段を vote と呼ぶ。
 - パッケージ名 `pyakaikkr.gaes`、CLI 名 `kkr-gaes`、例外 `GaesError`。文書はこのファイル（`ewidth_tuning_scheme.md`）にまとめる。
 
@@ -154,9 +155,11 @@ scheme 側は「inputcard 辞書（`AkaikkrJob.make_inputcard` に渡せるも�
 
 ### 3.2 ewidth_dos と dos の窓
 
-- go と j は同じ ewidth_go を使う。dos は ewidth_dos（既定 3.0、移植元と同じ）で、窓は [E_F − 0.75·3.0, E_F + 0.25·3.0] = [−2.25, 0.75] Ry、201 点、刻み 0.015 Ry。§4 の判定はこの mesh 上で行う。
+- go と j は同じ ewidth_go を使う。dos の edelt は go の edelt に連動させず `edelt_dos`（既定 1e-4 = STEP1 の edelt）に固定する。**edelt を 1e-2 のように大きくするのは SCF のためであり、バンドギャップ領域の認識には適さない**（大きい edelt はギャップ領域の DOS を持ち上げる）。STEP2 で edelt を 1e-2 から始めるようにしたため（§7）、go の edelt を dos に使うと DOS が広がってギャップ区間が縮み、判定が段ごとに変わってしまう（実測: AlGeHfBi fcc で edelt 1e-2 の dos はギャップが (−2.10, −2.01) しか残らず即 `fail`）。移植元は go と同じ edelt を dos にも使っていた（`compat=True` で再現）。dos は ewidth_dos（既定 3.0、移植元と同じ）で、窓は [E_F − 0.75·3.0, E_F + 0.25·3.0] = [−2.25, 0.75] Ry、201 点、刻み 0.015 Ry。§4 の判定はこの mesh 上で行う。
 - 窓の下端が −ewidth_go − eth より上にあると、ewidth_go の下側に幅 eth の区間があっても検出できない。`Gaes` は各 dos の前に `ref·ewidth_dos ≥ ewidth_go + eth + ediff` を確かめ、満たさなければ ewidth_dos を `(ewidth_go + eth + ediff)/ref` に広げる（`ewidth_dos_auto=True`、既定）。ref は `dosth` と同じくパラメータ（既定 0.75。akaikkr_cnd なら 0.5、`option={"cemesr_ref": ...}` を渡すならその値）。
 - mesh 点数は固定なので ewidth_dos を広げると刻みが粗くなる。eth より刻みが十分小さいこと（刻み ≤ eth/10）を確かめ、満たさなければ警告する。
+- **dos の窓は 4.5 Ry まで**（`ewidth_dos_max=4.5`）。AlGaSnPb fcc で窓を 6.0 Ry（下端 −4.5 Ry）にすると、core 準位（−6 Ry より深い）も無い −2〜−4.5 Ry に 10〜80 states/Ry の偽の構造が出た（エネルギー補間の適用範囲外）。また窓が深い core 準位を跨ぐと akaikkr ビルドは `reconf` で止まる。窓の下端に接する低 DOS 区間は候補にせず（`Decision.window_limited`）、それが理由で候補が無いときだけ Gaes が窓を 1.5 倍ずつ上限まで広げて dos を取り直す。広げた dos が specx で止まれば元の窓に戻して判定する。
+- **`min_ewidth=1.0`, `max_ewidth=2.0`**（既定、2026-09-25 ユーザー指定）: 候補 ewidth の下限と上限（Ry）。Ga 3d / Pb 5d / Sn 4d のように semicore が並んで幅 eth のギャップが無い系では、候補が semicore の下の深い区間へ潜り込み、semicore をまとめて valence に切り替えてしまう。上限を与えるとそれを止めて `fail` にできる。
 
 ## 4. バンドギャップ区間の検出と ewidth の判定（`gap.py`, `ewidth.py`）
 
@@ -198,6 +201,51 @@ def choose_ewidth(regions: Sequence[GapRegion], ewidth: float, *, eth: float = 0
   1. `check_ewidth` が区間を返せば `("old", ewidth, candidates)`。
   2. 無ければ幅 `> eth` の各区間から `−(e2 − ediff − margin)` を候補にして高エネルギー側から並べ、`("new", candidates[0], candidates)`。候補が無ければ `("fail", None, [])`。
 - 候補は「区間の上端の少し下」なので、valence 帯の直下のギャップがまず選ばれる。semicore を valence に含めたいときは `min_ewidth` で下限を与えて候補を絞る（新規、既定 None）。
+
+### 4.3 ewidth 判定の 2 方式: Method 1 と Method 2
+
+§4.2 の判定（2019 年のスクリプトと同じ、threshold 1 つ）を **Method 1** と呼ぶ。2026-09-25 の Bi 系のテスト（§13.2）で、Method 1 は threshold 2e-2 では semicore ピークの裾（DOS 3〜5e-3）に ewidth を置いても `old` にし、threshold 1e-3 では区間が eth より狭くなって `fail` にすることが分かった。これを直すのが **Method 2**（threshold 2 段）で、`Gaes(method=2)` で選ぶ（既定は 2。`compat=True` は 1）。
+
+**Method 2 の考え方**: 粗い threshold `dosth` でバンドギャップ「らしい」広い区間を認め、その中で細かい threshold `dosth2` を満たす（DOS が本当に小さい）部分に、valence 帯の底から ediff の余裕を取って ewidth を置く。
+
+```python
+def choose_ewidth2(energy, curves, ewidth, *, dosth=2e-2, dosth2=1e-3, eth=0.30, ediff=0.20,
+                   margin=0.01, dosth2_relax=2.0, min_ewidth=1.0, max_ewidth=2.0) -> Decision
+```
+
+手順:
+
+1. **粗い区間**: `gap_regions(energy, curves, dosth)` で区間を求め、幅 > eth のものだけ残す（Method 1 の条件 1 と同じ）。mesh の下端に接する区間（e1 = mesh の最小値）は「窓の外に続いているかもしれない」ので候補の順位を最後にする。
+2. **細かい部分区間**: 各粗い区間 [e1, e2] の内側で `gap_regions(energy, curves, dosth2)` を求める（粗い区間の内側にある区間だけ。幅の下限は課さない）。
+3. **上端の余裕**: 粗い区間の上端（valence 帯の底）から `top = e2 − ediff` を取る。−ewidth は `top` より下でなければならない（Method 1 の条件 3 と同じ）。
+4. **判定 `old`**: いまの −ewidth が、いずれかの粗い区間の細かい部分区間の中にあり、かつ −ewidth < top なら `old`。
+5. **候補**: 各粗い区間について、各細かい部分区間 [f1, f2] に対して `hi = min(f2, top)` を取り、`hi − margin > f1` なら候補 `−(hi − margin)`。つまり「DOS < dosth2 の範囲の中で、valence 帯の底から ediff 以上離れた最も浅い位置」に積分路の下端を置く。細かい部分区間が複数あれば上（高エネルギー側）のものを先に、粗い区間は高エネルギー側から並べる（mesh 下端に接するものは最後）。`min_ewidth` 未満の候補は捨てる。
+6. **細かい部分区間が無いとき**（ギャップの底が dosth2 をわずかに超える場合。例: AlSiGeBi の底 1.04e-3）: dosth2 を `dosth2 × dosth2_relax`（既定 2 倍）に緩めて 2〜5 をやり直す。それでも無ければその粗い区間は候補を出さない。緩めた事実は `Decision.relaxed=True` として記録する。
+7. 候補が 1 つも無ければ `fail`、あれば `new` と先頭候補。
+
+`Decision` は (flag, ewidth, candidates, coarse_regions, fine_regions, relaxed) を持ち、`Judgement` に粗い区間と細かい区間の両方を残す。
+
+Method 1 との違い:
+
+| | Method 1 | Method 2 |
+|---|---|---|
+| threshold | 1 つ（dosth） | 2 つ（dosth 粗、dosth2 細） |
+| 幅の条件 eth | dosth の区間に課す | dosth の区間に課す（細かい区間には課さない） |
+| −ewidth の置き場 | dosth の区間内で上端から ediff 下 | dosth2 の部分区間内で、かつ上端から ediff 下 |
+| semicore の裾 | dosth より低ければ区間に含めてしまう | dosth2 を超える裾は除外される（下端側の余裕が自動的に入る） |
+| ギャップの底が dosth2 を超える系 | – | dosth2 を relax 倍まで緩めて拾う |
+
+**Bi 系での値**（§13.2 の ewidth_go 1.6 の DOS、dosth 2e-2、dosth2 1e-3、eth 0.30、ediff 0.20）:
+
+| 系 | 粗い区間（dosth 2e-2） | top = e2 − ediff | dosth2（使用値） | 細かい部分区間 | Method 2 の候補 | Method 1（2e-2） | Method 1（1e-3） |
+|---|---|---|---|---|---|---|---|
+| AlSiRhBi fcc | [−1.688, −1.073] | −1.272 | 1e-3 | [−1.387, −1.147] | **1.2825** | old 1.6 | fail |
+| AlScNiBi fcc | [−1.673, −1.042] | −1.242 | 1e-3 | [−1.343, −1.117] | **1.2525** | old 1.6 | fail |
+| AlSiGeBi fcc | [−1.673, −1.028] | −1.228 | 1e-3 では無し → **2e-3**（relaxed） | [−1.508, −1.042] | **1.2375** | old 1.6 | fail |
+
+3 系とも −1.6（Bi 5d の裾）は細かい部分区間の外なので `new` になり、候補は 1.24〜1.28 Ry で、ギャップの底（DOS 最小 8e-4〜1e-3 の位置 −1.13〜−1.25 Ry）のすぐ下に落ちる。mesh 下端に接する粗い区間 [−2.243, −1.8〜−1.9]（Ge 3d / Bi 5d より下）からも候補 2.03〜2.12 が出るが順位は最後。
+
+実装上の注意: `gap_regions` は DOS が負の点（窓の下端付近で数値的に −1e-3 程度になることがある）も threshold 未満として区間に入れる。粗い区間が mesh の下端に接するかどうかは `GapRegion.i1 == 0` で判定する。
 
 ## 5. 「まだ収束に向かっている」判定（`convergence.py`）
 
@@ -255,10 +303,10 @@ class Layout:
 
 ```python
 class Gaes:
-    def __init__(self, akaikkr_exe: str, layout: Layout, *,
+    def __init__(self, akaikkr_exe: str, layout: Layout, *,  # fresh_retry=True, bzqlty_steps=("+4",) も受ける
                  ewidth_init=1.2, ewidth_dos=3.0, ewidth_dos_auto=True, ref=0.75,
-                 dosth=1e-3, eth=0.30, ediff=0.20, margin=0.01, min_ewidth=None,
-                 edelt_steps=(1e-4, 1e-3, 1e-2), pmix_steps=(1e-2, 5e-3, 1e-3, 5e-4, 1e-4),
+                 method=2, dosth=2e-2, dosth2=1e-3, eth=0.30, ediff=0.20, margin=0.01, min_ewidth=1.0, max_ewidth=2.0,
+                 edelt_init=1e-4, edelt_steps=(1e-2, 1e-3, 1e-4), pmix_steps=(1e-2, 5e-3, 1e-3, 5e-4, 1e-4),
                  pmix_init=0.005, maxitr_init=500, maxitr_2nd=200, maxitr_pm=300,
                  max_pm_iter=20, max_ew=10, with_j=True, compat=False, logger=None)
     def run(self, key: str, params: dict[str, dict]) -> KeyResult   # polytyp -> param_go 辞書
@@ -267,12 +315,12 @@ class Gaes:
 
 `params` は polytyp 名 → go の inputcard 辞書（`ewidth`, `edelt`, `pmix`, `maxitr` は scheme が上書きする）。単一サイト CPA なら `{"bcc": make_single_site_param(comp, "bcc"), "fcc": make_single_site_param(comp, "fcc")}`。1 キーの処理:
 
-1. **STEP1（ewidth の粗い決定）**: `iew=0, ewidth=ewidth_init, edelt=edelt_steps[0], pmix=pmix_init, maxitr=maxitr_init` で各 polytyp を 1 回だけ go → dos（→ j）。全 polytyp の total DOS（スピン和）を `gap_regions` に渡し `choose_ewidth`。
+1. **STEP1（ewidth の粗い決定）**: `iew=0, ewidth=ewidth_init, edelt=edelt_init, pmix=pmix_init, maxitr=maxitr_init` で各 polytyp を 1 回だけ go → dos（→ j）。全 polytyp の total DOS（スピン和）を `gap_regions` に渡し `choose_ewidth`。
    - `old` かつ全 polytyp 収束 → **finished**。
    - `old` だが未収束 → STEP2 へ。
    - `new` → `iew += 1`、ewidth を候補に置き換えて STEP1 をやり直す（誤り #1 の修正。`version=2` の layout なら別ディレクトリになる）。同じ ewidth を二度試さない。`iew >= max_ew` で **ewidth_exhausted**。
    - `fail` → **ewidth_fail**（収束扱いにしない）。go が全 polytyp 収束していれば結果は残す。
-2. **STEP2（SCF の追い込み）**: `maxitr=maxitr_2nd`。`edelt_steps` を順に、各 edelt で `pmix_steps` を順に試す。各 pmix では前段の pot.dat をコピーして `maxitr=maxitr_pm` で最大 `max_pm_iter` 回まで継続し、収束したら次の polytyp、`is_converging` が偽なら次の pmix。全 pmix を使い切ったら次の edelt。
+2. **STEP2（SCF の追い込み）**: `maxitr=maxitr_2nd`。`edelt_steps` を**大きい方から**（既定 1e-2 → 1e-3 → 1e-4。移植元は 1e-4 → 1e-3 → 1e-2 だったが、2026-09-25 にユーザー指示で逆順にした。大きい edelt で滑らかにして収束させてから締める）、各 edelt で `pmix_steps` を順に試す。各 pmix では前段の pot.dat をコピーして `maxitr=maxitr_pm` で最大 `max_pm_iter` 回まで継続し、収束したら次の polytyp、`is_converging` が偽なら次の pmix。全 pmix を使い切ったら次の edelt。
    - 各 edelt の後に DOS を見て `choose_ewidth`。`old` かつ全 polytyp 収束 → **finished**。`new` → 新 ewidth で STEP1 からやり直し。`fail` → **ewidth_fail**。
 3. `iew` が `max_ew` に達する、または候補が尽きたら **not_converged**。
 
@@ -280,25 +328,34 @@ class Gaes:
 - 判定に使う曲線は既定で polytyp ごとの total DOS。`curves="pdos"` にすると各 polytyp の全成分 PDOS を連結して渡す（§0.3。`dosth_pdos` を使う。実装は第 2 段階）。
 - `compat=True` のときの差: `Layout(version=1)`、dos / j を常に実行、`dosth=2e-2`、STEP1 の `new` で `iew` を進めずに既存結果を再利用（移植元の挙動の再現。2019 年の RUN の検証用で、新規計算には使わない）。
 
+- **ポテンシャルの引き継ぎ**（2026-09-25 ユーザー規則、実装済み）:
+  1. ewidth を変えたら古い pot.dat は使わず、新しい pot（specx の初期化）から始める。新 ewidth の STEP1 は pot.dat をコピーしない。
+  2. ewidth を変えずに収束パラメタ（edelt、pmix）を変えるときは、前の pot.dat から続ける（移植元の動作）。
+  3. それでも収束しなければ、同じ設定を新しい pot で試す（`fresh_retry=True`、既定。移植元にコメントアウトで残っていた `dir_first` 案に近い）。前段の pot から始めた連鎖が「まだ収束に向かっている」まま `max_pm_iter` を使い切ったときは fresh の再試行はせず、次の pmix に進む。
+  4. それでも収束しなければ bzqlty を上げて STEP2 をやり直す（`bzqlty_steps=("+4",)`、既定は 1 段階。`"+n"` は現在値に加算、数値なら置き換え。ディレクトリの `ied` は `edelt_steps` の本数ずつ進む）。
+  `compat=True` では 3 と 4 を行わない。
+
 ### 7.1 GAES-Committee（`committee.py`）
 
 ```python
 class GaesCommittee:
-    def __init__(self, gaes: Gaes, *, ewidth_members=(0.8, 1.0, 1.2, 1.5, 2.0), ewidth_dos=None,
+    def __init__(self, gaes: Gaes, *, ewidth_members=(0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0), ewidth_dos=None,
+                 dosth_members=(1e-2, 5e-3, 1e-3, 5e-4, 1e-4),
                  quorum="majority", n_parallel=4, threads_per_member=None,
-                 maxitr_member=None, reuse_member=True)
+                 maxitr_member=100, reuse_member=True)
     def run(self, key: str, params: dict[str, dict]) -> KeyResult
     def vote(self, energy: np.ndarray, member_regions: Sequence[Sequence[GapRegion]]) -> list[GapRegion]
 ```
 
 1 キーの処理:
 
-1. **Committee（投機的並列実行）**: `ewidth_members` の各 ewidth_go について、各 polytyp を go → dos で 1 回ずつ走らせる（`maxitr_member`、既定は `maxitr_init`。収束は要求しない。DOS のギャップは未収束でもおおむね出るため）。**ewidth_dos は全メンバーで固定**し、`ewidth_dos=None` なら `(max(ewidth_members) + eth + ediff) / ref` を使う（§3.2 の条件を全メンバーで満たすため。窓が届かないメンバーの DOS は投票に参加できない）。`n_parallel` 個の specx を同時に走らせ、`OMP_NUM_THREADS` を `threads_per_member`（既定は総スレッド数 / n_parallel）に分ける。ディレクトリは `Layout` の `iew` にメンバー番号を使い、ewidth の実値が名前に入る（§6.1 version 2）。
-2. **Vote（投票）**: メンバーごと・polytyp ごとに `gap_regions` を求め、mesh 点ごとに「その点がギャップ区間に入っている」票を数える。票数が quorum（`"majority"`: メンバー数の過半、整数: その数、`"all"`: 全員）以上の連続 mesh 区間を **consensus gap** とする。polytyp は AND（GAES と同じ）。ewidth_dos と mse が固定なので E − E_F の mesh は全メンバーで同一で、EF の差は軸に吸収される。投票の単位は mesh 点（区間の重なりではない）。
+1. **Committee（投機的並列実行）**: `ewidth_members` の各 ewidth_go について、各 polytyp を go → dos で 1 回ずつ走らせる。**SCF の収束は要求しない**（`maxitr_member` の既定は 100 程度の小さい値にする）。最初の ewidth はバンドギャップの外にあることが多く、そのとき AkaiKKR の SCF はむしろ収束しにくい（§13 の「未収束でも判定する」と同じ理由）。収束を待つより、多くの ewidth で多数のギャップ区間を求めて vote に回す方が重要で、メンバー数（`ewidth_members` の本数）を増やす方向に計算資源を使う。**ewidth_dos は全メンバーで固定**し、`ewidth_dos=None` なら `(max(ewidth_members) + eth + ediff) / ref` を使う（§3.2 の条件を全メンバーで満たすため。窓が届かないメンバーの DOS は投票に参加できない）。`n_parallel` 個の specx を同時に走らせ、`OMP_NUM_THREADS` を `threads_per_member`（既定は総スレッド数 / n_parallel）に分ける。ディレクトリは `Layout` の `iew` にメンバー番号を使い、ewidth の実値が名前に入る（§6.1 version 2）。
+2. **Vote（投票）**: 投票者は **ewidth メンバー × DOS threshold** の組（2026-09-25 ユーザー補足）。各メンバーの DOS に対して `dosth_members`（既定 1e-2, 5e-3, 1e-3, 5e-4, 1e-4）のそれぞれで `gap_regions` を求め、mesh 点ごとに「その点がギャップ区間に入っている」票を数える（8 メンバー × 5 threshold なら 40 票）。票数が quorum（`"majority"`: 投票者数の過半、整数: その数、`"all"`: 全員）以上の連続 mesh 区間を **consensus gap** とする。threshold を変えて投票するのは、threshold 1 つの値に判定が依存しないようにするためで、大きい threshold の票は区間を広く、小さい threshold の票は狭く取るので、過半で残るのは「ほとんどの threshold で低 DOS」の芯の部分になる。polytyp は AND（GAES と同じ）。ewidth_dos と mse が固定なので E − E_F の mesh は全メンバーで同一で、EF の差は軸に吸収される。投票の単位は mesh 点（区間の重なりではない）。
 3. **仕上げ**: consensus gap に `choose_ewidth` の候補生成（区間上端 − ediff − margin）を当てて初期 ewidth を決め、それを `ewidth_init` として `Gaes.run` を呼ぶ。`reuse_member=True` で、採った ewidth がメンバーの ewidth と一致すればそのディレクトリの pot.dat と結果を STEP1 の出発点として再利用する（inputcard 一致の規則 §6）。
 4. consensus gap が空なら **committee_fail** を記録し、`Gaes.run` を既定の `ewidth_init` で走らせる（GAES 単独に退避）。
 
-- `KeyResult` に `committee` を加える: メンバーごとの ewidth、収束、ギャップ区間、mesh 点ごとの得票数、consensus gap、採用した初期 ewidth。票の割れ（メンバー間でギャップ区間が一致しない度合い）はギャップ推定の不確かさとして残す。
+- `KeyResult` に `committee` を加える: メンバーごとの ewidth、収束、threshold ごとのギャップ区間、mesh 点ごとの得票数、consensus gap、採用した初期 ewidth。票の割れ（メンバー間でギャップ区間が一致しない度合い）はギャップ推定の不確かさとして残す。
+- メンバーの反復数は少なく、メンバー数は多く。1 メンバーの go は `maxitr_member` で打ち切り、DOS はその未収束ポテンシャルで計算する。仕上げの GAES（STEP2 の追い込み）だけが収束を目指す。
 - 使い分け: GAES は 1 本ずつ直すので specx の実行回数は少ないが逐次。GAES-Committee はメンバー数だけ余分に走らせる代わりに初期 ewidth の当たりがよく、valence 帯の中や semicore の中から始めて何度もやり直す事態を避けられる。並列資源があるときは Committee、無いときは GAES。
 - PDOS 拡張（§0.3）は vote の前段の `gap_regions` に PDOS 曲線を渡すだけで、Committee 側は変わらない。
 
@@ -356,7 +413,7 @@ specx 不要:
 - `test_layout.py`: v1 / v2 の往復、旧ディレクトリ名の `parse`。
 - `test_composition.py`: `from_type_name("Rh0.5Pt0.5_1")` → `{Rh: 0.5, Pt: 0.5}`、`"B0.975Vc0.025"` → Z (5, 0)、`from_elements("AlSiScTi")` が等比、`type_name()` の往復、41 文字以上・空白・カンマで `ValueError`、`heakey_to_composition("13142122")` ⇄ `("Al","Si","Sc","Ti")`、奇数桁で `ValueError`、5 元。`make_single_site_param(..., type_name="HEA")` の inputcard が例の `inputcard_go`（AlCdReHg fcc）と `#` 行と空白の正規化を除いて一致。
 - `test_result_legacy.py`: 例ディレクトリの out_go / out_dos / out_j を `KkrRunner.result()` で読む。
-- `test_committee_vote.py`: 合成 DOS 5 本（ギャップ区間を少しずつずらしたもの、1 本は窓が届かず区間無し）で `vote` が過半の区間を返す、`quorum="all"` で共通部分だけになる、全員不一致で空、`ewidth_dos=None` の自動決定が §3.2 の条件を満たす。
+- `test_committee_vote.py`: 合成 DOS 5 本（ギャップ区間を少しずつずらしたもの、1 本は窓が届かず区間無し）× threshold 5 個で `vote` が過半の区間を返す、threshold が大きいほど票の区間が広いこと、`quorum="all"` で共通部分だけになる、全員不一致で空、`ewidth_dos=None` の自動決定が §3.2 の条件を満たす。
 - `test_gap.py` にギザギザした合成 DOS（ギャップ内に幅 1 mesh の 5e-4 の凹凸、valence 帯に 1 mesh の落ち込み）を加え、threshold 比較だけで区間が正しく出ること（微分を使えば誤る形）。
 
 specx が必要（`AKAIKKR_PROGRAM_PATH`）:
@@ -374,3 +431,48 @@ specx が必要（`AKAIKKR_PROGRAM_PATH`）:
 - DOS 図を出すときは go の ewidth の線を入れる（`DosEXPlotter(..., go_outfile="out_go.log")`、[dos_plot_ewidth_line.md](dos_plot_ewidth_line.md)）。
 - 2019 年の RUN を読むときは、誤り #1 のため `ew_000` に「ewidth=1.2 で計算した結果」しか無い。ewidth は必ず inputcard_go から読み直す。
 - `test_committee_small.py`: 同じ系で `GaesCommittee(ewidth_members=(0.5, 1.0, 1.5), n_parallel=3, maxitr_member=30).run` が `committee` の票と consensus gap を返し、採用した初期 ewidth がその区間に入ること。
+
+## 13. 実装メモ（2026-09-25、GAES 逐次方式）
+
+実装: `library/PyAkaiKKR/src/pyakaikkr/gaes/`（`gap.py`, `ewidth.py`, `convergence.py`, `layout.py`, `runner.py`, `composition.py`, `legacy_hea.py`, `scheme.py`, `cli.py`）、`tests/gaes/`、CLI `kkr-gaes`（`setup.cfg` の console_scripts）。GAES-Committee（§7.1）は未実装。
+
+仕様からの差:
+
+- **SCF が未収束でも DOS でバンドギャップを判定する**（2019 年どおり、設計上の前提）。ewidth がギャップに無いこと自体が density / potential の不整合を生んで収束を妨げるので、収束を待ってから判定するのは順序が逆になる。また ewidth を変えれば DOS もギャップ区間も変わり、初期 ewidth がギャップ内でも多くの場合は SCF が進むにつれてギャップの下端が下がる。`Gaes(tighten_before_fail=True)` にすると未収束の `fail` の前に STEP2 を挟むが、既定は False。
+- **dos は go が未収束でも実行する**（`KkrRunner.run_all(dos_always=True)` を scheme が使う）。判定に DOS が要るため。j は収束したときだけ（`compat=True` なら常に）。
+- **dos の窓が届かないときの縮小**: `KkrRunner.run_dos` は specx が dos で止まったとき（`***err in reconf`、§13.1）、`ewidth_dos` を 0.25 ずつ `(ewidth_go + ediff)/ref` まで狭めて再試行する。使った値は `KkrRunner.ewidth_dos_used` と `Judgement.ewidth_dos` に残る。
+- **ref の検出**: dos の mesh の下端から実効 ref（`-emin/ewidth_dos`、半刻み補正）を求め、`Gaes(ref=...)` と 0.05 以上ずれればログに警告する（ビルドごとの ref 既定の違い、§13.1）。
+- `SiteComposition.conc` は百分率が整数になるときだけ整数を書く（等比 4 元で `25`、2019 年の inputcard と一致）。
+
+### 13.1 AkaiKKR 2022.0721 の各ビルドと `reconf`
+
+2019 年の HEA 系（AlGeHfBi、AlSiSnHf、AlScTiHf）で GAES を試したときに分かったこと。
+
+| ビルド | `reconf.f` | dos の ref | `begin_option` | Hf を含む go |
+|---|---|---|---|---|
+| akaikkr | あり、有効（core 状態の再配置を行う） | 0.75（`cemesr_ref=` で変更可） | あり | **`***err in reconf...ecor not found` で開始直後に停止**。Hf 4f の core 準位（−0.68 Ry、絶対値）が再配置の探索窓に入り、Newton 反復（20 回）が収束しない。ewidth 1.0〜2.5、ng / mse / mxl / reltyp / sdftyp / edelt / rmt を変えても同じ。Al, Si, Sc, Ti, Ge, Sn, Bi の単体は通る |
+| akaikkr_cpa2021v01 | あり、**`supprs=.true.` で再配置を抑止**（ebtm より下は core のまま、上は valence）。`emrgn` は 0.2（akaikkr は 0.7） | **0.5 固定**（`m_optn` を使わないので `cemesr_ref=` 不可） | 無し | 通る。AlCdReHg fcc は akaikkr ビルドと同じ 148 反復で収束（全エネルギー −21075.6451 と −21075.6422） |
+| akaikkr_cnd | 無し | 0.5 | あり | `displc` 必須 |
+
+- `reconf.f` は 2020 年 10 月に加わったもので 2019 年版には無い。2019 年の RUN は再配置無しの計算であり、cpa2021v01 ビルド（抑止）がそれに近い。
+- したがって `tests/gaes/test_gaes_run.py` は `GAES_SPECX_CODE`（既定 `akaikkr_cpa2021v01`）で実行ファイルを選び、dos の窓は ref=0.5 に合わせて `ewidth_dos=4.5`（下端 −2.25 Ry、2019 年の ewidth_dos 3.0 × ref 0.75 と同じ）にする。akaikkr ビルドで Hf 系を走らせるには `reconf.f` の `supprs` 相当（コメントで用意されている 7 行）を有効にして作り直す必要がある。
+- akaikkr ビルドでも、dos の窓が深い core 準位を跨ぐと同じ `reconf` で止まる（AlCdReHg: ewidth_dos 3.0 は停止、2.5 は通る）。上の「窓の縮小」はこのため。
+- 2022.0721 では go の既定 mse / ng が 2019 年版と違う（Cu 相当で mse 43 / ng 21、2019 年は 65 / 15）ので、全エネルギーは 2019 年の値と 0.04 Ry 程度ずれる。`begin_option` の `mse=`, `ng=` で揃えられる。
+- inputcard の末尾に改行が無い状態で `begin_option` を追記すると原子行に連結され `ty2ity...type not defined` になる。`make_inputcard` は末尾改行を付けないので、手で追記するときは注意。
+
+### 13.2 Bi 系のテスト（2026-09-25）
+
+Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore の 3 系 AlSiRhBi fcc（key 13144583）、AlSiGeBi fcc（13143283、Ge 3d も）、AlScNiBi fcc（13212883）を、初期 ewidth 1.6（Bi 5d ピーク −1.75 Ry の肩）で走らせた（`tests/gaes/test_gaes_run.py`、`GAES_EWIDTH_INIT`、`GAES_DOSTH`、akaikkr ビルド、ref 0.75、ewidth_dos 3.0）。
+
+- 3 系とも STEP1 の go は 123〜128 反復で収束（全エネルギー −13423.2853、−12080.5787、−12028.6003 Ry）。
+- Method 1、dosth 2e-2: 3 系とも `old`（ギャップ [−1.69, −1.07] が 5d の肩まで届き −1.6 を含む）→ `finished` at 1.6。
+- Method 1、dosth 1e-3: 3 系とも `fail`（区間幅 0.23〜0.24 < eth、AlSiGeBi は底 1.04e-3 で区間無し）。
+- Method 2（§4.3、実装済み、既定）で ewidth 1.6 から走らせた結果: 3 系とも STEP1 で `new` → 新 ewidth の STEP1 で `old`、合計 2 回の go で `finished`。
+
+  | 系 | ewidth の経過 | dosth（粗） | dosth2（使用値） | 最終ギャップ（細）| 収束 | 全エネルギー (Ry) |
+  |---|---|---|---|---|---|---|
+  | AlSiRhBi fcc | 1.6 → 1.2825 | 2e-2 | 1e-3 | [−1.373, −1.133] | 125 反復、err −6.16 | −13423.2973 |
+  | AlSiGeBi fcc | 1.6 → 1.2375 | 2e-2 | 2e-3（1e-3 では細かい区間が無く 2 倍に緩和）| [−1.478, −1.042] | 120 反復、err −6.04 | −12080.6142 |
+  | AlScNiBi fcc | 1.6 → 1.2525 | 2e-2 | 1e-3 | [−1.312, −1.103] | 136 反復、err −6.11 | −12028.6194 |
+
+  ewidth 1.6 の解と比べて全エネルギーは 0.012〜0.036 Ry 低い（Bi 5d の裾を積分路が跨がなくなった分）。新 ewidth の DOS では細かい区間の位置が 0.01〜0.03 Ry ずれるだけで、候補は変わらない（`old`）。

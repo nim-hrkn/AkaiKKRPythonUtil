@@ -72,3 +72,8 @@ class KKRUnknownOptionError(ValueError):
 class KKROptionValueError(ValueError):
     """value of a begin_option key cannot be written or converted"""
     pass
+
+
+class GaesError(Exception):
+    """error of the ewidth tuning scheme (pyakaikkr.gaes)"""
+    pass
