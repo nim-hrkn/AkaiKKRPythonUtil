@@ -705,10 +705,12 @@ aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 g
   | Rb 4p valence | 1.2 | [1.14, —] | `finished` 1.2（Rb 4p は `*`） |
   | Bi 6s core | 0.4（表 A から）→ 1.4025 → | [—, 1.63] → [—, 0.754] | `ewidth_fail`（eth 0.3 では 6s と valence 帯の間に幅 0.3 の区間が無い） |
   | Bi 6s core, eth 0.2 | 0.4 → 1.4025 → 0.7275 | [—, 1.63] → [—, 0.754] → [—, 0.754] | `finished` 0.7275（Bi 6s は core、−0.96 Ry、SCF 収束） |
-  | Rb 4p core | RUN_orb3 参照（下） | | |
-  | Se 4s core | RUN_orb3 参照（下） | | |
+  | Rb 4p core | 1.2 → 0.5875 | [—, 0.736] → [—, 0.736] | `ewidth_fail`（0.5875 で SCF 発散、rms 0.95 / 500 反復、低 DOS 区間無し。積分路の下端 −0.59 が valence 帯の底 −0.58 に接する。Rb 4p を core にした解はこの系に無い） |
+  | Se 4s core | 1.2 → 0.7725 | [—, 0.844] → [—, 0.844] | `finished` 0.7725（Se 4s は core、−1.05 Ry、SCF 収束、ギャップ [−0.89, −0.67]） |
 
-  最初の版（各 go の準位だけ、表 B も段階 0 に使用）では Rb 4p core が 1.2 → 0.5875 で SCF 発散（500 反復、rms 0.95）、DOS に低 DOS 区間が無く `ewidth_fail`。積分路の下端 −0.59 が valence 帯の底（DOS が 1e-3 を超える −0.58）に接していた。Se 4s core は 0.955 → 0.7275 → 0.7725 で `finished`（Se 4s は core、−1.05 Ry）。
+  aiida-akaikkr の `AkaikkrGaesWorkChain`（SLURM、specx-akaikkr@mygardenx2-slurm）でも同じ: Se 4s core は pk 3565 で 1.2 → 0.7725 `finished`、Rb 4p core は pk 3539 で 1.2 → 0.5875 `ewidth_fail`（終了コード 420）。図 `~/aiida_work/figures/gaes_orbital/pk3565_gaes01_dos.png`（斜線帯 [—, 0.844]、Se 4s の準位線）。
+
+  最初の版（各 go の準位だけ、表 B も段階 0 に使用）では、Rb 4p core の 2 回目の判定で範囲が [—, 1.48] に緩み（core 扱いの 4p が −1.68 Ry）、Se 4s core は表 B から 0.955 で始めて 0.955 → 0.7275 → 0.7725 と 3 回の go を要した。
 
 ### 15.6 実装しないこと
 
