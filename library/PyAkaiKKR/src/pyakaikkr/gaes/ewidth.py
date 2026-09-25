@@ -4,6 +4,8 @@
 """is E_F - ewidth_go anchored in a gap region, and if not, which ewidth to try next."""
 from typing import Optional
 
+import numpy as np
+
 from .gap import GapRegion
 
 
@@ -24,14 +26,26 @@ def check_ewidth(regions, ewidth, eth=ETH, ediff=EDIFF):
     return None
 
 
+def _clip_candidate(ew, lo, hi, min_ewidth, max_ewidth):
+    """candidate ew (Ry) with -ew allowed in the open interval (lo, hi): if ew is outside
+    [min_ewidth, max_ewidth] it is moved to the nearest bound provided -bound still lies
+    inside (lo, hi); otherwise None."""
+    if min_ewidth is not None and ew < min_ewidth:
+        ew = min_ewidth
+    if max_ewidth is not None and ew > max_ewidth:
+        ew = max_ewidth
+    return ew if lo < -ew < hi else None
+
+
 def ewidth_candidates(regions, eth=ETH, ediff=EDIFF, margin=MARGIN, min_ewidth=None, max_ewidth=None):
     """new ewidth candidates, one per region wider than eth, highest region first:
-    -(e2 - ediff - margin). Candidates below min_ewidth are dropped."""
+    -(e2 - ediff - margin), moved to min_ewidth / max_ewidth when outside the limits as long as
+    E_F - ewidth stays inside the region (below e2 - ediff)."""
     cands = []
     for g in sorted(regions, key=lambda g: g.e2, reverse=True):
         if g.width > eth:
-            ew = -(g.e2 - ediff - margin)
-            if (min_ewidth is None or ew >= min_ewidth) and (max_ewidth is None or ew <= max_ewidth):
+            ew = _clip_candidate(-(g.e2 - ediff - margin), g.e1, g.e2 - ediff, min_ewidth, max_ewidth)
+            if ew is not None:
                 cands.append(ew)
     return cands
 
@@ -92,11 +106,14 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
 
     1. coarse regions: DOS < dosth, wider than eth (regions touching the mesh bottom are ranked last);
     2. fine sub-regions: DOS < dosth2 inside each coarse region (dosth2 relaxed by dosth2_relax
-       when there is none); a coarse region touching the bottom of the mesh is ignored
-       (Decision.window_limited) because its lower edge is the window, not a band edge;
+       when there is none); in a coarse region touching the bottom of the mesh only positions
+       with at least eth of verified low DOS below them (-ewidth >= e_min + eth) are used, and
+       Decision.window_limited is set when that leaves nothing (the caller may widen the window);
     3. the upper margin is measured from the coarse region's upper edge: top = e2 - ediff;
     4. "old" if -ewidth lies in a fine sub-region and below top;
-    5. candidates: -(min(f2, top) - margin) for each fine sub-region [f1, f2] when it lies above f1.
+    5. candidates: -(min(f2, top) - margin) for each fine sub-region [f1, f2] when it lies above f1;
+       a candidate outside [min_ewidth, max_ewidth] is moved to the bound if E_F - bound is still
+       inside the sub-region (below top), otherwise dropped.
 
     Args:
         energy, curves: as for gap_regions.
@@ -109,12 +126,12 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
     coarse = _sorted_coarse([g for g in coarse_all if g.width > eth])
     dec = Decision(flag="fail", ewidth=None, coarse=coarse, dosth2_used=dosth2)
     cands = []
+    e_min = float(np.min(energy))
     for g in coarse:
-        if g.i1 == 0:
-            # touches the bottom of the dos window: its lower edge is the window, not a band edge,
-            # so it is neither an anchor nor a source of candidates (the caller may widen the window)
-            dec.window_limited = True
-            continue
+        # a region touching the bottom of the dos window has a real upper edge but an unknown
+        # lower edge: it may anchor or propose an ewidth only if at least eth of low DOS is
+        # verified below E_F - ewidth (-ewidth >= e_min + eth); otherwise the window must be widened
+        floor = e_min + eth if g.i1 == 0 else None
         top = g.e2 - ediff
         th2 = dosth2
         fine = [f for f in gap_regions(energy, curves, dosth=th2) if f.e1 >= g.e1 - 1e-12 and f.e2 <= g.e2 + 1e-12]
@@ -127,13 +144,18 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
         fine = sorted(fine, key=lambda f: -f.e2)
         dec.fine.extend(fine)
         for f in fine:
-            if ewidth is not None and dec.gap_used is None and f.e1 < -ewidth < f.e2 and -ewidth < top:
+            lo = f.e1 if floor is None else max(f.e1, floor)
+            if ewidth is not None and dec.gap_used is None and lo < -ewidth < f.e2 and -ewidth < top:
                 dec.gap_used = f
             hi = min(f.e2, top)
-            if hi - margin > f.e1:
-                c = -(hi - margin)
-                if (min_ewidth is None or c >= min_ewidth) and (max_ewidth is None or c <= max_ewidth):
+            if hi - margin > lo:
+                # shallowest position inside the fine sub-region below top; moved to the
+                # min/max bound when outside the limits as long as it stays inside (lo, hi)
+                c = _clip_candidate(-(hi - margin), lo, hi + 1e-12, min_ewidth, max_ewidth)
+                if c is not None:
                     cands.append(c)
+            elif floor is not None:
+                dec.window_limited = True   # usable part of a window-bottom region is too small
     dec.candidates = cands
     if dec.gap_used is not None:
         dec.flag, dec.ewidth = "old", ewidth

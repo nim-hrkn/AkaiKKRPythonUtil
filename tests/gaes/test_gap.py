@@ -68,5 +68,6 @@ def test_choose_ewidth_old_new_fail_and_min_ewidth():
     assert choose_ewidth(r, None)[0] == "new"        # no current value is never "old"
     narrow = gap_regions(e, [synthetic(gap=(-1.2, -1.0))[1]])
     assert choose_ewidth(narrow, 1.1)[0] == "fail"   # width 0.2 < eth 0.3
-    assert ewidth_candidates(r, min_ewidth=1.0) == []
-    assert choose_ewidth(r, 0.5, min_ewidth=1.0)[0] == "fail"
+    assert ewidth_candidates(r, min_ewidth=1.0) == [1.0]        # 0.9 is moved up to the bound, still inside the gap
+    assert choose_ewidth(r, 0.5, min_ewidth=1.0)[:2] == ("new", 1.0)
+    assert ewidth_candidates(r, min_ewidth=1.8) == []           # -1.8 is below the gap [-1.7, -0.7]
