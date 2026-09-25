@@ -5,6 +5,7 @@
 | [ase_calculator_usage.md](ase_calculator_usage.md) | 使い方 | `pyakaikkr.ase.AkaiKKR`（ASE calculator）。純物質・混晶（CPA）の指定、単位、パラメータ、ポテンシャル再利用、落とし穴 |
 | [testscript_usage.md](testscript_usage.md) | 使い方 | `tests/akaikkr*/testrun.py` と `testrun_ase.py`。参照ファイル、backend、環境、既知の最終桁差 |
 | `pyakaikkr.plot`（[gaes_usage.md](gaes_usage.md) 「図の共通部品」） | 実装 | DOS / PDOS / A(w,k) / J_ij / GAES の配列ベースの描画関数。pyakaikkr の Plotter と aiida-akaikkr の plot.py が共用 |
+| aiida-akaikkr/docs/report_spec.md | 仕様書 | HTML レポート（`pyakaikkr.report`、`pyakaikkr.plot.figure_to_svg / save_figure`、`kkr-report`）の関数設計。図は PNG + SVG |
 | [dos_plot_ewidth_line.md](dos_plot_ewidth_line.md) | 使い方 | DOS / PDOS 図の E − E_F = −|ewidth_go| の線。go の ewidth を使う理由、`ewidth_go` / `go_outfile` / `read_go_outfile` の優先順 |
 | [option_access_usage.md](option_access_usage.md) | 使い方 | `begin_option` を pyakaikkr から書く・検証する・読む（`OPTION_KEYS`, `normalize_option`, `read_inputcard_option`, `AkaikkrJob.get_option / get_emesh_param`、ASE の `option=` / `code=`） |
 | [akaikkr_option_keys.md](akaikkr_option_keys.md) | リファレンス | AkaiKKR の `begin_option` ブロックのキー（mse, tol, ng, dex, ...）の意味と既定値、読まれる場所 |
