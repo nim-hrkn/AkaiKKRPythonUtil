@@ -102,6 +102,7 @@ class Decision:
     gap_used: Optional[GapRegion] = None       # fine sub-region anchoring -ewidth when flag == old
     dosth2_used: Optional[float] = None
     window_limited: bool = False               # a coarse region touches the bottom of the dos window (ignored)
+    reasons: List[str] = field(default_factory=list)   # why a region gave no candidate (fail diagnosis)
 
 
 def _sorted_coarse(regions):
@@ -135,6 +136,11 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
     coarse_all = gap_regions(energy, curves, dosth=dosth)
     coarse = _sorted_coarse([g for g in coarse_all if g.width > eth])
     dec = Decision(flag="fail", ewidth=None, coarse=coarse, dosth2_used=dosth2)
+    if not coarse_all:
+        dec.reasons.append("no region with DOS < {:g} in the window [{:.3f}, {:.3f}]".format(dosth, float(np.min(energy)), float(np.max(energy))))
+    for g in coarse_all:
+        if g.width <= eth:
+            dec.reasons.append("region [{:.3f}, {:.3f}] (DOS < {:g}) is {:.3f} Ry wide < eth {:.2f}".format(g.e1, g.e2, dosth, g.width, eth))
     cands = []
     e_min = float(np.min(energy))
     may_keep = ewidth is not None and within_bounds(ewidth, min_ewidth, max_ewidth)
@@ -152,6 +158,10 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
             if fine:
                 dec.relaxed = True
                 dec.dosth2_used = th2
+        if not fine:
+            sel = (energy >= g.e1) & (energy <= g.e2)
+            dmin = float(min(np.min(c[sel]) for c in curves)) if np.any(sel) else float("nan")
+            dec.reasons.append("coarse region [{:.3f}, {:.3f}]: no sub-region with DOS < {:g} (minimum DOS {:.2e})".format(g.e1, g.e2, th2, dmin))
         fine = sorted(fine, key=lambda f: -f.e2)
         dec.fine.extend(fine)
         for f in fine:
@@ -162,11 +172,24 @@ def choose_ewidth2(energy, curves, ewidth, dosth=2e-2, dosth2=DOSTH2, eth=ETH, e
             if hi - margin > lo:
                 # shallowest position inside the fine sub-region below top; moved to the
                 # min/max bound when outside the limits as long as it stays inside (lo, hi)
-                c = _clip_candidate(-(hi - margin), lo, hi + 1e-12, min_ewidth, max_ewidth)
+                raw = -(hi - margin)
+                c = _clip_candidate(raw, lo, hi + 1e-12, min_ewidth, max_ewidth)
                 if c is not None:
                     cands.append(c)
+                else:
+                    dec.reasons.append("sub-region [{:.3f}, {:.3f}]: candidate {:.4f} is outside [min_ewidth, max_ewidth] = [{}, {}] "
+                                       "and the bound is not inside the sub-region".format(f.e1, f.e2, raw, min_ewidth, max_ewidth))
             elif floor is not None:
                 dec.window_limited = True   # usable part of a window-bottom region is too small
+                dec.reasons.append("sub-region [{:.3f}, {:.3f}] touches the window bottom: less than eth {:.2f} of low DOS verified "
+                                   "below E_F - ewidth (usable part above {:.3f} is empty)".format(f.e1, f.e2, eth, floor))
+            else:
+                # the sub-region lies within ediff of the coarse upper edge: ediff excludes it.
+                # ediff < e2 - f1 - margin would leave room (candidate about -f1)
+                ediff_max = g.e2 - lo - margin
+                dec.reasons.append("sub-region [{:.3f}, {:.3f}] excluded by ediff {:.2f} (E_F - ewidth must be below {:.3f} = coarse upper edge "
+                                   "{:.3f} - ediff); ediff < {:.3f} would give a candidate near {:.4f}".format(
+                                       f.e1, f.e2, ediff, top, g.e2, ediff_max, -lo - margin if ediff_max > 0 else float("nan")))
     dec.candidates = cands
     if dec.gap_used is not None:
         dec.flag, dec.ewidth = "old", ewidth

@@ -102,3 +102,25 @@ def test_candidate_is_clipped_to_the_bounds_inside_the_gap():
     from pyakaikkr.gaes import decide
     m1 = decide(1, e, [d], 1.2, dosth=2e-2, min_ewidth=1.0, max_ewidth=2.0)
     assert m1.flag == "old"   # at 2e-2 the coarse gap [-1.3, -0.5] contains -1.2
+
+
+def test_fail_carries_reasons():
+    """a 'fail' says why each region gave no candidate (In-Mn-Fe-Co In4d=core case: the gap between
+    the 4d and the valence band is 0.35 Ry wide but never below 1e-3, and ediff = 0.2 leaves no room)."""
+    e = np.linspace(-2.2425, 0.7425, 400)
+    d = np.full_like(e, 3e-3)                       # gap between the 4d and the valence band: 2e-3 .. 3e-3
+    d[(e > -1.10) & (e < -0.94)] = 1.5e-3           # its lowest part (found only with the relaxed 2e-3)
+    d[e > -0.92] = 5.0                              # valence band bottom
+    d[(e > -1.45) & (e < -1.27)] = 40.0             # In 4d (core) peak
+    d[e < -1.45] = 5e-4
+    m = choose_ewidth2(e, [d], 0.641, dosth=2e-2, dosth2=1e-3, eth=0.3, ediff=0.2, max_ewidth=1.146)
+    assert m.flag == "fail" and m.relaxed
+    txt = " | ".join(m.reasons)
+    assert "excluded by ediff 0.20" in txt and "outside [min_ewidth, max_ewidth]" in txt
+    m = choose_ewidth2(e, [d], 0.641, dosth=2e-2, dosth2=1e-3, eth=0.3, ediff=0.1, max_ewidth=1.146)
+    assert m.flag == "new" and 1.0 < m.ewidth < 1.15
+    d2 = np.full_like(e, 5.0); d2[(e > -1.2) & (e < -1.0)] = 1e-4     # only a 0.2 Ry wide dip
+    m = choose_ewidth2(e, [d2], 1.1, dosth=2e-2, eth=0.3)
+    assert m.flag == "fail" and any("< eth 0.30" in r for r in m.reasons)
+    m = choose_ewidth2(e, [np.full_like(e, 5.0)], 1.1, dosth=2e-2)
+    assert m.flag == "fail" and any("no region with DOS <" in r for r in m.reasons)

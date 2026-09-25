@@ -1,5 +1,5 @@
 """DOS of go runs where a small change of ewidth flips the SCF convergence (spec section 12 note)."""
-import re, glob, os
+import re, glob, os, textwrap
 import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pyakaikkr import AkaikkrJob
@@ -30,7 +30,7 @@ def info(d):
     txt = open(d + "/out_go.log").read()
     itr = re.findall(r"itr=\s*(\d+)", txt); err = re.findall(r"rms err=\s*(-?\d+\.\d+)", txt)
     return (int(itr[-1]) if itr else None), (float(err[-1]) if err else None), ("cpu time" in txt or "sbrtime" in txt)
-fig, axes = plt.subplots(len(PAIRS), 2, figsize=(16, 4.3 * len(PAIRS)), sharex=True)
+fig, axes = plt.subplots(len(PAIRS), 2, figsize=(16, 5.0 * len(PAIRS)), sharex=True)
 for row, (name, keys, runs) in enumerate(PAIRS):
     for col, (d, ew, bounds) in enumerate(runs):
         ax = axes[row, col]
@@ -44,9 +44,10 @@ for row, (name, keys, runs) in enumerate(PAIRS):
         # how specx treated the orbital concerned in this go: '*' = valence (inside the contour), else core
         roles = ", ".join("%s: %s (%.2f Ry)" % (k, "VALENCE *" if lv[k].star else "CORE", lv[k].e) for k in keys if k in lv)
         bl = "[%s, %s]" % tuple(None if b is None else round(b, 3) for b in bounds) if bounds else "none"
-        ax.set_title("%s: ewidth %.4f (%s)\n%s, itr %s, log10 rms %s\n%s\ngap judgement with [min, max] ewidth %s: %s%s" % (
+        why = ("\n" + "\n".join(textwrap.fill("why: " + r, 110) for r in dec.reasons)) if flag == "fail" else ""
+        ax.set_title("%s: ewidth %.4f (%s)\n%s, itr %s, log10 rms %s\n%s\ngap judgement with [min, max] ewidth %s: %s%s%s" % (
             name, ew, START_NOTE.get(ew, ""), "CONVERGED" if conv else "NOT CONVERGED", n, err, roles, bl, flag,
-            " -> %.4f" % dec.ewidth if flag == "new" else ""), fontsize=8, loc="left",
+            " -> %.4f" % dec.ewidth if flag == "new" else "", why), fontsize=8, loc="left",
             color="k" if conv else "darkred")
 for ax in axes[-1]: ax.set_xlabel("E - EF (Ry)")
 fig.suptitle("SCF convergence flips with ewidth. Second title line: how specx treated the orbital in that go (CORE, or VALENCE *).\n" + legend_text(), fontsize=9)

@@ -1,5 +1,5 @@
 """DOS of the last judgement of every orbital-rule GAES run (RUN_orb*), with the rule's level, the bounds band and the regions."""
-import json, glob, os, sys
+import json, glob, os, sys, textwrap
 import matplotlib
 matplotlib.use("Agg"); import matplotlib.pyplot as plt
 from pyakaikkr import AkaikkrJob
@@ -12,7 +12,7 @@ for k in sorted(glob.glob("RUN_orb*/*/key_*.json")):
     tag = os.path.basename(os.path.dirname(k)); cases[tag] = k
 order = sys.argv[1:] or sorted(cases)
 n = len(order); ncol = 2; nrow = (n + 1) // 2
-fig, axes = plt.subplots(nrow, ncol, figsize=(16, 3.3 * nrow), sharex=True); axes = axes.ravel()
+fig, axes = plt.subplots(nrow, ncol, figsize=(16, 3.9 * nrow), sharex=True); axes = axes.ravel()
 for ax, tag in zip(axes, order):
     d = json.load(open(cases[tag])); rules = d["parameters"].get("orbitals", []); pr = d["parameters"]
     jf = d["judgements"][-1]; dd = list(jf["directories"].values())[0]
@@ -22,9 +22,10 @@ for ax, tag in zip(axes, order):
                          margin=pr["margin"], dosth2_relax=pr["dosth2_relax"], min_ewidth=lo, max_ewidth=hi)
     draw_gaes_dos(ax, e, c[0], ewidth=jf["ewidth"], decision=dec, bounds=(lo, hi), levels=lv,
                   highlight=[r.split("=")[0] for r in rules], xlim=(-2.9, 0.9))
-    ax.set_title("%s: %s, ewidth %.4f, conv=%s, bounds [%s, %s], tried %s" % (
+    why = ("\n" + "\n".join(textwrap.fill("why: " + r, 120) for r in dec.reasons)) if dec.flag == "fail" else ""
+    ax.set_title("%s: %s, ewidth %.4f, conv=%s, bounds [%s, %s], tried %s%s" % (
         tag, d["status"], jf["ewidth"], d["converged"].get("fcc"), lo and round(lo, 3), hi and round(hi, 3),
-        [round(t, 3) for t in d["ewidth_tried"]]), fontsize=8, loc="left")
+        [round(t, 3) for t in d["ewidth_tried"]], why), fontsize=8, loc="left")
 for ax in axes[len(order):]: ax.axis("off")
 for ax in axes[-ncol:]: ax.set_xlabel("E - EF (Ry)")
 fig.suptitle("GAES with orbital rules (X-Mn-Fe-Co fcc): last judgement DOS. " + legend_text(), fontsize=9)

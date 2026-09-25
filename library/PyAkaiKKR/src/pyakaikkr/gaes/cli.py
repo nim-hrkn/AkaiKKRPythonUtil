@@ -132,6 +132,8 @@ def cmd_check(args):
     print("ewidth {:.4f}: {}".format(args.ewidth, dec.flag),
           "" if dec.flag == "fail" else "next {:.4f}".format(dec.ewidth) if dec.flag == "new" else "keep")
     print("candidates:", ", ".join("{:.4f}".format(c) for c in dec.candidates))
+    for r in dec.reasons:
+        print("  note:", r)
 
 
 def cmd_collect(args):

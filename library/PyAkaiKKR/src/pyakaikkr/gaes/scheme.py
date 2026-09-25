@@ -51,6 +51,7 @@ class Judgement:
     orbital_levels: Dict[str, list] = field(default_factory=dict)   # 'Rb4p': [E - E_F, star] from the go outputs
     orbital_bounds: Optional[list] = None                            # [min_ewidth, max_ewidth] used for this judgement
     orbital_mismatch: List[dict] = field(default_factory=list)      # rules the go output does not satisfy
+    reasons: List[str] = field(default_factory=list)                # why regions gave no candidate (fail diagnosis)
 
 
 @dataclass
@@ -253,7 +254,8 @@ class Gaes:
                       ewidth_dos=next(iter(runners.values())).ewidth_dos_used if runners else None,
                       method=self.method, fine_regions=[list(f.as_tuple()) for f in dec.fine], relaxed=dec.relaxed,
                       dosth2_used=dec.dosth2_used, window_limited=dec.window_limited,
-                      orbital_levels=levels_as_dict(levels), orbital_bounds=bounds.as_list(), orbital_mismatch=mismatch)
+                      orbital_levels=levels_as_dict(levels), orbital_bounds=bounds.as_list(), orbital_mismatch=mismatch,
+                      reasons=list(dec.reasons))
         for p, r in runners.items():
             if r.ref_effective is not None and abs(r.ref_effective - self.ref) > 0.05:
                 self.logger.warning("polytyp %s: dos window gives ref=%.3f but Gaes(ref=%.3f); the window "
@@ -357,9 +359,10 @@ class Gaes:
 
     def _finish(self, res, status, ewidth, runners, converged, judgement):
         res.status = status
-        if status == "ewidth_fail" and judgement is not None and judgement.orbital_bounds and not res.message:
-            res.message = "no gap candidate inside [min_ewidth, max_ewidth] = {}{}".format(
-                judgement.orbital_bounds, " (orbital rules {})".format([str(r) for r in self.orbitals]) if self.orbitals else "")
+        if status == "ewidth_fail" and judgement is not None and not res.message:
+            res.message = "no gap candidate inside [min_ewidth, max_ewidth] = {}{}: {}".format(
+                judgement.orbital_bounds, " (orbital rules {})".format([str(r) for r in self.orbitals]) if self.orbitals else "",
+                "; ".join(judgement.reasons) or "no reason recorded")
         res.ewidth_final = ewidth
         res.converged = dict(converged)
         res.final = {p: r.directory for p, r in runners.items()}
