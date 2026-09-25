@@ -1,0 +1,56 @@
+{
+ "1.4": {
+  "status": "error",
+  "ewidth": null,
+  "tried": [
+   1.4
+  ],
+  "gap": null,
+  "flags": [
+   "new"
+  ],
+  "steps": [
+   [
+    "step1",
+    0
+   ]
+  ],
+  "converged": {},
+  "message": "KKRFailedExecutionError: stopped by errtrp",
+  "results": {},
+  "seconds": 27
+ },
+ "1.55": {
+  "status": "finished",
+  "ewidth": 1.55,
+  "tried": [
+   1.55
+  ],
+  "gap": [
+   -1.5975,
+   -1.4775
+  ],
+  "flags": [
+   "old"
+  ],
+  "steps": [
+   [
+    "step1",
+    0
+   ]
+  ],
+  "converged": {
+   "fcc": true
+  },
+  "message": "",
+  "results": {
+   "fcc": {
+    "total_energy_Ry": -14106.703555226,
+    "total_moment": 0.8957,
+    "n_iter": 210,
+    "last_err": -6.081
+   }
+  },
+  "seconds": 24
+ }
+}
