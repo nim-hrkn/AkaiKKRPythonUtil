@@ -1,4 +1,4 @@
-# AkaiKKRTestScript と tests/akaikkr/testrun.py の ASE 対応 修正仕様
+# AkaiKKRTestScript と tests/testrun/akaikkr/testrun.py の ASE 対応 修正仕様
 
 作成日: 2026-09-24
 前提: `docs/ase_calculator_spec.md`（pyakaikkr 側の `pyakaikkr.ase` パッケージ）が実装済みであること。本仕様はその上に載るテストスクリプト側の変更を定める。
@@ -7,7 +7,7 @@
 
 - 既存の動作を変えない。`python testrun.py <program_path> --set Cu` は今までどおり pymatgen（`Cif2Kkr` / `CompareCifKkr`）経路で動き、既存の参照 `reference/ifort.json` と比較できる。
 - ASE 経路は「構造パラメータ dict を作る部分」だけを差し替える。`GoGo` 系クラス、`OutputAnalyzer`、参照 JSON の形式、`ExeUtil` / `ResultUtil` は共通のまま使う。
-- ASE 版の実行スクリプトは `tests/akaikkr/testrun_ase.py` とし、`testrun.py` は残す。
+- ASE 版の実行スクリプトは `tests/testrun/akaikkr/testrun_ase.py` とし、`testrun.py` は残す。
 - バグ修正（§5）は両経路に効く。修正により既存参照と一致しなくなる項目は明記する。
 - ase は必須依存にしない。`akaikkr_testscript` は ase 未導入でも import・実行できる。
 
@@ -15,19 +15,19 @@
 
 | 区分 | パス | 内容 |
 |---|---|---|
-| 追加 | `library/AkaiKKRTestScript/src/akaikkr_testscript/asestruc.py` | `get_kkr_struc_from_ase` と geom 検証（§2） |
-| 修正 | `library/AkaiKKRTestScript/src/akaikkr_testscript/testrun_class.py` | 構造取得の振り分け関数 `get_kkr_struc`、各 `_X_common_param` の呼び出し置換、`change_atomic_type` の index キー対応、`all_go` の `backend` 引数（§3） |
-| 修正 | `library/AkaiKKRTestScript/src/akaikkr_testscript/__init__.py` | 変更なし（`asestruc` は `get_kkr_struc` 内で遅延 import） |
-| 修正 | `library/AkaiKKRTestScript/setup.cfg` | `[options.extras_require] ase = pyakaikkr[ase]` |
-| 修正 | `library/PyAkaiKKR/src/pyakaikkr/Fmg.py` | flip 名不一致の検出（§5.1） |
-| 修正 | `library/PyAkaiKKR/src/pyakaikkr/GoGo.py` | `GoFmg` の flip 名解決（§5.1） |
-| 追加 | `tests/akaikkr/testsets.py` | `make_exe()` を `testrun.py` から移す（§4） |
-| 修正 | `tests/akaikkr/testrun.py` | `testsets.make_exe` を使う。動作は同じ（§4） |
-| 追加 | `tests/akaikkr/testrun_ase.py` | ASE 経路の実行スクリプト（§4） |
-| 追加 | `tests/akaikkr/reference/<compiler>_ase.json` | ASE 経路の参照（`--create_ref` で生成、§4.3） |
+| 追加 | `src/akaikkr_testscript/asestruc.py` | `get_kkr_struc_from_ase` と geom 検証（§2） |
+| 修正 | `src/akaikkr_testscript/testrun_class.py` | 構造取得の振り分け関数 `get_kkr_struc`、各 `_X_common_param` の呼び出し置換、`change_atomic_type` の index キー対応、`all_go` の `backend` 引数（§3） |
+| 修正 | `src/akaikkr_testscript/__init__.py` | 変更なし（`asestruc` は `get_kkr_struc` 内で遅延 import） |
+| 修正 | `pyproject.toml` | `[options.extras_require] ase = pyakaikkr[ase]` |
+| 修正 | `src/pyakaikkr/Fmg.py` | flip 名不一致の検出（§5.1） |
+| 修正 | `src/pyakaikkr/GoGo.py` | `GoFmg` の flip 名解決（§5.1） |
+| 追加 | `tests/testrun/akaikkr/testsets.py` | `make_exe()` を `testrun.py` から移す（§4） |
+| 修正 | `tests/testrun/akaikkr/testrun.py` | `testsets.make_exe` を使う。動作は同じ（§4） |
+| 追加 | `tests/testrun/akaikkr/testrun_ase.py` | ASE 経路の実行スクリプト（§4） |
+| 追加 | `tests/testrun/akaikkr/reference/<compiler>_ase.json` | ASE 経路の参照（`--create_ref` で生成、§4.3） |
 | 追加 | `tests/ase/test_backend_consistency.py` | cif 経路と ASE 経路の dict 一致テスト（§6） |
 
-`tests/akaikkr_cpa2021v01/` と `tests/akaikkr_cnd/` の `testrun.py` は本仕様の範囲外。同じ手順（§4）でそれぞれ `testrun_ase.py` を足せる。
+`tests/testrun/akaikkr_cpa2021v01/` と `tests/testrun/akaikkr_cnd/` の `testrun.py` は本仕様の範囲外。同じ手順（§4）でそれぞれ `testrun_ase.py` を足せる。
 
 ## 2. `asestruc.py`
 
@@ -46,7 +46,7 @@ def get_kkr_struc_from_ase(structure, akaikkr_exe: str, displc: bool,
 ### 2.1 入力
 
 - `structure` は `ase.Atoms` またはファイルパス。パスのときは `ase.io.read(structure, format=fmt)` で読む。CIF は ASE 既定で `fractional_occupancies=True` なので `info['occupancy']` と `spacegroup_kinds` が付く。
-- `tests/structure/GaAsVc-F43m.cif` の `Og`（空孔）は ASE が元素 Og として読む。`ElementKKR(Vc="Og")` が Z=0 に写すので追加処理は不要。
+- `tests/testrun/structure/GaAsVc-F43m.cif` の `Og`（空孔）は ASE が元素 Og として読む。`ElementKKR(Vc="Og")` が Z=0 に写すので追加処理は不要。
 - `use_bravais` は署名互換のためだけに受け取る。ASE 経路は常に `brvtyp=aux`（`ase_calculator_spec.md` §2）。`True` が渡されたら一度だけ警告を出して無視する。
 
 ### 2.2 変換
@@ -153,7 +153,7 @@ def all_go(akaikkr_exe, fmg_exe, exe_dic, displc=False, backend="cif"):
 - `meta` には `"backend"` を追加する（`make_meta` の戻り値に `meta["backend"] = backend`）。
 - `parse_args` は変更しない。backend の切り替えはスクリプト名（`testrun.py` / `testrun_ase.py`）で行う。
 
-## 4. `tests/akaikkr/` のスクリプト
+## 4. `tests/testrun/akaikkr/` のスクリプト
 
 ### 4.1 `testsets.py`（追加）
 
@@ -184,13 +184,13 @@ if __name__ == "__main__":
 - 実行は `python testrun_ase.py <program_path> --set Cu` 。初回は `--create_ref` で `reference/ifort_ase.json` を作る（`meta.json` の扱いは従来どおり）。
 - `--set` のキーと関数は `testsets.py` 経由で `testrun.py` と共通。
 - ase 未導入なら `get_kkr_struc` の遅延 import で `ImportError` が出る。メッセージに `pip install ase` を含める。
-- 実行ディレクトリの基底名（`akaikkr`）から `specx` の場所を決める仕組み（`kkrtype = basename(cwd)`）は共通なので、`testrun_ase.py` も `tests/akaikkr/` で実行する。
+- 実行ディレクトリの基底名（`akaikkr`）から `specx` の場所を決める仕組み（`kkrtype = basename(cwd)`）は共通なので、`testrun_ase.py` も `tests/testrun/akaikkr/` で実行する。
 
 ## 5. バグ修正（両経路に効く）
 
 ### 5.1 `GoFmg` の flip が黙って無視される
 
-`AlMnFeCo_bcc_gofmg` は `flip_list = ["HEA_Mn_25.0%"]` を渡すが、`typeofsites` の shortname は `Mn0.25Al0.25Fe0.25Co0.25_2a_0_Mn_25.0%` なので一致せず、`Fmg.make_inputfile` は `all_flip_dic["HEA_Mn_25.0%"] = 1` を追加するだけで何も反転しない。実際に `tests/akaikkr_cpa2021v01/AlMnFeCo_bcc/fmg.input` は `pot.dat 1 2 3 4 / pot_fmg.dat 1 2 3 4` で反転無し。
+`AlMnFeCo_bcc_gofmg` は `flip_list = ["HEA_Mn_25.0%"]` を渡すが、`typeofsites` の shortname は `Mn0.25Al0.25Fe0.25Co0.25_2a_0_Mn_25.0%` なので一致せず、`Fmg.make_inputfile` は `all_flip_dic["HEA_Mn_25.0%"] = 1` を追加するだけで何も反転しない。実際に `tests/testrun/akaikkr_cpa2021v01/AlMnFeCo_bcc/fmg.input` は `pot.dat 1 2 3 4 / pot_fmg.dat 1 2 3 4` で反転無し。
 
 修正:
 
@@ -214,7 +214,7 @@ if __name__ == "__main__":
 
 specx が必要なので環境変数 `AKAIKKR_PROGRAM_PATH`（`testrun.py` の `program_path` と同じ意味）が無ければ skip する。
 
-各 CIF（`tests/structure/*.cif` のうち `testrun.py` で使う 12 件。`Fe_lmd` は `Fe-Im3m.cif` を共用）について:
+各 CIF（`tests/testrun/structure/*.cif` のうち `testrun.py` で使う 12 件。`Fe_lmd` は `Fe-Im3m.cif` を共用）について:
 
 1. `get_kkr_struc_from_cif(...)` と `get_kkr_struc_from_ase(...)` を同じ `directory` 設定で呼ぶ。
 2. 次を比較する。
@@ -259,6 +259,6 @@ specx 実行を伴う確認（手動）:
 
 ## 9. 後日談（2026-09-24）
 
-- `tests/akaikkr_cnd` を全件流した際に直した不具合（`*_j30` 後処理の type 名決め打ち、`_canonical_type_name` による Jij `pair` キーの正規化）と、残る 6 件の最終桁差は [testscript_usage.md](testscript_usage.md) §4–5 にまとめた。
+- `tests/testrun/akaikkr_cnd` を全件流した際に直した不具合（`*_j30` 後処理の type 名決め打ち、`_canonical_type_name` による Jij `pair` キーの正規化）と、残る 6 件の最終桁差は [testscript_usage.md](testscript_usage.md) §4–5 にまとめた。
 - `AlMnFeCo_bcc_gofmg` は flip 名の修正で本当に Mn を反転するようになったため、旧 cif 参照とは一致しない。参照を作り直すこと。
 - 同じ `_<物質>_common_param` を AiiDA から使う経路を `aiida-akaikkr/example/run_examples.py` に置いた。共通パラメータを構造キー（`brvtyp, a, ..., atmicx, displc`）とそれ以外に分けて CalcJob の `structure` / `parameters` に渡す。akaikkr_cnd では `displc` が無いと specx が "illegal input" で止まるので、`GoGo.execute` と同様に `make_displc_list(anclr)` を付ける。

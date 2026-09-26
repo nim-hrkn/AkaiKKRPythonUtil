@@ -79,14 +79,14 @@ plot_gaes_dos(ax, energy, dos_block, ewidth=1.2, decision=dec, bounds=(1.0, 2.0)
               levels=levels_from_go(d + "/out_go.log"), highlight=["Bi6s"], natm=5, dosth=2e-2, dosth2=1e-3)
 ```
 
-`pyakaikkr.gaes.plot`（`draw_gaes_dos`、`legend_text`）は互換のための再輸出。テストは `tests/plot/test_plot_arrays.py`（specx 不要）。`tests/gaes/tools/plot_hea_XMnFeCo.py`, `plot_orbital_rules.py`, `plot_conv_pairs.py` と aiida-akaikkr の `plot --dos-pk / --spc-pk / --jij-pk / --gaes-pk` が同じ関数で描く。
+`pyakaikkr.gaes.plot`（`draw_gaes_dos`、`legend_text`）は互換のための再輸出。テストは `tests/plot/test_plot_arrays.py`（specx 不要）。`scripts/gaes_survey/plot_hea_XMnFeCo.py`, `plot_orbital_rules.py`, `plot_conv_pairs.py` と aiida-akaikkr の `plot --dos-pk / --spc-pk / --jij-pk / --gaes-pk` が同じ関数で描く。
 
-## 例（tests/akaikkr/）
+## 例（examples/gaes/）
 
-`testrun.py` と同じく `<program_path>`（`akaikkr/specx` を含むディレクトリ）を渡す。出力は tests/akaikkr の直下（`SeMnFeCo_fcc_ewidth/`、`SeMnFeCo_fcc_Se4s-valence/`、`SeMnFeCo_fcc_Se4s-core/`、`gaes_*.png`。testrun の `Cu/` などと同じ扱いで .gitignore 済み）。
+`testrun.py` と同じく `<program_path>`（`akaikkr/specx` を含むディレクトリ）を渡す。出力は examples/gaes の直下（`SeMnFeCo_fcc_ewidth/`、`SeMnFeCo_fcc_Se4s-valence/`、`SeMnFeCo_fcc_Se4s-core/`、`gaes_*.png`。.gitignore 済み）。
 
 ```
-cd tests/akaikkr
+cd examples/gaes
 python gaes_ewidth_example.py  <program_path> [--comp SeMnFeCo] [--polytyp fcc] [--ewidth-init 1.2] [--min-ewidth 1.0] [--max-ewidth 2.0]
 python gaes_orbital_example.py <program_path> [--comp SeMnFeCo] [--orbital Se4s] [--eth 0.3]
 ```
@@ -139,7 +139,7 @@ candidates:
   note: sub-region [-2.243, -1.657]: candidate 1.6675 is outside [min_ewidth, max_ewidth] = [None, 1.1473] and the bound is not inside the sub-region
 ```
 
-図: `python tests/gaes/tools/plot_orbital_rules.py <tag> ...`（RUN_orb*/<tag>/key_*.json を読み、最終判定の DOS に規則の準位・範囲・理由を重ねる。`OUT=file.png` で出力名）。例は docs/data の `hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 例）と `hea_XMnFeCo_fcc_orbital_pairs_dos.png`（Rb 4p / Se 4s / Bi 6s の valence と core の対）。
+図: `python scripts/gaes_survey/plot_orbital_rules.py <tag> ...`（RUN_orb*/<tag>/key_*.json を読み、最終判定の DOS に規則の準位・範囲・理由を重ねる。`OUT=file.png` で出力名）。例は docs/data の `hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 例）と `hea_XMnFeCo_fcc_orbital_pairs_dos.png`（Rb 4p / Se 4s / Bi 6s の valence と core の対）。
 
 ## 2019 年の RUN との互換
 

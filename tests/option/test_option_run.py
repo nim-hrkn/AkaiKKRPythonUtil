@@ -6,7 +6,7 @@ from copy import deepcopy
 import pytest
 
 from pyakaikkr import AkaikkrJob, KKRFailedExecutionError, KKRUnknownOptionError
-from option_env import TESTS_DIR, needs_specx, needs_specx_cnd, specx_path
+from kkr_env import DATA_DIR, needs_specx, needs_specx_cnd, specx_path
 
 CU_PARAM = dict(
     go="go", potentialfile="pot.dat", brvtyp="fcc", a=6.82, **{"c/a": 1.0, "b/a": 1.0},
@@ -49,12 +49,12 @@ def test_unknown_key_is_reported(tmp_path):
         job.run(specx_path("akaikkr"), "inputcard_go", "out_go.log")
 
 
-CND_CU = os.path.join(TESTS_DIR, "akaikkr_cnd", "Cu")
+CND_CU = os.path.join(DATA_DIR, "Cu_cnd")
 
 
 @needs_specx_cnd
 @pytest.mark.skipif(not os.path.isfile(os.path.join(CND_CU, "pot.dat")),
-                    reason="tests/akaikkr_cnd/Cu/pot.dat (converged by testrun.py) is needed")
+                    reason="tests/data/Cu_cnd/pot.dat is needed")
 def test_cnd_dos_with_cemesr_ref(tmp_path):
     """akaikkr_cnd: dos with cemesr_ref= 0.75 instead of the build default 0.5.
 

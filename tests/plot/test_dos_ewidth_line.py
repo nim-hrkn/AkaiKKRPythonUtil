@@ -12,11 +12,13 @@ import pytest
 from pyakaikkr import DosEXPlotter, DosPlotter, PDosEXPlotter
 from pyakaikkr.DosPlotter import _EWIDTH_LINE_LABEL, _mark_ewidth_go, resolve_ewidth_go
 
-CU_DIR = os.path.join(os.path.dirname(__file__), "..", "akaikkr", "Cu")
+from kkr_env import DATA_DIR
+
+CU_DIR = os.path.join(DATA_DIR, "Cu")
 needs_cu = pytest.mark.skipif(
     not (os.path.isfile(os.path.join(CU_DIR, "out_go.log"))
          and os.path.isfile(os.path.join(CU_DIR, "out_dos.log"))),
-    reason="tests/akaikkr/Cu/out_go.log and out_dos.log (made by testrun.py) are needed")
+    reason="tests/data/Cu/out_go.log and out_dos.log are needed")
 
 
 def _ewidth_lines(ax):

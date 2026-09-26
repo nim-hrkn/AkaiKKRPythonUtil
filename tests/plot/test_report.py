@@ -8,7 +8,9 @@ from pyakaikkr.plot import figure_to_svg, figure_to_png, data_uri, save_figure
 from pyakaikkr.report import (ReportData, Component, render_html, add_dos_figure, add_awk_figures, add_jij_figures,
                               add_gaes_figure, formula_of, symmetry_of, components_from_outputs, report_from_directory, T, LANGS)
 
-AKAIKKR_TESTS = os.path.join(os.path.dirname(__file__), "..", "akaikkr")
+from kkr_env import TESTRUN_DIR
+
+AKAIKKR_TESTS = os.path.join(TESTRUN_DIR, "akaikkr")
 
 
 def _data():
@@ -91,7 +93,7 @@ def test_formula_symmetry_and_components():
                                          ("SmCo5_oc", {"formula": "SmCo5", "sg": "P6/mmm", "figs": {"dos", "pdos", "awk_up", "awk_dn"}, "jij": 6, "tc": True}),
                                          ("Cu", {"formula": "Cu", "sg": "Fm-3m", "figs": {"dos", "pdos", "awk_up"}, "jij": 0, "tc": False})])
 def test_report_from_test_outputs(name, expect, tmp_path):
-    """the testrun outputs (tests/akaikkr/<name>/) when present: go + dos + spc31 (+ j3.0). SmCo5_oc has a type
+    """the testrun outputs (tests/testrun/akaikkr/<name>/) when present: go + dos + spc31 (+ j3.0). SmCo5_oc has a type
     with f states (unequal l per type, NaN-padded PDOS)."""
     d = os.path.join(AKAIKKR_TESTS, name)
     if not os.path.isfile(os.path.join(d, "out_go.log")):

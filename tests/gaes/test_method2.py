@@ -7,7 +7,7 @@ import pytest
 
 from pyakaikkr import AkaikkrJob
 from pyakaikkr.gaes import choose_ewidth2, decide, dos_curves_from_outputs
-from gaes_env import RUN_DIR
+from kkr_env import RUN_DIR
 
 
 def synthetic(floor=8e-4, tail=3e-3):

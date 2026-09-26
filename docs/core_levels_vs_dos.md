@@ -2,7 +2,7 @@
 
 作成日: 2026-09-25
 データ: `fukushima_HEA_run_exprlattice/production_run/run0/RUN/`（2019 年、4 元等比 HEA の単一サイト CPA、fcc の 7,505 ディレクトリ）と、2026-09-25 に AkaiKKR 2022.0721 で走らせた GAES のテスト（[ewidth_tuning_scheme.md](ewidth_tuning_scheme.md) §13）
-スクリプト: `tests/gaes/tools/scan_semicore.py`（DOS からギャップと semicore 区間を抽出）、`tests/gaes/tools/corelevel_vs_dos.py`（core 準位と DOS ピークの突き合わせ）
+スクリプト: `scripts/gaes_survey/scan_semicore.py`（DOS からギャップと semicore 区間を抽出）、`scripts/gaes_survey/corelevel_vs_dos.py`（core 準位と DOS ピークの突き合わせ）
 
 ## 1. out_go.log のどこに何が書いてあるか
 

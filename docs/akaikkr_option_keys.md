@@ -63,5 +63,5 @@ Python からの参照（2026-09-25 実装、[option_access_usage.md](option_acc
 ## 3. 注意
 
 - `ie`, `cpaitr_show`, `cpaitr_tol`, `ddos`, `tempmu` は akaikkr_cnd 向け。akaikkr 本体に書いても停止はしないが効かない（`ie` は読まれて捨てられる）。
-- 論理値は Fortran の list-directed 読みなので `T`/`F`、`.true.`/`.false.` が確実。デモ `demo/akaikkr_cnd.small.devel/cnd_test/finite_temperature.py` は `cpaitr_show= True` を渡しており、ifort ではこれも受け付ける。
+- 論理値は Fortran の list-directed 読みなので `T`/`F`、`.true.`/`.false.` が確実。デモ `examples/cnd/akaikkr_cnd.small.devel/cnd_test/finite_temperature.py` は `cpaitr_show= True` を渡しており、ifort ではこれも受け付ける。
 - `tests/` の回帰テストは option ブロックを使っていない（すべて既定値）。`testrun_class.py` の `Cu_go`, `Cu_spc` にコメントアウトされた例が残っている。

@@ -81,7 +81,7 @@ DOS の単位: pyakaikkr の `get_dos` が返す total DOS はスピンごと（
 
 | 区分 | パス | 内容 |
 |---|---|---|
-| 追加 | `library/PyAkaiKKR/src/pyakaikkr/gaes/__init__.py` | 公開 API（`gap_regions`, `check_ewidth`, `choose_ewidth`, `is_converging`, `KkrRunner`, `Layout`, `Gaes`, `GaesCommittee`, `SiteComposition`） |
+| 追加 | `src/pyakaikkr/gaes/__init__.py` | 公開 API（`gap_regions`, `check_ewidth`, `choose_ewidth`, `is_converging`, `KkrRunner`, `Layout`, `Gaes`, `GaesCommittee`, `SiteComposition`） |
 | 追加 | `pyakaikkr/gaes/gap.py` | バンドギャップ区間の検出（§4） |
 | 追加 | `pyakaikkr/gaes/ewidth.py` | ewidth の判定と候補生成（§4.2） |
 | 追加 | `pyakaikkr/gaes/convergence.py` | SCF 履歴の「まだ落ちている」判定（§5） |
@@ -93,7 +93,7 @@ DOS の単位: pyakaikkr の `get_dos` が返す total DOS はスピンごと（
 | 追加 | `pyakaikkr/gaes/composition.py` | `SiteComposition`（任意の元素と比の単一サイト組成、AkaiKKR の type 名との相互変換、type 名の長さ検査）、`make_single_site_param`（§3.1） |
 | 追加 | `pyakaikkr/gaes/legacy_hea.py` | 2019 年の 2 桁原子番号キー（`13142122`）⇄ `SiteComposition`、`heakeylist0.csv` の読み込み。互換モード専用 |
 | 修正 | `pyakaikkr/Error.py` | `GaesError(Exception)` を追加 |
-| 修正 | `library/PyAkaiKKR/setup.cfg` | `console_scripts: kkr-gaes = pyakaikkr.gaes.cli:main` |
+| 修正 | `pyproject.toml` | `console_scripts: kkr-gaes = pyakaikkr.gaes.cli:main` |
 | 追加 | `tests/gaes/` | pytest（§11） |
 | 追加 | `docs/gaes_usage.md` | 使い方（実装後） |
 
@@ -418,7 +418,7 @@ specx 不要:
 
 specx が必要（`AKAIKKR_PROGRAM_PATH`）:
 
-- `test_run.py`: Cu fcc（`lattice=6.82`、`tests/akaikkr/reference/ifort.json` の Cu_go と同じ ewidth / bzqlty）で `KkrRunner.run_all(with_j=False)` が収束し te が一致。`gap_regions` が E_F − 1.0 を含む区間を返し `check_ewidth(1.0)` が None でないこと（Cu の 3d 価電子帯の下に semicore は無い）。
+- `test_run.py`: Cu fcc（`lattice=6.82`、`tests/testrun/akaikkr/reference/ifort.json` の Cu_go と同じ ewidth / bzqlty）で `KkrRunner.run_all(with_j=False)` が収束し te が一致。`gap_regions` が E_F − 1.0 を含む区間を返し `check_ewidth(1.0)` が None でないこと（Cu の 3d 価電子帯の下に semicore は無い）。
 - `test_gaes_small.py`: 1 系（bcc のみ、`max_pm_iter=2`, `maxitr_init=50`）で `Gaes.run` が例外なく `status` を返すこと。ewidth_init を意図的に valence 帯の中（例 0.3）にして `new` が出て別ディレクトリで再計算されること（誤り #1 の修正の確認）。
 
 ## 12. 実装時の注意
@@ -428,14 +428,14 @@ specx が必要（`AKAIKKR_PROGRAM_PATH`）:
 - specx は `a=1000000` をヘッダで `a=*********` と印字する。`get_lattice_constant` は `bravais=` の行から読むので影響しない。
 - DOS の閾値判定は E − E_F の軸で行う。`get_dos` が返すエネルギーは out_dos.log の 1 列目そのもの（E_F 基準）。
 - 移植元の `pot.dat.info` は読まない。
-- **ewidth を微少動かしただけで SCF が収束する / しないことがある**（ユーザー注記、2026-09-25）。積分路の下端 E_F − ewidth が準位や帯の端の近くにあると、わずかな ewidth の違いで下端が準位をまたぐ（`*` の付け替え、reconf の結果が変わる）、あるいは帯の裾を切る量が変わり、収束の可否が反転する。例: Hf 4f が −1.2 Ry にある系で ewidth 1.2 は収束せず 0.9 は収束する（§13.1）、Rb 4p core 指定で 0.5875（valence 帯の底 −0.58 に接する）は発散する（§15.5.1）。したがって、収束しないことだけを理由に「その ewidth 付近に解が無い」とは言えず、ギャップ判定は DOS で行う（§0.2）。逆に、収束したことは積分路がギャップにある証拠にならない（In 4d core の 0.641 は valence 帯の中で収束した）。候補 ewidth は必ずギャップの位置から決め、収束パラメタ（edelt、pmix、bzqlty）の変更と ewidth の変更は別の段階で行う（§7）。図 `docs/data/scf_convergence_vs_ewidth_dos.png`（各面の 2 行目に、その go で specx がその軌道を core と valence（`*`）のどちらで扱ったかを書く。AlSiSnHf bcc は cpa2021v01 ビルド: 0.9 収束 / 1.2 未収束、どちらも 4f は valence `*` で −0.91 / −1.20 Ry、積分路の下端に重なる。In 4d は 0.641 で core（−1.35 Ry）、1.2 で valence `*`（−1.11 Ry）。Tl 5d は 0.386 で core（−3.21 Ry、窓の外）、1.2 で valence `*`（−0.94 Ry）。InMnFeCo In 4d core: 0.641 は valence 帯の中で収束、1.2 も収束。TlMnFeCo Tl 5d core: 0.386 は発散し 5d が −3.2 Ry へ、1.2 は収束。Rb 4p core の 1.2 / 0.5875 は `hea_XMnFeCo_fcc_orbital_rules_dos.png`）。スクリプト `tests/gaes/tools/plot_conv_pairs.py`。
+- **ewidth を微少動かしただけで SCF が収束する / しないことがある**（ユーザー注記、2026-09-25）。積分路の下端 E_F − ewidth が準位や帯の端の近くにあると、わずかな ewidth の違いで下端が準位をまたぐ（`*` の付け替え、reconf の結果が変わる）、あるいは帯の裾を切る量が変わり、収束の可否が反転する。例: Hf 4f が −1.2 Ry にある系で ewidth 1.2 は収束せず 0.9 は収束する（§13.1）、Rb 4p core 指定で 0.5875（valence 帯の底 −0.58 に接する）は発散する（§15.5.1）。したがって、収束しないことだけを理由に「その ewidth 付近に解が無い」とは言えず、ギャップ判定は DOS で行う（§0.2）。逆に、収束したことは積分路がギャップにある証拠にならない（In 4d core の 0.641 は valence 帯の中で収束した）。候補 ewidth は必ずギャップの位置から決め、収束パラメタ（edelt、pmix、bzqlty）の変更と ewidth の変更は別の段階で行う（§7）。図 `docs/data/scf_convergence_vs_ewidth_dos.png`（各面の 2 行目に、その go で specx がその軌道を core と valence（`*`）のどちらで扱ったかを書く。AlSiSnHf bcc は cpa2021v01 ビルド: 0.9 収束 / 1.2 未収束、どちらも 4f は valence `*` で −0.91 / −1.20 Ry、積分路の下端に重なる。In 4d は 0.641 で core（−1.35 Ry）、1.2 で valence `*`（−1.11 Ry）。Tl 5d は 0.386 で core（−3.21 Ry、窓の外）、1.2 で valence `*`（−0.94 Ry）。InMnFeCo In 4d core: 0.641 は valence 帯の中で収束、1.2 も収束。TlMnFeCo Tl 5d core: 0.386 は発散し 5d が −3.2 Ry へ、1.2 は収束。Rb 4p core の 1.2 / 0.5875 は `hea_XMnFeCo_fcc_orbital_rules_dos.png`）。スクリプト `scripts/gaes_survey/plot_conv_pairs.py`。
 - DOS 図を出すときは go の ewidth の線を入れる（`DosEXPlotter(..., go_outfile="out_go.log")`、[dos_plot_ewidth_line.md](dos_plot_ewidth_line.md)）。
 - 2019 年の RUN を読むときは、誤り #1 のため `ew_000` に「ewidth=1.2 で計算した結果」しか無い。ewidth は必ず inputcard_go から読み直す。
 - `test_committee_small.py`: 同じ系で `GaesCommittee(ewidth_members=(0.5, 1.0, 1.5), n_parallel=3, maxitr_member=30).run` が `committee` の票と consensus gap を返し、採用した初期 ewidth がその区間に入ること。
 
 ## 13. 実装メモ（2026-09-25、GAES 逐次方式）
 
-実装: `library/PyAkaiKKR/src/pyakaikkr/gaes/`（`gap.py`, `ewidth.py`, `convergence.py`, `layout.py`, `runner.py`, `composition.py`, `legacy_hea.py`, `scheme.py`, `cli.py`）、`tests/gaes/`、CLI `kkr-gaes`（`setup.cfg` の console_scripts）。GAES-Committee（§7.1）は未実装。
+実装: `src/pyakaikkr/gaes/`（`gap.py`, `ewidth.py`, `convergence.py`, `layout.py`, `runner.py`, `composition.py`, `legacy_hea.py`, `scheme.py`, `cli.py`）、`tests/gaes/`、CLI `kkr-gaes`（`setup.cfg` の console_scripts）。GAES-Committee（§7.1）は未実装。
 
 仕様からの差:
 
@@ -486,10 +486,10 @@ ewidth を振った結果（2022.0721 cpa2021v01、E_F 基準の 4f 準位は絶
 
 - 4f 準位は ewidth を変えると ebtm に追随して動く（0.9 で −0.37、1.2 で −0.68〜−0.87、1.5 で −1.0〜−1.15）。部分的に空いた 4f がポテンシャルを変え、準位が積分路の下端に張り付く自己無撞着な帰結で、2019 年版の −1.84 Ry（E_F 基準）とはまったく違う位置にある。
 - 準位が ebtm のすぐ下にある間（0.9、1.15、1.2）は、reconf の幅 3 mRy のなましで脱占有は 0.02〜0.03 電子にとどまり、0.9 は収束、1.15 と 1.2 は振動する（1.15 は 2026-09-25 のユーザー指定で追加。up / down の 4f 準位が 0.05〜0.06 Ry 割れ、down 側だけ `*`）。1.5（lmxtyp=3）では down スピンの 4f が ebtm より上に出て 7 電子がまるごと core から外れ（球内 core 電荷 60.96）、valence の f には 0.015 電子しか入らないので発散する。
-- **k 点を増やしても変わらない**（2026-09-25、ユーザー指定、ewidth 1.15、lmxtyp=2）: bzqlty 10 / 14 / 18（nk = 256 / 624 / 1240）で SCF の履歴は 500 反復まで 7 桁一致し（190 反復目 te = −10894.003679、rms 0.766）、最後の rms 0.106、球内 core 電荷 67.9438、4f の `*` も同じ。振動は k 点の粗さではなく、ebtm に張り付いた 4f の reconf に由来する。SCF 履歴（`neu=` 行）を見ると、6 反復ごとに neu（電子数の誤差）が −1.2〜−1.8 に跳び、全エネルギーが 13 Ry 変わる（itr 7, 13, ...）。4f の占有の再配置がその反復で反転し、SCF を毎回やり直している形で、bzqlty を変えても反復番号まで同じ。図 `docs/data/hf_bzqlty_AlSiSnHf_ew1.15_dos.png`（DOS と SCF 履歴）、出力 `tests/gaes/RUN_Hf_stopped/AlSiSnHf_bcc_lmxtyp3/lmx2_ew_1.15_bz*/`。
+- **k 点を増やしても変わらない**（2026-09-25、ユーザー指定、ewidth 1.15、lmxtyp=2）: bzqlty 10 / 14 / 18（nk = 256 / 624 / 1240）で SCF の履歴は 500 反復まで 7 桁一致し（190 反復目 te = −10894.003679、rms 0.766）、最後の rms 0.106、球内 core 電荷 67.9438、4f の `*` も同じ。振動は k 点の粗さではなく、ebtm に張り付いた 4f の reconf に由来する。SCF 履歴（`neu=` 行）を見ると、6 反復ごとに neu（電子数の誤差）が −1.2〜−1.8 に跳び、全エネルギーが 13 Ry 変わる（itr 7, 13, ...）。4f の占有の再配置がその反復で反転し、SCF を毎回やり直している形で、bzqlty を変えても反復番号まで同じ。図 `docs/data/hf_bzqlty_AlSiSnHf_ew1.15_dos.png`（DOS と SCF 履歴）、出力 `tests/gaes/RUN_Hf_stopped/（git には無い。tag v1.1.0 に有る）AlSiSnHf_bcc_lmxtyp3/lmx2_ew_1.15_bz*/`。
 - `lmxtyp=3` で f を valence 基底に入れても、4f は core 配置のままなので valence の f 帯にはならず、収束の可否も変わらない。**Hf を含む系を 2022.0721 で扱うには、4f が ebtm から十分離れる小さい ewidth（この系では 0.9 が収束）を選ぶか、§15 の `Hf4f=core` 指定で max_ewidth を |E_4f − E_F| − ediff に抑えるしかない**。ただし準位が ebtm に追随するため、`core` 指定でも 1 回の go ごとに範囲を決め直す必要がある（§15.2 の「見た準位のうち最も浅い値」）。
 
-図 `docs/data/hf_lmxtyp3_AlSiSnHf_dos.png`（左 lmxtyp=2、右 lmxtyp=3、上から ewidth 0.9 / 1.15 / 1.2 / 1.5。紫 = Hf の f-PDOS × 濃度）、出力 `tests/gaes/RUN_Hf_stopped/AlSiSnHf_bcc_lmxtyp3/ew_*/`、スクリプト `tests/gaes/tools/plot_hf_lmxtyp3.py`。
+図 `docs/data/hf_lmxtyp3_AlSiSnHf_dos.png`（左 lmxtyp=2、右 lmxtyp=3、上から ewidth 0.9 / 1.15 / 1.2 / 1.5。紫 = Hf の f-PDOS × 濃度）、出力 `tests/gaes/RUN_Hf_stopped/（git には無い。tag v1.1.0 に有る）AlSiSnHf_bcc_lmxtyp3/ew_*/`、スクリプト `scripts/gaes_survey/plot_hf_lmxtyp3.py`。
 
 ### 13.2 Bi 系のテスト（2026-09-25）
 
@@ -510,7 +510,7 @@ Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore
 
 ### 13.3 X-Mn-Fe-Co fcc の 18 系（2026-09-25、Method 2、min_ewidth 1.0 / max_ewidth 2.0）
 
-§14.1.1 の表から希ガスと reconf で止まる元素（Hf など）を除いた X = Ga, As, Se, Rb, In, Sb, Te, Ba, La, Ce, Pr, Nd, Pm, Sm, Yb, Lu, Tl, Bi について、X-Mn-Fe-Co 等比 fcc（単一サイト CPA、akaikkr ビルド、ref 0.75、ewidth 初期値 1.2）を走らせた。スクリプト `tests/gaes/tools/run_hea_XMnFeCo.py`、図 `tests/gaes/tools/plot_hea_XMnFeCo.py`、結果 `docs/data/hea_XMnFeCo_fcc_gaes_summary.json`、図 `docs/data/hea_XMnFeCo_fcc_gaes_dos.png`（各成分の core 準位を重ね描き、斜線は [E_F − max_ewidth, E_F − min_ewidth]）。
+§14.1.1 の表から希ガスと reconf で止まる元素（Hf など）を除いた X = Ga, As, Se, Rb, In, Sb, Te, Ba, La, Ce, Pr, Nd, Pm, Sm, Yb, Lu, Tl, Bi について、X-Mn-Fe-Co 等比 fcc（単一サイト CPA、akaikkr ビルド、ref 0.75、ewidth 初期値 1.2）を走らせた。スクリプト `scripts/gaes_survey/run_hea_XMnFeCo.py`、図 `scripts/gaes_survey/plot_hea_XMnFeCo.py`、結果 `docs/data/hea_XMnFeCo_fcc_gaes_summary.json`、図 `docs/data/hea_XMnFeCo_fcc_gaes_dos.png`（各成分の core 準位を重ね描き、斜線は [E_F − max_ewidth, E_F − min_ewidth]）。
 
 §4.3 の 2 つの修正（範囲外の候補を端へ寄せる、窓の下端に接する区間も使う）の後、18 系すべてが `finished`、SCF 収束。
 
@@ -539,9 +539,9 @@ Hf 系（§13.1）の代わりに、RUN/ の走査で見つけた Bi 5d semicore
 - Pr / Nd / Pm は 5p 帯の上のギャップ [−1.1〜−1.2, −0.77] の候補 0.78〜0.79 が `min_ewidth` 1.0 に寄せられた解。5p 帯の下（1.78〜1.87）に置きたければ `min_ewidth` を 1.2 にする。
 - Te / In / As / Bi の −0.7 Ry 付近（X の浅い s / d 帯と valence 帯の底の間）の低 DOS 区間は、DOS < 2e-2 の幅が 0.16〜0.29 Ry で eth = 0.30 に届かず、DOS < 1e-3 の点も無いので、ギャップ区間にならない。`min_ewidth` 0.5 で再実行しても同じ解になる（Te 1.4025、In 1.5025、As 1.3125、Bi 1.3725）。In は幅 0.29 で境界にあり、eth 0.25 なら In 4d を core 側に置く解（≈ 0.8）が候補になる。
 
-### 13.4 tests/structure/small_primitive_structures の 7 構造（2026-09-25、ユーザー指定）
+### 13.4 examples/small_primitive_structures の 7 構造（2026-09-25、ユーザー指定）
 
-CIF（原始胞、`ak_cif2kkrparam` で変換）から akaikkr ビルド、nmag、pbe、sra、bzqlty 8、Method 2、ewidth_init 1.2、[min, max] = [1.0, 2.0] で GAES を走らせた。スクリプト `tests/gaes/tools/run_small_primitive_structures.py`、結果 `docs/data/small_primitive_structures_gaes_summary.json`、図 `docs/data/small_primitive_structures_gaes_dos.png`（`GLOB="RUN/*/key_*.json" plot_orbital_rules.py` で描画。DOS は胞あたり、閾値の線は natm 倍）。
+CIF（原始胞、`ak_cif2kkrparam` で変換）から akaikkr ビルド、nmag、pbe、sra、bzqlty 8、Method 2、ewidth_init 1.2、[min, max] = [1.0, 2.0] で GAES を走らせた。スクリプト `scripts/gaes_survey/run_small_primitive_structures.py`、結果 `docs/data/small_primitive_structures_gaes_summary.json`、図 `docs/data/small_primitive_structures_gaes_dos.png`（`GLOB="RUN/*/key_*.json" plot_orbital_rules.py` で描画。DOS は胞あたり、閾値の線は natm 倍）。
 
 **判定は原子あたりの DOS（既定、§4.3）**。胞あたりで判定した最初の走行（`*_per_cell.json` / `*_per_cell.png`）との比較:
 
@@ -816,7 +816,7 @@ aiida-akaikkr: `gaes` Dict に `orbitals: ["Rb4p=valence"]`。WorkChain は各 g
 
   同じ軌道を valence / core にした対の図: `docs/data/hea_XMnFeCo_fcc_orbital_pairs_dos.png`（Rb 4p、Se 4s、Bi 6s の 3 組。左 valence、右 core。Rb 4p core は SCF 発散で `ewidth_fail`、Bi 6s core は eth 0.2 の走行）。
 
-  図 `docs/data/hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 面、最終判定の DOS、青線 = 指定した準位（破線 `*`）、斜線 = その判定の範囲、赤 = −ewidth）、結果 `docs/data/hea_XMnFeCo_fcc_orbital_rules_summary.json`、スクリプト `tests/gaes/tools/plot_orbital_rules.py`。Rb 4s valence の面（窓 3.73）では −2.3 Ry より下の DOS に窓を広げたことによる偽のピークが並ぶ（§13、ewidth_dos_max の理由）。
+  図 `docs/data/hea_XMnFeCo_fcc_orbital_rules_dos.png`（17 面、最終判定の DOS、青線 = 指定した準位（破線 `*`）、斜線 = その判定の範囲、赤 = −ewidth）、結果 `docs/data/hea_XMnFeCo_fcc_orbital_rules_summary.json`、スクリプト `scripts/gaes_survey/plot_orbital_rules.py`。Rb 4s valence の面（窓 3.73）では −2.3 Ry より下の DOS に窓を広げたことによる偽のピークが並ぶ（§13、ewidth_dos_max の理由）。
 
   `core` 指定が通るのは、その準位と valence 帯の間に幅 eth のギャップがある系（La、Ba、Se、Bi は eth 0.2）だけで、In / Tl / Ga のように準位が valence 帯に近い系では `fail` になる。`valence` 指定は準位の下にギャップがあれば通る（Pr、Ce）。
 

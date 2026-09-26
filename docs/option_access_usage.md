@@ -77,7 +77,7 @@ job.get_option("out_dos.log")            # {'cemesr_ref': 0.75}
 e, dos = job.get_dos_as_list("out_dos.log")   # e は -1.5 〜 0.5 Ry（ref 無しなら -1.0 〜 1.0）
 ```
 
-`tests/option/test_option_run.py::test_cnd_dos_with_cemesr_ref` がこれを確かめる（`AKAIKKR_PROGRAM_PATH` と `tests/akaikkr_cnd/Cu/pot.dat` が要る）。
+`tests/option/test_option_run.py::test_cnd_dos_with_cemesr_ref` がこれを確かめる（`AKAIKKR_PROGRAM_PATH` と `tests/testrun/akaikkr_cnd/Cu/pot.dat` が要る）。
 
 ## テスト
 

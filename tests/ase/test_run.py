@@ -7,9 +7,9 @@ import pytest
 from ase import units
 from ase.build import bulk
 
-from conftest import needs_specx, specx_path, AKAIKKR_DIR
+from kkr_env import needs_specx, specx_path, STRUCTURE_DIR, TESTRUN_DIR
 
-REF = os.path.join(AKAIKKR_DIR, "reference", "ifort.json")
+REF = os.path.join(TESTRUN_DIR, "akaikkr", "reference", "ifort.json")
 
 
 def _calc(directory, **kw):
@@ -22,9 +22,9 @@ def _calc(directory, **kw):
 @needs_specx
 def test_cu_energy_against_reference(tmp_path):
     cu = bulk("Cu", "fcc", a=3.615)
-    # the same lattice constant as tests/structure/Cu-Fm3m.cif
+    # the same lattice constant as tests/testrun/structure/Cu-Fm3m.cif
     import ase.io
-    conv = ase.io.read(os.path.join(AKAIKKR_DIR, "..", "structure", "Cu-Fm3m.cif"))
+    conv = ase.io.read(os.path.join(STRUCTURE_DIR, "Cu-Fm3m.cif"))
     cu = bulk("Cu", "fcc", a=conv.cell.lengths()[0])
     cu.calc = _calc(tmp_path, magtyp="nmag", sdftyp="mjw", bzqlty=6)
     e = cu.get_potential_energy()

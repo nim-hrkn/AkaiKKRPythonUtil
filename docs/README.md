@@ -3,7 +3,7 @@
 | 文書 | 種類 | 内容 |
 |---|---|---|
 | [ase_calculator_usage.md](ase_calculator_usage.md) | 使い方 | `pyakaikkr.ase.AkaiKKR`（ASE calculator）。純物質・混晶（CPA）の指定、単位、パラメータ、ポテンシャル再利用、落とし穴 |
-| [testscript_usage.md](testscript_usage.md) | 使い方 | `tests/akaikkr*/testrun.py` と `testrun_ase.py`。参照ファイル、backend、環境、既知の最終桁差 |
+| [testscript_usage.md](testscript_usage.md) | 使い方 | `tests/testrun/akaikkr*/testrun.py` と `testrun_ase.py`。参照ファイル、backend、環境、既知の最終桁差 |
 | `pyakaikkr.plot`（[gaes_usage.md](gaes_usage.md) 「図の共通部品」） | 実装 | DOS / PDOS / A(w,k) / J_ij / GAES の配列ベースの描画関数。pyakaikkr の Plotter と aiida-akaikkr の plot.py が共用 |
 | [report_usage.md](report_usage.md) | 使い方 | HTML レポート `kkr-report <dir>` / `pyakaikkr.report`（式、空間群、SCF 結果、成分の表、DOS / PDOS / A(ω,k) / J_ij / GAES の図、cnd。英語 / 日本語、SVG inline）。例 data/report_FeRh05Pt05_{en,ja}.html, report_SmCo5_oc_ja.html |
 | aiida-akaikkr/docs/report_spec.md | 仕様書 | HTML レポート（`pyakaikkr.report`、`pyakaikkr.plot.figure_to_svg / save_figure`、`kkr-report`）の関数設計。図は PNG + SVG |
@@ -13,11 +13,11 @@
 | [ase_calculator_spec.md](ase_calculator_spec.md) | 仕様書 | ASE calculator の設計仕様（2026-09-24 実装、末尾に実装メモと後日談） |
 | [testscript_ase_spec.md](testscript_ase_spec.md) | 仕様書 | テストスクリプトの ASE backend の設計仕様（同上） |
 | [option_access_spec.md](option_access_spec.md) | 仕様書 | `begin_option` を pyakaikkr から参照する設計仕様（2026-09-25 実装、末尾に実装メモ）: キー辞書 `OPTION_KEYS`、inputcard の option ブロックの読み取り、出力の `optnwrt:` echo と `meshr mse ng mxl` の実効値の読み取り、書く前の検証 |
-| [gaes_usage.md](gaes_usage.md) | 使い方 | GAES（`pyakaikkr.gaes`, CLI `kkr-gaes`）: 既存 dos への判定、スキームの実行、互換モード、2022.0721 の各ビルドの注意。例 `tests/akaikkr/gaes_ewidth_example.py`（ewidth のみ）と `gaes_orbital_example.py`（Se4s の valence / core 切替） |
+| [gaes_usage.md](gaes_usage.md) | 使い方 | GAES（`pyakaikkr.gaes`, CLI `kkr-gaes`）: 既存 dos への判定、スキームの実行、互換モード、2022.0721 の各ビルドの注意。例 `examples/gaes/gaes_ewidth_example.py`（ewidth のみ）と `gaes_orbital_example.py`（Se4s の valence / core 切替） |
 | [data/converged_core_levels_2019.csv](data/converged_core_levels_2019.csv) | データ | 2019 年 RUN（fcc 7,505 系）の収束済み core 準位 E − E_F の元素・軌道別の中央値と範囲（dos の窓に入る 14 本）。GAES の段階 0（計算前の ewidth 予測、ewidth_tuning_scheme.md §14.1.1）の主表 |
-| [data/atomic_core_levels_dsp.csv](data/atomic_core_levels_dsp.csv) | データ | H〜Bi の単体 fcc（a=実験原子体積、nmag、pbe、sra）に specx `go=dsp` を新規（pot.dat 無し）で掛けた初期原子ポテンシャルの core 準位 646 本（Ry / eV、core 電子数、`*`）。図 [data/atomic_core_levels_dsp.png](data/atomic_core_levels_dsp.png)、スクリプト `tests/gaes/tools/atomic_levels_dsp.py`, `plot_atomic_levels.py` |
-| [data/hea_XMnFeCo_fcc_gaes_summary.json](data/hea_XMnFeCo_fcc_gaes_summary.json) | データ | X-Mn-Fe-Co 等比 fcc の 18 系（X = Ga, As, Se, Rb, In, Sb, Te, Ba, La, Ce, Pr, Nd, Pm, Sm, Yb, Lu, Tl, Bi）を GAES Method 2（ewidth 初期値 1.2、min 1.0 / max 2.0）で走らせた結果（採用 ewidth、経過、使ったギャップ、収束）。図 [data/hea_XMnFeCo_fcc_gaes_dos.png](data/hea_XMnFeCo_fcc_gaes_dos.png)（最終 DOS + 成分 core 準位 + [min, max] の帯）、表は ewidth_tuning_scheme.md §13.3、スクリプト `tests/gaes/tools/run_hea_XMnFeCo.py`, `plot_hea_XMnFeCo.py` |
-| [data/hea_XMnFeCo_fcc_orbital_rules_summary.json](data/hea_XMnFeCo_fcc_orbital_rules_summary.json) | データ | 軌道の valence / core 指定（ewidth_tuning_scheme.md §15）を X-Mn-Fe-Co fcc の 19 例に掛けた GAES の結果。図 [data/hea_XMnFeCo_fcc_orbital_rules_dos.png](data/hea_XMnFeCo_fcc_orbital_rules_dos.png)（17 面）、同じ軌道の valence / core の対 [data/hea_XMnFeCo_fcc_orbital_pairs_dos.png](data/hea_XMnFeCo_fcc_orbital_pairs_dos.png)（Rb 4p、Se 4s、Bi 6s）、SCF 収束が ewidth で反転する例 [data/scf_convergence_vs_ewidth_dos.png](data/scf_convergence_vs_ewidth_dos.png)、スクリプト `tests/gaes/tools/plot_orbital_rules.py`, `plot_conv_pairs.py` |
+| [data/atomic_core_levels_dsp.csv](data/atomic_core_levels_dsp.csv) | データ | H〜Bi の単体 fcc（a=実験原子体積、nmag、pbe、sra）に specx `go=dsp` を新規（pot.dat 無し）で掛けた初期原子ポテンシャルの core 準位 646 本（Ry / eV、core 電子数、`*`）。図 [data/atomic_core_levels_dsp.png](data/atomic_core_levels_dsp.png)、スクリプト `scripts/gaes_survey/atomic_levels_dsp.py`, `plot_atomic_levels.py` |
+| [data/hea_XMnFeCo_fcc_gaes_summary.json](data/hea_XMnFeCo_fcc_gaes_summary.json) | データ | X-Mn-Fe-Co 等比 fcc の 18 系（X = Ga, As, Se, Rb, In, Sb, Te, Ba, La, Ce, Pr, Nd, Pm, Sm, Yb, Lu, Tl, Bi）を GAES Method 2（ewidth 初期値 1.2、min 1.0 / max 2.0）で走らせた結果（採用 ewidth、経過、使ったギャップ、収束）。図 [data/hea_XMnFeCo_fcc_gaes_dos.png](data/hea_XMnFeCo_fcc_gaes_dos.png)（最終 DOS + 成分 core 準位 + [min, max] の帯）、表は ewidth_tuning_scheme.md §13.3、スクリプト `scripts/gaes_survey/run_hea_XMnFeCo.py`, `plot_hea_XMnFeCo.py` |
+| [data/hea_XMnFeCo_fcc_orbital_rules_summary.json](data/hea_XMnFeCo_fcc_orbital_rules_summary.json) | データ | 軌道の valence / core 指定（ewidth_tuning_scheme.md §15）を X-Mn-Fe-Co fcc の 19 例に掛けた GAES の結果。図 [data/hea_XMnFeCo_fcc_orbital_rules_dos.png](data/hea_XMnFeCo_fcc_orbital_rules_dos.png)（17 面）、同じ軌道の valence / core の対 [data/hea_XMnFeCo_fcc_orbital_pairs_dos.png](data/hea_XMnFeCo_fcc_orbital_pairs_dos.png)（Rb 4p、Se 4s、Bi 6s）、SCF 収束が ewidth で反転する例 [data/scf_convergence_vs_ewidth_dos.png](data/scf_convergence_vs_ewidth_dos.png)、スクリプト `scripts/gaes_survey/plot_orbital_rules.py`, `plot_conv_pairs.py` |
 | [data/hea_RbSeBiFe_fcc_gaes_summary.json](data/hea_RbSeBiFe_fcc_gaes_summary.json) | データ | RbSeBiFe fcc HEA4（go edelt 1e-3、判定 dos 1e-4）の GAES: 1.2 未収束で fail、1.4 は reconf 停止、1.55 で finished。図 [data/hea_RbSeBiFe_fcc_gaes_dos.png](data/hea_RbSeBiFe_fcc_gaes_dos.png)（収束解）、[data/hea_RbSeBiFe_fcc_gaes_dos_init1.2_unconverged.png](data/hea_RbSeBiFe_fcc_gaes_dos_init1.2_unconverged.png)。経緯と Rb s チャネルの数値的な極の帰属は ewidth_tuning_scheme.md §13.5 |
 | [core_levels_vs_dos.md](core_levels_vs_dos.md) | 解析記録 | out_go.log の E_F（`ef=` 行）と成分ごとの core 準位（`*` = valence に切替）の読み方、2019 年 RUN 7,505 系での core 準位と total DOS の semicore ピークの一致（Ge 3d, Sn 4d, Bi 5d, Pb 5d, Sc 3p, Y 4p, Zr 4p, In 4d ...）、GAES への含意 |
 | [ewidth_tuning_scheme.md](ewidth_tuning_scheme.md) | 仕様書 | ewidth 自動調整スキーム GAES（Gap-Anchored Ewidth Search: DOS < threshold の連続 mesh 区間 = バンドギャップに E_F − ewidth_go が入るまで go/dos を回す。2019 年の HEA 網羅計算 run_scheme2 を一般化。微分は使わない）と GAES-Committee（複数 ewidth_go の投機的並列実行と vote）の pyakaikkr.gaes 移植仕様。移植元の誤り 12 件、PDOS 拡張、SiteComposition、type 名 40 文字制限。§15: 軌道の valence / core（occupied / unoccupied）指定から ewidth の範囲を決める仕様（branch ewidth_select_orbital） |
@@ -29,12 +29,16 @@
 ## ライブラリの構成
 
 ```
-library/PyAkaiKKR/src/pyakaikkr/         AkaikkrJob（入力生成・出力解析）、GoGo（go/dos/spc/... の実行クラス）、
-                                          Cif2Kkr、HighsymmetryKpath、AwkReader/AwkPlotter、Fmg、ase/（ASE calculator）
-library/AkaiKKRTestScript/src/akaikkr_testscript/
-                                          testrun_class（物質ごとのパラメータと Go* の呼び出し）、asestruc（ASE backend）、
-                                          OutputAnalyzer / resultutil（参照との比較）、exeutil
-tests/akaikkr, tests/akaikkr_cnd, tests/akaikkr_cpa2021v01
-                                          テストセットと reference/*.json
-tests/ase/                                pytest（ASE calculator、backend 一致）
+pyproject.toml            配布物 pyakaikkr（src/ の 2 パッケージ、console script kkr-gaes / kkr-report / kkr-cmd、pytest 設定）
+src/pyakaikkr/            AkaikkrJob（入力生成・出力解析）、GoGo（go/dos/spc/... の実行クラス）、Cif2Kkr、
+                          HighsymmetryKpath、AwkReader/AwkPlotter、Fmg、plot / report、gaes/（GAES）、ase/（ASE calculator）、
+                          cmd（kkr-cmd）
+src/akaikkr_testscript/   testrun_class（物質ごとのパラメータと Go* の呼び出し）、asestruc（ASE backend）、
+                          OutputAnalyzer / resultutil（参照との比較）、exeutil
+tests/                    pytest（ase / gaes / option / plot、共通の kkr_env.py と conftest.py、data/ の小さな fixture）
+tests/testrun/            specx の回帰テスト akaikkr / akaikkr_cnd / akaikkr_cpa2021v01（testrun.py、reference/*.json）と structure/ の CIF。
+                          物質ごとの出力は git に入れない
+examples/                 gaes/（GAES の例）、cnd/（akaikkr_cnd のデモ）、small_primitive_structures/
+scripts/                  gaes_survey/（docs/data の図を作った調査スクリプト）、cif2kkr/、comparemany.py
+docs/                     この文書群と data/
 ```

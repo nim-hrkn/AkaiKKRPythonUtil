@@ -1,7 +1,7 @@
 # `begin_option` を pyakaikkr から参照する仕様
 
 作成日: 2026-09-25
-対象: pyakaikkr 2023.2.1（`library/PyAkaiKKR`）、AkaiKKR 2022.0721（akaikkr, akaikkr_cnd, akaikkr_cpa2021v01）
+対象: pyakaikkr 2023.2.1（`src/pyakaikkr`）、AkaiKKR 2022.0721（akaikkr, akaikkr_cnd, akaikkr_cpa2021v01）
 根拠: `akaikkr_common/source/m_optn.f`（`optnrd_rd`, `optnwrt_*`）、`docs/akaikkr_option_keys.md`、2026-09-25 に Cu で option 付き go を 1 回走らせて採った出力
 
 ## 0. 目的と範囲
@@ -38,7 +38,7 @@
 
 | 区分 | パス | 内容 |
 |---|---|---|
-| 追加 | `library/PyAkaiKKR/src/pyakaikkr/option.py` | `OptionKey`, `OPTION_KEYS`, `canonical_name`, `list_option_keys`, `normalize_option`, `format_option_card`, `parse_option_block`, `read_inputcard_option`, `parse_option_echo`（§3〜§5） |
+| 追加 | `src/pyakaikkr/option.py` | `OptionKey`, `OPTION_KEYS`, `canonical_name`, `list_option_keys`, `normalize_option`, `format_option_card`, `parse_option_block`, `read_inputcard_option`, `parse_option_echo`（§3〜§5） |
 | 修正 | `pyakaikkr/AkaiKkr.py` | `make_option_card` を `option.format_option_card` の呼び出しにする。`get_option`, `get_emesh_param`, `check_option_error` を追加（§5）。`run` の失敗時メッセージに `unknown token` を含める |
 | 修正 | `pyakaikkr/Error.py` | `KKRUnknownOptionError(ValueError)`, `KKROptionValueError(ValueError)` |
 | 修正 | `pyakaikkr/__init__.py` | `from .option import *`（`__all__` で公開名を絞る） |
@@ -125,7 +125,7 @@ specx 不要:
 - `test_normalize.py`: `{"mse": 3, "cpaitr_show": True, "klabel": ["G", "X"]}` → `{"mse": "3", "cpaitr_show": "T", "klabel": ["G", "X"]}`。`"number_emesh"` が `"mse"` になる。`code="akaikkr"` で `cpaitr_show` に警告。`strict=False` で未知キーが警告付きで残る。80 文字超で例外。
 - `test_format.py`: `make_inputcard` の出力が現行と同じ（`docs/akaikkr_option_keys.md` §1 の例と一致）。option 無し・空 dict でブロックが出ない。
 - `test_parse.py`: §1 の例、実測に使った inputcard（`mse= 5`, `tol= 1e-5`, `critic= -2.0`, `cemesr_ref= 0.6`, `klabel`, `begin_foo`）を `strict=False` で読んで `{"mse": 5, "tol": 1e-5, "critic": -2.0, "cemesr_ref": 0.6, "klabel": ["G","X","W"], "foo": ["1","2"]}`、`strict=True` で `foo` により例外。`mse=5`（空白無し）で例外。`end_option` 無しで例外。`make_inputcard` → `read_inputcard_option` の往復で元の dict（正規化後）に戻る。2 ブロックの上書き。
-- `test_echo.py`: fixture `out_go_option.log` に対し `get_option` が `{"tol": 1e-5, "mse": 5, "critic": -2.0}`（`cemesr_ref` は go では出ないので含まれない）、`get_emesh_param` が `{"meshr": 400, "mse": 5, "ng": 21, "mxl": 3}`。`tests/akaikkr/Cu/out_go.log`（option 無し）があれば `get_option` が `{}`。`check_option_error` が `unknown token: mse=5` の行を返す（fixture `out_go_badoption.log`、3 行）。
+- `test_echo.py`: fixture `out_go_option.log` に対し `get_option` が `{"tol": 1e-5, "mse": 5, "critic": -2.0}`（`cemesr_ref` は go では出ないので含まれない）、`get_emesh_param` が `{"meshr": 400, "mse": 5, "ng": 21, "mxl": 3}`。`tests/testrun/akaikkr/Cu/out_go.log`（option 無し）があれば `get_option` が `{}`。`check_option_error` が `unknown token: mse=5` の行を返す（fixture `out_go_badoption.log`、3 行）。
 
 specx が必要（`AKAIKKR_PROGRAM_PATH` があるときだけ、`tests/ase/conftest.py` の `needs_specx` を流用）:
 

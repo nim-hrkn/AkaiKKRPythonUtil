@@ -10,7 +10,7 @@ from pyakaikkr.gaes import (parse_orbital_rules, levels_from_go, levels_from_tab
                             initial_ewidth, choose_ewidth, choose_ewidth2, decide, Gaes)
 from pyakaikkr.gaes.gap import GapRegion
 
-DATA = os.path.join(os.path.dirname(__file__), "data")
+from kkr_env import DATA_DIR as DATA
 RB_GO = os.path.join(DATA, "out_go_RbMnFeCo_fcc_ew1.2.log")   # Rb-Mn-Fe-Co fcc, ewidth 1.2, E_F 0.245 / 0.280
 
 

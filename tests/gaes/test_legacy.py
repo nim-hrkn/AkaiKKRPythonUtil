@@ -5,7 +5,7 @@ import pytest
 
 from pyakaikkr import AkaikkrJob
 from pyakaikkr.gaes import gap_regions, choose_ewidth, dos_curves_from_outputs, KkrRunner, Layout, collect_legacy
-from gaes_env import legacy_dir, needs_run0, RUN0_RUN
+from kkr_env import legacy_dir, needs_run0, RUN0_RUN
 
 
 @needs_run0

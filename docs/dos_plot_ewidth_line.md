@@ -19,10 +19,10 @@
 ## 呼び出し側
 
 - `GoGo.GoDos.postscript` は同じディレクトリの `out_go.log` を `go_outfile` に渡します。テストスクリプト（`tests/akaikkr*/testrun.py`）の dos.png / pdos_*.png はこれで線が付きます。
-- `util/read_output/akaikkrCmd.py dos <dir>/out_dos.log -o output` は `<dir>/out_go.log` を読みます（以前は存在しない `make_dos` を呼んでいて動きませんでした）。
+- `kkr-cmd dos <dir>/out_dos.log -o output` は `<dir>/out_go.log` を読みます（以前は存在しない `make_dos` を呼んでいて動きませんでした）。
 - aiida-akaikkr の `aiida_akaikkr.plot` は provenance（`inputs.potential.creator`）から go の ewidth を取る同じ規則です。
 
-テスト: `tests/plot/test_dos_ewidth_line.py`（`tests/akaikkr/Cu/` の出力があれば go=1.0 / dos=2.0 の取り違えが無いことも確認）。
+テスト: `tests/plot/test_dos_ewidth_line.py`（`tests/testrun/akaikkr/Cu/` の出力があれば go=1.0 / dos=2.0 の取り違えが無いことも確認）。
 
 ## 2026-09-26: 描画の共通化
 

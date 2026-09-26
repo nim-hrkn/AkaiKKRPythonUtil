@@ -15,7 +15,7 @@ import os
 import pytest
 
 from pyakaikkr.gaes import Gaes, Layout, heakey_to_composition, make_single_site_param
-from gaes_env import specx_path, RUN_DIR
+from kkr_env import specx_path, RUN_DIR
 
 SPECX_CODE = os.environ.get("GAES_SPECX_CODE", "akaikkr")
 EWIDTH_INIT = float(os.environ.get("GAES_EWIDTH_INIT", "1.6"))
@@ -46,8 +46,7 @@ def _gaes(prefix, **kw):
                 pmix_init=0.005, maxitr_init=500, maxitr_2nd=200, maxitr_pm=300, max_pm_iter=2, with_j=False, **kw)
 
 
-@pytest.mark.skipif(specx_path(os.environ.get("GAES_SPECX_CODE", "akaikkr")) is None,
-                    reason="set AKAIKKR_PROGRAM_PATH (directory containing <GAES_SPECX_CODE>/specx)")
+@pytest.mark.specx(SPECX_CODE)
 @pytest.mark.parametrize("key,polytyp", SYSTEMS)
 def test_gaes_2019_systems(key, polytyp):
     comp = heakey_to_composition(key)

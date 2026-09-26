@@ -1,12 +1,12 @@
 # テストスクリプトの使い方
 
-`tests/akaikkr`（標準ビルド）、`tests/akaikkr_cnd`（伝導度ビルド）、`tests/akaikkr_cpa2021v01`（CPA2021V01）にそれぞれ `testrun.py` があります。物質ごとのパラメータは `akaikkr_testscript.testrun_class` の `_<物質>_common_param` と `<物質>_<mode>` 関数、実行は `pyakaikkr.GoGo` の `GoGo / GoDos / GoSpc / Goj30 / GoTc / GoFsm / GoCnd / GoFmg` が担います。
+`tests/testrun/akaikkr`（標準ビルド）、`tests/testrun/akaikkr_cnd`（伝導度ビルド）、`tests/testrun/akaikkr_cpa2021v01`（CPA2021V01）にそれぞれ `testrun.py` があります。物質ごとのパラメータは `akaikkr_testscript.testrun_class` の `_<物質>_common_param` と `<物質>_<mode>` 関数、実行は `pyakaikkr.GoGo` の `GoGo / GoDos / GoSpc / Goj30 / GoTc / GoFsm / GoCnd / GoFmg` が担います。
 
 ## 1. 実行
 
 ```bash
 conda activate akaikkr
-cd tests/akaikkr
+cd tests/testrun/akaikkr
 export OMP_NUM_THREADS=24
 python testrun.py /path/to/AkaiKKRprogram.2022.0721.ifort [--set Cu] [--create_ref] [--compiler ifort]
 python testrun_ase.py /path/to/AkaiKKRprogram.2022.0721.ifort            # ASE backend
@@ -34,7 +34,7 @@ python testrun_ase.py /path/to/AkaiKKRprogram.2022.0721.ifort            # ASE b
 
 ## 4. 既知の最終桁差（128 スレッド EPYC 7702 の参照と 24 スレッドのこのマシン）
 
-`tests/akaikkr_cnd` の全 61 件のうち 6 件が X になります。いずれも閾値のすぐ外です。
+`tests/testrun/akaikkr_cnd` の全 61 件のうち 6 件が X になります。いずれも閾値のすぐ外です。
 
 | 計算 | 差 |
 |---|---|
@@ -51,7 +51,7 @@ python testrun_ase.py /path/to/AkaiKKRprogram.2022.0721.ifort            # ASE b
 - `*_j30` の後処理で type 名を `"Rh0.5Pt0.5_1d_1"` と決め打ちしていた（pymatgen 2026 は `Pt0.5Rh0.5_1d_1`）。`typeofsite` から取るようにした。
 - `OutputAnalyzer._canonical_type_name` で Jij の `pair` キーの元素順を正規化し、古い pymatgen で作った参照と突き合わせられるようにした（以前は不一致ペアが黙って落ちていた）。
 - `GoFmg` の flip 名が一致しなくても無視されていた（`AlMnFeCo_bcc_gofmg` は Mn を反転していなかった）。未知の名前は例外、`*suffix` の末尾一致に対応。
-- `tests/akaikkr_cpa2021v01/reference/ifort.json` は `tests/akaikkr` の参照のコピーで、cpa2021v01 の te（例 Cu_go −3304.747251823）とは合いません。cpa2021v01 用の参照は作り直しが必要です。
+- `tests/testrun/akaikkr_cpa2021v01/reference/ifort.json` は `tests/testrun/akaikkr` の参照のコピーで、cpa2021v01 の te（例 Cu_go −3304.747251823）とは合いません。cpa2021v01 用の参照は作り直しが必要です。
 
 ## 6. AiiDA から同じテストセットを流す
 

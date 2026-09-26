@@ -7,7 +7,7 @@ import os
 import numpy as np
 import pytest
 
-from conftest import needs_specx, specx_path, STRUCTURE_DIR
+from kkr_env import needs_specx, specx_path, STRUCTURE_DIR
 
 CIFS = ["Cu-Fm3m", "Fe-Im3m", "Co_P63mmc", "Ni-Fm3m", "NiFe-Fm3m", "AlMnFeCo-Im3m",
         "FeRh0.5Pt0.5", "FeB1.95-P6mmm", "GaAsVc-F43m", "Co2MnSi-Fm3m", "SmCo5_P6mmm",

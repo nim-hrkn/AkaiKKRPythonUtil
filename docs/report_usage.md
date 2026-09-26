@@ -5,7 +5,7 @@
 ## ファイルから
 
 ```
-kkr-report tests/akaikkr/FeRh05Pt05 --lang ja -o report.html [--embed png] [--cif FeRh0.5Pt0.5.cif] [--poscar POSCAR] [--figure-dir figs]
+kkr-report tests/testrun/akaikkr/FeRh05Pt05 --lang ja -o report.html [--embed png] [--cif FeRh0.5Pt0.5.cif] [--poscar POSCAR] [--figure-dir figs]
 ```
 
 - ディレクトリの `out_go.log`（必須）、`out_dos.log`、`out_spc*.log` + `pot.dat_up.spc` / `pot.dat_dn.spc` + `klabel.json`、`out_j*.log`、`out_cnd.log` を見つけたものだけ使う（`--go / --dos / --spc / --j / --cnd` で名前を指定できる）。
@@ -18,7 +18,7 @@ kkr-report tests/akaikkr/FeRh05Pt05 --lang ja -o report.html [--embed png] [--ci
 
 ```python
 from pyakaikkr.report import report_from_directory, write_report, render_html
-data = report_from_directory("tests/akaikkr/FeRh05Pt05", structure_files={"cif": "FeRh0.5Pt0.5.cif"}, lang="ja")
+data = report_from_directory("tests/testrun/akaikkr/FeRh05Pt05", structure_files={"cif": "FeRh0.5Pt0.5.cif"}, lang="ja")
 data.summary()                       # 式、空間群、全エネルギー、全モーメント、Tc、cnd、図の名前
 write_report(data, "report.html", lang="ja", embed="svg", figure_dir="figs")
 html_text = render_html(data, lang="en")
@@ -36,4 +36,4 @@ html_text = render_html(data, lang="en")
 6. 輸送（cnd の抵抗率・伝導度）。GAES（状態、ewidth、試した値、ギャップ）。
 7. 来歴（段階ごとのファイル、または AiiDA の pk と作業ディレクトリ）。
 
-テスト: `tests/plot/test_report.py`（合成配列と、tests/akaikkr の FeRh05Pt05 / SmCo5_oc / Cu の出力があればそれも）。
+テスト: `tests/plot/test_report.py`（合成配列と、tests/testrun/akaikkr の FeRh05Pt05 / SmCo5_oc / Cu の出力があればそれも）。

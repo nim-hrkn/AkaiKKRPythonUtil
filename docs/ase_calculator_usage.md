@@ -5,7 +5,7 @@
 ## 1. インストール
 
 ```bash
-pip install -e library/PyAkaiKKR[ase]      # ase >= 3.23 を一緒に入れる
+pip install -e ".[ase]"      # ase >= 3.23 を一緒に入れる
 ```
 
 specx の起動コマンドは次のいずれかで与えます。`PREFIX` は calculator の label に置き換わります。

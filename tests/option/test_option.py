@@ -10,9 +10,10 @@ from pyakaikkr import (AkaikkrJob, OPTION_KEYS, KKRUnknownOptionError, KKROption
                        canonical_name, list_option_keys, normalize_option, format_option_card,
                        parse_option_block, read_inputcard_option, read_inputcard_option_blocks,
                        parse_option_echo, find_option_error)
-from option_env import DATA_DIR, TESTS_DIR
+from kkr_env import DATA_DIR as SHARED_DATA_DIR, DOCS_DIR
 
-DOC = os.path.join(TESTS_DIR, "..", "docs", "akaikkr_option_keys.md")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "data")
+DOC = os.path.join(DOCS_DIR, "akaikkr_option_keys.md")
 EXAMPLE_BLOCK = """begin_option
  mse= 3
  cpaitr_show= True
@@ -176,10 +177,10 @@ def test_echo_error_output():
     assert find_option_error(["x", ' failed to read "end_option", but found EOF']).startswith("failed")
 
 
-CU_GO = os.path.join(TESTS_DIR, "akaikkr", "Cu", "out_go.log")
+CU_GO = os.path.join(SHARED_DATA_DIR, "Cu", "out_go.log")
 
 
-@pytest.mark.skipif(not os.path.isfile(CU_GO), reason="tests/akaikkr/Cu/out_go.log not found")
+@pytest.mark.skipif(not os.path.isfile(CU_GO), reason="tests/data/Cu/out_go.log not found")
 def test_output_without_option():
     job = AkaikkrJob(os.path.dirname(CU_GO))
     assert job.get_option("out_go.log") == {}

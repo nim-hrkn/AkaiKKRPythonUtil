@@ -16,13 +16,13 @@
 
 | 区分 | パス | 内容 |
 |---|---|---|
-| 追加 | `library/PyAkaiKKR/src/pyakaikkr/ase/__init__.py` | `AkaiKKR` calculator と補助関数を公開する |
-| 追加 | `library/PyAkaiKKR/src/pyakaikkr/ase/structure.py` | `Atoms` → 格子・原子座標（`brvtyp=aux`, `a`, `r1..r3`, `natm`, `atmicx`） |
-| 追加 | `library/PyAkaiKKR/src/pyakaikkr/ase/occupancy.py` | 部分占有の検査・正規化、kind と対称性による type 決定、`ntyp / type / ncmp / anclr / conc / rmt / field / mxl` の生成 |
-| 追加 | `library/PyAkaiKKR/src/pyakaikkr/ase/calculator.py` | `class AkaiKKR(FileIOCalculator)` |
-| 修正 | `library/PyAkaiKKR/src/pyakaikkr/AkaiKkr.py` | デバッグ print の除去、成分別モーメント取得の追加（§5） |
-| 修正 | `library/PyAkaiKKR/src/pyakaikkr/__init__.py` | 変更しない（`pyakaikkr.ase` は明示 import。ase 未導入環境で `import pyakaikkr` が壊れないようにするため） |
-| 修正 | `library/PyAkaiKKR/setup.cfg` | `[options.extras_require] ase = ase>=3.23` を追加 |
+| 追加 | `src/pyakaikkr/ase/__init__.py` | `AkaiKKR` calculator と補助関数を公開する |
+| 追加 | `src/pyakaikkr/ase/structure.py` | `Atoms` → 格子・原子座標（`brvtyp=aux`, `a`, `r1..r3`, `natm`, `atmicx`） |
+| 追加 | `src/pyakaikkr/ase/occupancy.py` | 部分占有の検査・正規化、kind と対称性による type 決定、`ntyp / type / ncmp / anclr / conc / rmt / field / mxl` の生成 |
+| 追加 | `src/pyakaikkr/ase/calculator.py` | `class AkaiKKR(FileIOCalculator)` |
+| 修正 | `src/pyakaikkr/AkaiKkr.py` | デバッグ print の除去、成分別モーメント取得の追加（§5） |
+| 修正 | `src/pyakaikkr/__init__.py` | 変更しない（`pyakaikkr.ase` は明示 import。ase 未導入環境で `import pyakaikkr` が壊れないようにするため） |
+| 修正 | `pyproject.toml` | `[options.extras_require] ase = ase>=3.23` を追加 |
 | 追加 | `tests/ase/test_inputcard.py`, `tests/ase/test_occupancy.py`, `tests/ase/test_run.py` | §7 |
 
 `pyakaikkr/ase/` はパッケージ名 `ase` と衝突しない（相対 import は `from . import ...`、本家は `import ase` で絶対 import する）。`from __future__ import annotations` を付け、モジュール先頭で `import ase` する。
@@ -219,17 +219,17 @@ def get_component_moment(self, outfile) -> list[dict]:
 specx 不要（inputcard 生成のみ）:
 
 1. 純物質: `bulk('Cu', 'fcc', a=3.615)` → `brvtyp aux`、`a = 2.5562/0.529177`、`r1..r3` が基本胞、`ntyp=1, ncmp=1, anclr=[[29]], conc=[[100.0]]`。
-2. 二元混晶: `set_occupancy(bulk('Ni','fcc',a=3.571), {0: {"Fe":0.1,"Ni":0.9}})` → `ncmp=2, anclr=[[26,28]], conc=[[10.0,90.0]]`（`tests/akaikkr_cpa2021v01/NiFe/inputcard_go` と成分部が一致）。
-3. 四元 HEA: `ase.io.read('tests/structure/AlMnFeCo-Im3m.cif')` → `ntyp=1, ncmp=4, anclr=[[13,25,26,27]], conc=[[25.0]*4]`（`AlMnFeCo_bcc/inputcard_go` と一致）。
+2. 二元混晶: `set_occupancy(bulk('Ni','fcc',a=3.571), {0: {"Fe":0.1,"Ni":0.9}})` → `ncmp=2, anclr=[[26,28]], conc=[[10.0,90.0]]`（`tests/testrun/akaikkr_cpa2021v01/NiFe/inputcard_go` と成分部が一致）。
+3. 四元 HEA: `ase.io.read('tests/testrun/structure/AlMnFeCo-Im3m.cif')` → `ntyp=1, ncmp=4, anclr=[[13,25,26,27]], conc=[[25.0]*4]`（`AlMnFeCo_bcc/inputcard_go` と一致）。
 4. 空孔: 占有和 0.95 → `ncmp` が +1、最後が `anclr=0, conc=5.0`。
 5. 対称性による type 分割: 2×2×2 超格子で 1 原子だけ z 方向に 0.05 Å ずらす → `type_mode="symmetry"` で `ntyp` が 2 以上、`type_mode="kind"` で 1。
 6. 検査: 占有率 1.2、和 1.1、未知元素、`symbols[i]` が占有 dict に無い、左手系 cell、`pbc=False` がそれぞれ `InputError`。
 7. `check_state`: 同じ `Atoms` で占有率だけ変えると `all_changes` が返る。
 8. `record`: 同じ type 集合で 2 回目は `2nd`、組成を変えると `init` に戻る。
 
-specx 必要（`akaikkr` 環境、`tests/akaikkr` の Cu 入力と同じ条件）:
+specx 必要（`akaikkr` 環境、`tests/testrun/akaikkr` の Cu 入力と同じ条件）:
 
-9. Cu の `get_potential_energy()` が `tests/akaikkr/reference/ifort.json` の `Cu_go` の `te` に対して `Rydberg` 換算で 1e-6 eV 以内。
+9. Cu の `get_potential_energy()` が `tests/testrun/akaikkr/reference/ifort.json` の `Cu_go` の `te` に対して `Rydberg` 換算で 1e-6 eV 以内。
 10. NiFe の `magmom` が参照値と 1e-3 μB 以内、`component_moments` が Fe と Ni の 2 成分を持つ。
 11. 出力の `primitive translation vectors` と `atoms in the unit cell` が入力と一致する（§4 の検証を通る）。
 12. EOS: Cu の体積 5 点を `ase.eos.EquationOfState` で当てはめ、2 回目以降の呼び出しで `record=2nd` が使われて反復回数が減る。
@@ -253,7 +253,7 @@ nife.calc = AkaiKKR(directory="nife", magtyp="mag", type_params={"Fe0.1Ni0.9_0":
 print(nife.get_magnetic_moment(), nife.calc.results["component_moments"])
 
 # HEA（CIF の部分占有をそのまま使う）
-hea = read("tests/structure/AlMnFeCo-Im3m.cif")   # info['occupancy'] 付き
+hea = read("tests/testrun/structure/AlMnFeCo-Im3m.cif")   # info['occupancy'] 付き
 hea.calc = AkaiKKR(directory="hea")
 print(hea.get_potential_energy())
 ```
@@ -265,7 +265,7 @@ print(hea.get_potential_energy())
 - 基本胞への縮約 `to_primitive(atoms, symprec)` を追加した。`spglib.find_primitive` に kind 番号を原子種として渡すので占有の違うサイトは併合されない。縮約後の原子は「対応する入力原子の最小 index」順に並べる。
 - type 順は「原子の出現順」。ASE は CIF の `_atom_site` 順を保つが、pymatgen の慣用胞は電気陰性度順に並べ替えるため、cif 経路と type 順が一致しない構造がある（FeRh0.5Pt0.5、SmCo5）。type 順に依存する設定は type 名で決めること（`testscript_ase_spec.md` §3.2 の SmCo5 の例）。
 - 例外 `KKRStructureMismatchError` を `pyakaikkr.Error` に追加し、`check_kkr_output_structure(job, outfile, param)` を `pyakaikkr.ase.structure` に置いた（calculator とテストスクリプトの geom 検証で共用）。
-- `pyakaikkr` は編集可能インストール（`pip install -e library/PyAkaiKKR`）に切り替えた。
+- `pyakaikkr` は編集可能インストール（`pip install -e .`）に切り替えた。
 - pytest は `tests/ase/` に置いた。specx を使うテストは環境変数 `AKAIKKR_PROGRAM_PATH`（`akaikkr/specx` を含むディレクトリ）が無ければ skip する。
 
 - **type 順（追記）**: `rmt=0`（自動決定）のマフィンティン半径は type の並び順に依存する（FeB1.95 で Fe→B と B→Fe で Fe の rmt が 0.381 と 0.474、全エネルギーが 0.02 Ry 違った）。そのため `atoms_to_kkr_types` に `type_order` を追加し、既定を `"electronegativity"`（占有率加重の Pauling 電気陰性度の昇順、同点は出現順、Og などの NaN は最後）にした。これは pymatgen がサイトを並べる規則と同じで、cif 経路と type 順が一致する（consistency テストで順序一致も検査する）。`"appearance"` で出現順にできる。

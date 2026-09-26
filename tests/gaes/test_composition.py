@@ -6,7 +6,7 @@ import pytest
 from pyakaikkr import AkaikkrJob, GaesError
 from pyakaikkr.gaes import (SiteComposition, make_single_site_param, check_type_name, TYPE_NAME_MAX_LEN,
                             heakey_to_composition, composition_to_heakey)
-from gaes_env import legacy_dir, needs_run0
+from kkr_env import legacy_dir, needs_run0
 
 
 def test_from_type_name_and_back():
