@@ -2,20 +2,13 @@
 # Copyright (c) 2021-2026 AkaiKKRteam.
 # Distributed under the terms of the Apache License, Version 2.0.
 
+"""command line front end to the readers and plotters of pyakaikkr (``kkr-cmd``; formerly util/read_output/akaikkrCmd.py)."""
+
 from collections import OrderedDict
 import os
-import sys
-from typing import OrderedDict
 import click
 
-__verson__ = '2021.10.18'
-
-_path = os.path.split(os.path.split(__file__)[0])[0]
-sys.path.append(_path)
-print("temporary: add python path", _path)
-
-if "pyakaikkr" not in sys.modules:
-    from pyakaikkr import *
+from pyakaikkr import *  # noqa: F401,F403
 
 _OUTPUTPATH_HELP_ = "output directory"
 _PNG_HELP_ = "create png file"
@@ -419,5 +412,9 @@ def spc(filename, outputpath, klabelfile):
                  klabel_filename=klabelfile)
 
 
-if __name__ == '__main__':
+def main():
     cmd()
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyakaikkr"
+dynamic = ["version"]
+description = "Python utilities for AkaiKKR (specx): input cards, output parsing, runners, plots, GAES, an ASE calculator, and the regression test script"
+readme = "README.md"
+license = { text = "Apache-2.0" }
+authors = [{ name = "AkaiKKRteam" }]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "pymatgen>=2022.11.7",
+    "spglib>=1.16.1",
+    "scipy",
+    "seaborn",
+]
+
+[project.optional-dependencies]
+ase = ["ase>=3.23"]
+test = ["pytest"]
+cli = ["click"]
+analysis = ["scikit-learn"]
+
+[project.scripts]
+kkr-gaes = "pyakaikkr.gaes.cli:main"
+kkr-report = "pyakaikkr.report:main"
+kkr-cmd = "pyakaikkr.cmd:main"
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.dynamic]
+version = { attr = "pyakaikkr.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+"pyakaikkr.gaes" = ["data/*.csv"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["tests"]
+markers = [
+    "specx: runs the specx binary (needs AKAIKKR_PROGRAM_PATH)",
+]
