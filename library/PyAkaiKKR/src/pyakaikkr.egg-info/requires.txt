@@ -1,5 +1,0 @@
-pymatgen>=2022.11.7
-spglib>=1.16.1
-
-[ase]
-ase>=3.23
